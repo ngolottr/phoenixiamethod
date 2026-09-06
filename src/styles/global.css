@@ -939,6 +939,247 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
 }
 
 /* ===========================================================================
+   EL CONJURO — chispas al abrir una fotografía
+   Dorado de varita sobre el verde de la escena. Nace en el punto exacto
+   del clic y se apaga sola en poco más de un segundo.
+   =========================================================================== */
+
+.spell { position: fixed; z-index: 940; width: 0; height: 0; pointer-events: none; }
+
+.spell-flash {
+  position: absolute; left: 0; top: 0;
+  width: 220px; height: 220px; margin: -110px 0 0 -110px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 246, 214, .95) 0%, var(--laton) 22%, rgba(200, 160, 90, 0) 62%);
+  animation: spellFlash 620ms cubic-bezier(.15, .85, .3, 1) backwards;
+}
+@keyframes spellFlash {
+  0%   { transform: scale(.05); opacity: 1; }
+  35%  { opacity: .85; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+.spell-ring {
+  position: absolute; left: 0; top: 0;
+  width: 340px; height: 340px; margin: -170px 0 0 -170px; border-radius: 50%;
+  border: 1px solid var(--laton);
+  box-shadow: 0 0 30px rgba(200, 160, 90, .45), inset 0 0 26px rgba(200, 160, 90, .25);
+  animation: spellRing 900ms cubic-bezier(.12, .8, .25, 1) backwards;
+}
+.spell-ring.two {
+  width: 200px; height: 200px; margin: -100px 0 0 -100px;
+  border-color: var(--amb-accent);
+  box-shadow: 0 0 26px var(--amb-glow);
+  animation-delay: 120ms; animation-duration: 780ms;
+}
+@keyframes spellRing {
+  0%   { transform: scale(.08) rotate(0deg); opacity: .95; border-width: 3px; }
+  100% { transform: scale(1) rotate(140deg); opacity: 0; border-width: .5px; }
+}
+
+.spell-spark {
+  position: absolute; left: 0; top: 0;
+  width: var(--s); height: var(--s); border-radius: 50%;
+  background: var(--laton);
+  box-shadow: 0 0 8px 2px rgba(255, 236, 180, .75);
+  transform: rotate(var(--a)) translateX(0);
+  animation: spellSpark var(--dur) cubic-bezier(.1, .75, .2, 1) var(--delay) backwards;
+}
+/* Cada chispa viaja sobre su propio ángulo: el rotate se mantiene y solo
+   avanza la distancia, de ahí que el estallido salga radial y no en bloque. */
+@keyframes spellSpark {
+  0%   { transform: rotate(var(--a)) translateX(6px) scale(1.4); opacity: 1; }
+  70%  { opacity: .9; }
+  100% { transform: rotate(var(--a)) translateX(var(--d)) scale(.2); opacity: 0; }
+}
+
+html[data-motion='reduced'] .spell { display: none; }
+
+/* --- La lámina se materializa y se desliza --- */
+
+.lb-frame.is-conjuring { animation: conjurar 800ms cubic-bezier(.16, .9, .24, 1) backwards; }
+@keyframes conjurar {
+  0%   { opacity: 0; transform: scale(.72) rotate(-4deg); filter: blur(22px) brightness(2.4); }
+  55%  { opacity: 1; filter: blur(4px) brightness(1.35); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); filter: blur(0) brightness(1); }
+}
+
+/* Al cambiar de foto, la nueva entra barriendo desde el costado con estela */
+.lb-frame[data-dir='1']:not(.is-conjuring) { animation: deslizarDer 620ms cubic-bezier(.18, .9, .22, 1) backwards; }
+.lb-frame[data-dir='-1']:not(.is-conjuring) { animation: deslizarIzq 620ms cubic-bezier(.18, .9, .22, 1) backwards; }
+
+@keyframes deslizarDer {
+  0%   { opacity: 0; transform: translateX(16%) skewX(-5deg) scale(.94); filter: blur(14px) brightness(1.8); }
+  60%  { opacity: 1; filter: blur(3px) brightness(1.2); }
+  100% { opacity: 1; transform: translateX(0) skewX(0) scale(1); filter: blur(0) brightness(1); }
+}
+@keyframes deslizarIzq {
+  0%   { opacity: 0; transform: translateX(-16%) skewX(5deg) scale(.94); filter: blur(14px) brightness(1.8); }
+  60%  { opacity: 1; filter: blur(3px) brightness(1.2); }
+  100% { opacity: 1; transform: translateX(0) skewX(0) scale(1); filter: blur(0) brightness(1); }
+}
+
+html[data-motion='reduced'] .lb-frame { animation: none !important; }
+
+/* ===========================================================================
+   EL PANAL — llamada a la acción y vórtice hacia el formulario
+   =========================================================================== */
+
+.cta {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: clamp(18px, 3vw, 48px); flex-wrap: wrap;
+  margin-top: clamp(16px, 3vh, 34px);
+  padding-top: clamp(14px, 2.4vh, 26px);
+  border-top: 1px solid var(--linea);
+}
+.cta-kicker {
+  font-size: 10px; letter-spacing: .3em; text-transform: uppercase;
+  color: var(--amb-accent); margin-bottom: 8px;
+}
+.cta-line {
+  font-family: var(--serif); font-size: clamp(16px, 1.8vw, 24px);
+  line-height: 1.35; color: var(--hueso); max-width: 34ch;
+}
+
+/* El único botón de la página que respira solo */
+.cta-btn {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: inline-flex; align-items: center; gap: 18px;
+  padding: clamp(18px, 2.4vh, 26px) clamp(28px, 3.4vw, 46px);
+  border: 1px solid var(--amb-accent);
+  font-family: var(--sans); font-size: clamp(11px, 1.1vw, 13px);
+  letter-spacing: .3em; text-transform: uppercase; color: var(--amb-bg);
+  transition: transform .4s var(--ease), box-shadow .5s var(--ease);
+  box-shadow: 0 0 0 0 var(--amb-glow);
+  animation: ctaLatido 3.4s ease-in-out infinite;
+}
+.cta-btn-bg {
+  position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(110deg, var(--amb-accent) 0%, var(--laton) 52%, var(--amb-accent) 100%);
+  background-size: 260% 100%;
+  animation: ctaBrillo 4.5s linear infinite;
+}
+.cta-btn-arrow { transition: transform .45s var(--ease); font-size: 15px; }
+.cta-btn:hover, .cta-btn:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 60px -12px var(--amb-glow), 0 0 0 6px var(--amb-glow);
+}
+.cta-btn:hover .cta-btn-arrow { transform: translateX(8px); }
+.cta-btn:active { transform: translateY(0) scale(.98); }
+
+@keyframes ctaLatido {
+  0%, 100% { box-shadow: 0 0 0 0 var(--amb-glow); }
+  50%      { box-shadow: 0 0 0 12px rgba(0, 0, 0, 0); }
+}
+@keyframes ctaBrillo {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 260% 50%; }
+}
+html[data-motion='reduced'] .cta-btn,
+html[data-motion='reduced'] .cta-btn-bg { animation: none; }
+
+@media (max-width: 700px) {
+  .cta { flex-direction: column; align-items: stretch; }
+  .cta-btn { justify-content: center; }
+}
+
+/* --- El vórtice: diez planos de panal viniendo hacia el espectador --- */
+
+.vortex {
+  position: fixed; inset: 0; z-index: 850; pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, transparent 0%, var(--amb-bg) 78%);
+  animation: vortexFondo 1.25s ease-in forwards;
+  perspective: 620px;
+  overflow: hidden;
+}
+@keyframes vortexFondo {
+  0%   { opacity: 0; }
+  22%  { opacity: 1; }
+  82%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.vortex-tunnel {
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  display: grid; place-items: center;
+}
+
+/* Cada capa es una malla hexagonal que avanza desde el fondo girando */
+.vortex-layer {
+  position: absolute;
+  width: 190vmax; height: 190vmax;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='104' viewBox='0 0 60 104'%3E%3Cpath d='M30 0 L60 17.32 L60 51.96 L30 69.28 L0 51.96 L0 17.32 Z' fill='none' stroke='%232BE58F' stroke-width='2'/%3E%3C/svg%3E");
+  background-size: 68px 118px;
+  opacity: 0;
+  transform: translateZ(-2600px) rotate(0deg);
+  animation: vortexCapa 1.25s cubic-bezier(.42, 0, .78, 1) var(--delay) forwards;
+}
+@keyframes vortexCapa {
+  0%   { opacity: 0;   transform: translateZ(-2600px) rotate(0deg)   scale(.55); }
+  22%  { opacity: .75; }
+  70%  { opacity: .5; }
+  100% { opacity: 0;   transform: translateZ(700px)   rotate(190deg) scale(1.5); }
+}
+
+/* El corazón del panal: la luz al final del túnel */
+.vortex-core {
+  position: absolute; left: 50%; top: 50%;
+  width: 22vmin; height: 22vmin; margin: -11vmin 0 0 -11vmin; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, .95) 0%, var(--amb-accent) 30%, transparent 68%);
+  animation: vortexCorazon 1.25s cubic-bezier(.5, 0, .75, 1) forwards;
+}
+@keyframes vortexCorazon {
+  0%   { transform: scale(.02); opacity: .2; }
+  60%  { transform: scale(.5);  opacity: .85; }
+  100% { transform: scale(9);   opacity: 0; }
+}
+
+html[data-motion='reduced'] .vortex { display: none; }
+
+/* --- El formulario, ya dentro del panal --- */
+
+.hive {
+  position: fixed; inset: 0; z-index: 810;
+  background: color-mix(in srgb, var(--amb-bg) 94%, black);
+  display: grid; place-items: center;
+  padding: clamp(16px, 4vh, 44px) var(--edge);
+  animation: hiveIn .6s var(--ease) backwards;
+  overflow: hidden;
+}
+/* la textura de panal queda de fondo, apenas insinuada */
+.hive::before {
+  content: ''; position: absolute; inset: -10%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='104' viewBox='0 0 60 104'%3E%3Cpath d='M30 0 L60 17.32 L60 51.96 L30 69.28 L0 51.96 L0 17.32 Z' fill='none' stroke='%232BE58F' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 78px 135px;
+  opacity: .07;
+  animation: hivePan 40s linear infinite;
+}
+@keyframes hiveIn {
+  from { opacity: 0; transform: scale(1.06); filter: blur(10px); }
+}
+@keyframes hivePan {
+  to { transform: translate(-78px, -135px); }
+}
+html[data-motion='reduced'] .hive::before { animation: none; }
+
+.hive-inner {
+  position: relative; z-index: 2;
+  width: min(1080px, 100%); max-height: 100%;
+  display: flex; flex-direction: column; gap: clamp(16px, 3vh, 30px);
+  overflow-y: auto; overscroll-behavior: contain;
+}
+.hive-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+.hive-body {
+  display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1fr);
+  gap: clamp(22px, 4vw, 64px); align-items: start;
+}
+.hive-side { display: flex; flex-direction: column; gap: 10px; }
+
+@media (max-width: 860px) {
+  .hive-body { grid-template-columns: 1fr; }
+}
+
+/* ===========================================================================
    INTRO (primer impacto)
    =========================================================================== */
 

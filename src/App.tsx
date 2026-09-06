@@ -66,6 +66,13 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [navLocked, next, prev, home, go])
 
+  // Al cambiar de escena el color vuelve al de la marca: el tono de una
+  // fotografía no debe quedarse pegado en la escena siguiente.
+  const resetAmbient = ambient.reset
+  useEffect(() => {
+    resetAmbient()
+  }, [scene.id, resetAmbient])
+
   // Ningún gesto de scroll debe mover el documento
   useEffect(() => {
     const block = (e: Event) => e.preventDefault()
@@ -85,7 +92,7 @@ export default function App() {
       case 'destacados':
         return <Highlights onLockNav={setNavLocked} />
       case 'trabajo':
-        return <Work onContact={() => goTo('contacto')} />
+        return <Work onLockNav={setNavLocked} />
       case 'manifiesto':
         return <Manifesto />
       case 'contacto':

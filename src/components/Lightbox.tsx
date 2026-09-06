@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { SmartImage } from './SmartImage'
 import { MagneticButton } from './MagneticButton'
@@ -23,6 +23,21 @@ export function Lightbox({ shots, index, onClose, onPrev, onNext }: Props) {
   const opener = useRef<Element | null>(null)
   const { paint } = useAmbientApi()
   const shot = shots[index]
+
+  // Hacia dónde se desliza la lámina. En el salto del final al principio
+  // (17 → 0) la resta miente, así que ahí se invierte a mano.
+  const anterior = useRef(index)
+  const [dir, setDir] = useState<1 | -1>(1)
+  const [primera, setPrimera] = useState(true)
+
+  useEffect(() => {
+    if (index === anterior.current) return
+    const salto = index - anterior.current
+    const haciaAdelante = Math.abs(salto) > 1 ? salto < 0 : salto > 0
+    setDir(haciaAdelante ? 1 : -1)
+    setPrimera(false)
+    anterior.current = index
+  }, [index])
 
   // Cada cambio de foto repinta el ambiente
   useEffect(() => {
@@ -85,7 +100,11 @@ export function Lightbox({ shots, index, onClose, onPrev, onNext }: Props) {
       </div>
 
       <div className="lb-stage">
-        <div className="lb-frame" key={shot.src}>
+        <div
+          className={`lb-frame${primera ? ' is-conjuring' : ''}`}
+          data-dir={dir}
+          key={shot.src}
+        >
           <SmartImage src={shot.src} alt={shot.alt} priority />
           {/* la frase vive sobre la foto, no al costado */}
           <figcaption className="lb-over">

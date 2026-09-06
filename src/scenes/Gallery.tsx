@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import { SmartImage } from '../components/SmartImage'
 import { Lightbox } from '../components/Lightbox'
+import { Spell, useSpell } from '../components/Spell'
 import { useAmbientApi } from '../hooks/useAmbient'
 import { categories, gallery, type CategoryId } from '../data/site'
 
@@ -8,18 +9,24 @@ export function Gallery({ onLockNav }: { onLockNav: (locked: boolean) => void })
   const [filter, setFilter] = useState<CategoryId>('todo')
   const [open, setOpen] = useState<number | null>(null)
   const { paint, reset } = useAmbientApi()
+  const spell = useSpell()
 
   const shots = useMemo(
     () => (filter === 'todo' ? gallery : gallery.filter((s) => s.category === filter)),
     [filter],
   )
 
+  // El conjuro sale del punto exacto del clic; el visor entra 180 ms después,
+  // justo cuando las chispas ya se abrieron.
   const openAt = useCallback(
-    (i: number) => {
-      setOpen(i)
-      onLockNav(true)
+    (i: number, e: React.MouseEvent) => {
+      spell.cast(e)
+      window.setTimeout(() => {
+        setOpen(i)
+        onLockNav(true)
+      }, document.documentElement.dataset.motion === 'reduced' ? 0 : 180)
     },
-    [onLockNav],
+    [onLockNav, spell],
   )
 
   const close = useCallback(() => {
@@ -71,7 +78,7 @@ export function Gallery({ onLockNav }: { onLockNav: (locked: boolean) => void })
           <button
             key={shot.src}
             className="gal-item"
-            onClick={() => openAt(i)}
+            onClick={(e) => openAt(i, e)}
             // el color se adelanta al hover: la escena ya empieza a teñirse
             onMouseEnter={() => paint(shot.src)}
             onFocus={() => paint(shot.src)}
@@ -93,6 +100,8 @@ export function Gallery({ onLockNav }: { onLockNav: (locked: boolean) => void })
       <p className="gal-hint rise" data-d="3">
         Pasa el cursor y el sitio toma el color de la foto. Pulsa para verla completa.
       </p>
+
+      <Spell point={spell.point} onDone={spell.clear} />
 
       {open !== null && shots[open] && (
         <Lightbox
