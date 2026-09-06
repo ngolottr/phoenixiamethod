@@ -1,0 +1,91 @@
+/* ===========================================================================
+   PÁGINA DE RESERVA
+   Hereda la paleta y las tipografías del sitio, pero acá sí se permite scroll:
+   es una pantalla de trámite, no una escena.
+   =========================================================================== */
+
+html, body, #agenda { height: auto; overflow: auto; }
+body { background: var(--cripta); min-height: 100%; }
+
+.ag {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: clamp(36px, 8vh, 88px) clamp(20px, 5vw, 40px) clamp(48px, 10vh, 96px);
+  position: relative;
+  z-index: 2;
+}
+
+.ag-title { margin-top: 14px; white-space: pre-line; }
+.ag-intro { margin-top: 18px; max-width: 52ch; }
+
+/* Marcador mientras llegan los horarios */
+.ag-skeleton {
+  margin-top: 34px; height: 180px;
+  background: linear-gradient(110deg, var(--sepulcro) 0%, rgba(255,255,255,.05) 42%, var(--sepulcro) 78%);
+  background-size: 300% 100%;
+  animation: cargando 1.7s linear infinite;
+}
+
+/* --- Días: tira horizontal deslizable --- */
+
+.ag-dias {
+  display: flex; gap: 8px; margin-top: clamp(26px, 5vh, 44px);
+  overflow-x: auto; padding-bottom: 8px;
+  scrollbar-width: thin;
+}
+.ag-dias::-webkit-scrollbar { height: 3px; }
+.ag-dias::-webkit-scrollbar-thumb { background: var(--linea-fuerte); }
+
+.ag-dia {
+  flex: none; min-width: 96px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
+  padding: 13px 15px; border: 1px solid var(--linea);
+  transition: border-color .35s var(--ease), background .35s var(--ease);
+}
+.ag-dia-n { font-size: 9px; letter-spacing: .26em; text-transform: uppercase; color: var(--humo); }
+.ag-dia-f { font-family: var(--serif); font-size: 20px; color: var(--hueso); }
+.ag-dia-c { font-size: 9px; letter-spacing: .2em; color: var(--laton); }
+.ag-dia:hover { border-color: var(--linea-fuerte); }
+.ag-dia[aria-selected='true'] {
+  border-color: var(--veneno); background: rgba(43, 229, 143, .07);
+}
+.ag-dia[aria-selected='true'] .ag-dia-f { color: var(--veneno); }
+
+/* --- Horas --- */
+
+.ag-horas {
+  display: grid; gap: 8px; margin-top: 22px;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+}
+.ag-hora {
+  padding: 15px 8px; border: 1px solid var(--linea-fuerte);
+  font-family: var(--sans); font-size: 13px; letter-spacing: .16em; color: var(--hueso);
+  transition: all .3s var(--ease);
+}
+.ag-hora:hover { border-color: var(--veneno); color: var(--veneno); }
+.ag-hora.on {
+  background: var(--veneno); border-color: var(--veneno); color: var(--cripta);
+}
+
+/* --- Formulario --- */
+
+.ag-form {
+  margin-top: clamp(28px, 5vh, 46px);
+  padding-top: clamp(22px, 4vh, 34px);
+  border-top: 1px solid var(--linea);
+  animation: rise .6s var(--ease) backwards;
+}
+.ag-elegida {
+  font-family: var(--serif); font-size: clamp(17px, 2vw, 22px);
+  color: var(--humo); margin-bottom: 6px;
+}
+.ag-elegida strong { color: var(--veneno); font-weight: 400; }
+.ag-opt { color: var(--humo); letter-spacing: .1em; }
+
+.ag-cta { margin-top: 26px; }
+.ag-link { color: var(--veneno); text-decoration: underline; text-underline-offset: 3px; }
+
+@media (max-width: 520px) {
+  .ag-horas { grid-template-columns: repeat(3, 1fr); }
+  .ag-hora { padding: 14px 4px; font-size: 12px; }
+}

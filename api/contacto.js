@@ -24,8 +24,15 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i
 const LIMITES = { nombre: 80, email: 160, mensaje: 2000, presupuesto: 80 }
 
 const REMITENTE = { name: 'Nicolás Golott', email: 'contacto.nicolaspk@gmail.com' }
+const SITIO = process.env.SITIO_URL || 'https://elgolott.vercel.app'
 const HORARIO =
   'lunes a viernes desde las 20:30, sábados desde las 16:00 y domingos todo el día (hora de Chile)'
+
+/** Enlace a la página de reserva, con los datos ya rellenados. */
+function enlaceAgenda({ nombre, email }) {
+  const q = new URLSearchParams({ nombre, email })
+  return `${SITIO}/agendar.html?${q.toString()}`
+}
 
 function limpiar(valor, max) {
   return String(valor ?? '')
@@ -47,8 +54,9 @@ const primerNombre = (nombre) => nombre.split(/\s+/)[0]
 
 /* --- El correo que recibe la persona ------------------------------------- */
 
-function correoParaElCliente({ nombre, mensaje }) {
+function correoParaElCliente({ nombre, email, mensaje }) {
   const nom = primerNombre(nombre)
+  const agenda = enlaceAgenda({ nombre, email })
 
   const texto = `Hola, ${nom},
 
@@ -60,7 +68,11 @@ Para dimensionarlo bien necesito conversarlo contigo en vivo: por correo se pier
 
 El siguiente paso es una reunión de 30 minutos por videollamada.
 
-RESPONDE ESTE CORREO con dos o tres horarios que te acomoden y te mando la invitación al calendario con el enlace de la reunión.
+Elige tú mismo la hora que te acomode acá:
+
+${agenda}
+
+Ahí ves solo los horarios que tengo realmente libres. Eliges uno, confirmas, y te llega la invitación al calendario con el enlace de la reunión.
 
 Atiendo ${HORARIO}.
 
@@ -97,7 +109,10 @@ NeuraIA`
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #2BE58F;">
       <tr><td style="padding:20px 22px;">
         <p style="margin:0;font:400 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;color:#2BE58F;text-transform:uppercase;">Cómo seguimos</p>
-        <p style="margin:12px 0 0;font:400 16px/1.55 Helvetica,Arial,sans-serif;color:#EFE7D5;">Responde este correo con <strong>dos o tres horarios</strong> que te acomoden y te mando la invitación al calendario con el enlace de la reunión.</p>
+        <p style="margin:12px 0 0;font:400 16px/1.55 Helvetica,Arial,sans-serif;color:#EFE7D5;">Elige tú mismo la hora que te acomode. Verás solo los horarios que tengo <strong>realmente libres</strong>.</p>
+        <p style="margin:20px 0 6px;">
+          <a href="${agenda}" style="display:inline-block;background:#2BE58F;color:#040D0A;text-decoration:none;padding:16px 30px;font:400 12px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;">Elegir mi horario</a>
+        </p>
         <p style="margin:14px 0 0;font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#8FA79B;">Atiendo ${HORARIO}.</p>
       </td></tr>
     </table>
@@ -126,9 +141,11 @@ Presupuesto:  ${presupuesto || 'No indicado'}
 Qué necesita:
 ${mensaje}
 
-Ya se le pidió que responda con dos o tres horarios.
-Cuando lleguen, dile a Claude: "agenda con ${nombre} el <dia> a las <hora>"
-y queda el evento en tu Google Calendar con la invitación enviada.
+Ya se le envió el enlace para que elija su horario.
+Cuando reserve, el evento aparece solo en tu calendario NeuraIA · Clientes.
+
+Si prefieres agendarlo tú, dile a Claude:
+"agenda con ${nombre} el <dia> a las <hora>, correo ${email}"
 
 Responde directo a este mensaje para contestarle.`
 

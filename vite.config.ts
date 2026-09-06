@@ -12,5 +12,13 @@ export default defineConfig({
   build: {
     target: 'es2020',
     cssMinify: true,
+    rollupOptions: {
+      // Dos páginas independientes: el portfolio y la de reserva de hora.
+      // La de reserva no arrastra React, así carga en un parpadeo.
+      input: {
+        main: 'index.html',
+        agendar: 'agendar.html',
+      },
+    },
   },
 })
