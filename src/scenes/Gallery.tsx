@@ -98,7 +98,10 @@ export function Gallery({ onLockNav }: { onLockNav: (locked: boolean) => void })
       </div>
 
       <p className="gal-hint rise" data-d="3">
-        Pasa el cursor y el sitio toma el color de la foto. Pulsa para verla completa.
+        <span className="con-cursor">
+          Pasa el cursor y el sitio toma el color de la foto. Pulsa para verla completa.
+        </span>
+        <span className="con-dedo">Toca una foto: el sitio se tiñe con su color y se abre completa.</span>
       </p>
 
       <Spell point={spell.point} onDone={spell.clear} />

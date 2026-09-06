@@ -825,6 +825,13 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
   color: rgba(143, 167, 155, .6);
 }
 
+/* En un teléfono no hay cursor que pasar: la instrucción cambia sola */
+.con-dedo { display: none; }
+@media (pointer: coarse) {
+  .con-cursor { display: none; }
+  .con-dedo { display: inline; }
+}
+
 /* Bloque de texto tendido sobre la fotografía, al pie del cuadro */
 .lb-over {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
