@@ -394,13 +394,26 @@ export const contact = {
     'Este formulario funciona en local: valida y prepara el mensaje sin enviarlo a ningún servidor. Al confirmar se abre tu cliente de correo.',
 }
 
+/** Enlaces reales, tomados de elgolottlinks.carrd.co */
 export const socials: Social[] = [
-  { label: 'Instagram', handle: '@elgolott', url: 'https://instagram.com/elgolott' },
-  { label: 'TikTok', handle: '@elgolott', url: 'https://tiktok.com/@elgolott' },
-  { label: 'LinkedIn', handle: '/in/nicolas', url: 'https://linkedin.com/in/' },
-  { label: 'Twitch', handle: '/elgolott', url: 'https://twitch.tv/elgolott' },
-  { label: 'YouTube', handle: '/@elgolott', url: 'https://youtube.com/@elgolott' },
+  { label: 'Instagram', handle: '@elgolott', url: 'https://www.instagram.com/elgolott/' },
+  { label: 'TikTok', handle: '@elgolott', url: 'https://www.tiktok.com/@elgolott' },
+  { label: 'YouTube', handle: '@ElGolott', url: 'https://www.youtube.com/@ElGolott' },
+  { label: 'Twitch', handle: '/elgolott', url: 'https://www.twitch.tv/elgolott' },
+  { label: 'X', handle: '@elgolott', url: 'https://x.com/elgolott' },
+  { label: 'Discord', handle: 'Comunidad', url: 'https://discord.gg/GPzXhQ972' },
+  {
+    label: 'LinkedIn',
+    handle: 'Nicolás Golott Rojas',
+    url: 'https://www.linkedin.com/in/nicol%C3%A1s-golott-rojas-0248782a9/',
+  },
 ]
+
+/** Todos los enlaces en un solo lugar, para el acceso directo de "Sobre mí". */
+export const linkHub = {
+  label: 'Todos mis enlaces',
+  url: 'https://elgolottlinks.carrd.co/',
+}
 
 export const socialScene = {
   eyebrow: 'Señal',

@@ -87,13 +87,17 @@ export function Lightbox({ shots, index, onClose, onPrev, onNext }: Props) {
       <div className="lb-stage">
         <div className="lb-frame" key={shot.src}>
           <SmartImage src={shot.src} alt={shot.alt} priority />
+          {/* la frase vive sobre la foto, no al costado */}
+          <figcaption className="lb-over">
+            <span className="lb-over-t">{shot.caption}</span>
+            <span className="lb-over-n">{shot.note}</span>
+          </figcaption>
         </div>
       </div>
 
       <div className="lb-foot">
         <div className="lb-caption">
-          <div className="t">{shot.caption}</div>
-          <p className="lb-note">{shot.note}</p>
+          <span className="eyebrow">{shot.category}</span>
         </div>
         <div className="arrows">
           <MagneticButton className="btn icon" onClick={onPrev} aria-label="Imagen anterior">

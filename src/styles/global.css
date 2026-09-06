@@ -503,6 +503,22 @@ html[data-motion='reduced'] .rise { animation: none !important; opacity: 1; tran
     linear-gradient(90deg, rgba(4,13,10,.88) 0%, rgba(4,13,10,.28) 42%, rgba(4,13,10,.72) 100%),
     linear-gradient(180deg, rgba(4,13,10,.7) 0%, transparent 26%, transparent 62%, rgba(4,13,10,.92) 100%);
 }
+
+/* En pantalla ancha, una foto vertical recortada por el centro pierde justo lo
+   que importa: la figura entera. Por eso la imagen pasa a ocupar su propio
+   panel a la derecha y se muestra COMPLETA, sin recorte, con el texto al lado. */
+@media (min-width: 1100px) {
+  .home-media { left: auto; right: 0; width: 46vw; }
+  .home-media .img img { object-fit: contain; object-position: center bottom; }
+  /* funde el borde izquierdo de la foto con el fondo, sin línea de corte */
+  .home-media::after {
+    background:
+      linear-gradient(90deg, var(--amb-bg) 0%, rgba(4, 13, 10, 0) 26%),
+      linear-gradient(180deg, rgba(4, 13, 10, .55) 0%, transparent 20%);
+  }
+  .home-copy { padding-right: 50vw; }
+  .home-meta { right: auto; left: var(--edge); }
+}
 .home-copy {
   position: relative; z-index: 2; height: 100%;
   display: grid; align-content: center;
@@ -785,10 +801,23 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
   color: rgba(143, 167, 155, .6);
 }
 
-.lb-note {
+/* Bloque de texto tendido sobre la fotografía, al pie del cuadro */
+.lb-over {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: clamp(26px, 6vh, 60px) clamp(18px, 3vw, 34px) clamp(16px, 3vh, 28px);
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, .55) 45%, rgba(0, 0, 0, .88));
+  animation: rise .8s var(--ease) .25s backwards;
+}
+.lb-over-t {
+  font-family: var(--serif); font-size: clamp(22px, 3vw, 40px);
+  line-height: 1; letter-spacing: -.02em; color: var(--hueso);
+}
+.lb-over-n {
   font-family: var(--serif); font-style: italic;
-  font-size: clamp(13px, 1.3vw, 17px); line-height: 1.5;
-  color: var(--humo); margin-top: 8px; max-width: 46ch;
+  font-size: clamp(13px, 1.4vw, 19px); line-height: 1.45;
+  color: rgba(239, 231, 213, .82); max-width: 40ch;
+  text-wrap: balance;
 }
 
 /* ===========================================================================
@@ -808,29 +837,32 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
 }
 
 .hl-card {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
-  padding: clamp(14px, 1.8vw, 24px); text-align: left;
+  display: flex; flex-direction: column; align-items: stretch; gap: 12px;
+  padding: clamp(10px, 1.2vw, 16px); text-align: left;
   border: 1px solid var(--linea); min-height: 0;
-  transition: border-color .5s var(--ease), transform .5s var(--ease), background .5s var(--ease);
+  transition: border-color .5s var(--ease), background .5s var(--ease);
 }
 .hl-card:hover, .hl-card:focus-visible {
   border-color: var(--amb-accent); transform: translateY(-6px);
   background: rgba(255, 255, 255, .025);
 }
 
-/* El anillo de Instagram, pero en la clave del sitio */
+/* Lámina 16:9 con el borde vivo de Instagram. La portada es vertical, así que
+   se encuadra por la parte alta, donde suele estar el sujeto. */
 .hl-ring {
   position: relative; display: block;
-  width: clamp(64px, 7vw, 104px); aspect-ratio: 1;
-  border-radius: 50%; padding: 3px; flex: none;
-  background: conic-gradient(from 210deg, var(--amb-accent), var(--laton), var(--amb-accent));
-  transition: transform .6s var(--ease);
+  width: 100%; aspect-ratio: 16 / 9;
+  padding: 2px; flex: none;
+  background: linear-gradient(135deg, var(--amb-accent), var(--laton) 55%, var(--amb-accent));
+  transition: transform .6s var(--ease), box-shadow .6s var(--ease);
 }
-.hl-card:hover .hl-ring { transform: scale(1.06) rotate(-3deg); }
-.hl-ring .img {
-  width: 100%; height: 100%; border-radius: 50%;
-  border: 2px solid var(--amb-bg); overflow: hidden;
+.hl-card:hover .hl-ring, .hl-card:focus-visible .hl-ring {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 26px 60px rgba(0, 0, 0, .7);
 }
+/* En posición absoluta la foto no puede estirar la lámina: manda el 16:9 */
+.hl-ring .img { position: absolute; inset: 2px; overflow: hidden; }
+.hl-ring .img img { object-position: center 22%; }
 
 .hl-meta { display: flex; flex-direction: column; gap: 5px; }
 .hl-kind { font-size: 8px; letter-spacing: .3em; text-transform: uppercase; color: var(--laton); }
