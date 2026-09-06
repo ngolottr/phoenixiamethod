@@ -28,13 +28,27 @@ const base64url = (buf) =>
   Buffer.from(buf).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
 
 /**
- * Las claves privadas se pegan en Vercel con los saltos de línea escapados.
- * Esto las devuelve a su forma original para que crypto las acepte.
+ * Reconstruye la clave privada.
+ *
+ * Al pegar una clave en un panel web pasa de todo: los saltos de línea se
+ * convierten en la secuencia \n literal, o en espacios, o desaparecen. Como
+ * cualquiera de esos casos hace que la criptografía la rechace, acá se
+ * descarta el formato que venga y se rearma el PEM desde cero: se toma solo el
+ * contenido, se le quita todo el espacio en blanco y se parte en líneas de 64
+ * caracteres, que es como exige el estándar.
  */
 function normalizarClave(clave) {
-  return String(clave || '')
-    .replace(/\\n/g, '\n')
-    .trim()
+  let texto = String(clave || '').trim()
+  texto = texto.replace(/^["']|["']$/g, '') // por si vino entre comillas
+  texto = texto.replace(/\\n/g, '\n')
+
+  const partes = texto.match(/-----BEGIN ([A-Z ]+)-----([\s\S]*?)-----END \1-----/)
+  if (!partes) return texto // no parece un PEM: se devuelve tal cual y que falle con su propio error
+
+  const tipo = partes[1]
+  const cuerpo = partes[2].replace(/\s+/g, '')
+  const lineas = cuerpo.match(/.{1,64}/g) || []
+  return `-----BEGIN ${tipo}-----\n${lineas.join('\n')}\n-----END ${tipo}-----\n`
 }
 
 let cache = { token: null, expira: 0 }
