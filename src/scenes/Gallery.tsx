@@ -1,0 +1,108 @@
+import { useCallback, useMemo, useState } from 'react'
+import { SmartImage } from '../components/SmartImage'
+import { Lightbox } from '../components/Lightbox'
+import { useAmbientApi } from '../hooks/useAmbient'
+import { categories, gallery, type CategoryId } from '../data/site'
+
+export function Gallery({ onLockNav }: { onLockNav: (locked: boolean) => void }) {
+  const [filter, setFilter] = useState<CategoryId>('todo')
+  const [open, setOpen] = useState<number | null>(null)
+  const { paint, reset } = useAmbientApi()
+
+  const shots = useMemo(
+    () => (filter === 'todo' ? gallery : gallery.filter((s) => s.category === filter)),
+    [filter],
+  )
+
+  const openAt = useCallback(
+    (i: number) => {
+      setOpen(i)
+      onLockNav(true)
+    },
+    [onLockNav],
+  )
+
+  const close = useCallback(() => {
+    setOpen(null)
+    onLockNav(false)
+    reset()
+  }, [onLockNav, reset])
+
+  const step = useCallback(
+    (delta: number) => setOpen((i) => (i === null ? null : (i + delta + shots.length) % shots.length)),
+    [shots.length],
+  )
+
+  const changeFilter = (id: CategoryId) => {
+    setFilter(id)
+    setOpen(null)
+    reset()
+  }
+
+  return (
+    <section className="scene" aria-labelledby="gal-title">
+      <div className="gal-head rise" data-d="1">
+        <div>
+          <p className="eyebrow">Galería</p>
+          <h2 id="gal-title" className="display h-md" style={{ marginTop: 12 }}>
+            Fotogramas.
+          </h2>
+        </div>
+
+        <div className="filters" role="group" aria-label="Filtrar por categoría">
+          {categories.map((c) => (
+            <button
+              key={c.id}
+              className="filter"
+              aria-pressed={filter === c.id}
+              onClick={() => changeFilter(c.id)}
+            >
+              {c.label}
+              <span className="filter-n">
+                {c.id === 'todo' ? gallery.length : gallery.filter((s) => s.category === c.id).length}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="gal-strip rise" data-d="2" key={filter}>
+        {shots.map((shot, i) => (
+          <button
+            key={shot.src}
+            className="gal-item"
+            onClick={() => openAt(i)}
+            // el color se adelanta al hover: la escena ya empieza a teñirse
+            onMouseEnter={() => paint(shot.src)}
+            onFocus={() => paint(shot.src)}
+            onMouseLeave={() => open === null && reset()}
+            onBlur={() => open === null && reset()}
+            aria-label={`Ampliar: ${shot.caption}. ${shot.note}`}
+          >
+            <SmartImage src={shot.src} alt={shot.alt} />
+            <span className="gal-cap">
+              <span className="t">{shot.caption}</span>
+              <span className="y">
+                {(i + 1).toString().padStart(2, '0')} — {shot.category}
+              </span>
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <p className="gal-hint rise" data-d="3">
+        Pasa el cursor y el sitio toma el color de la foto. Pulsa para verla completa.
+      </p>
+
+      {open !== null && shots[open] && (
+        <Lightbox
+          shots={shots}
+          index={open}
+          onClose={close}
+          onPrev={() => step(-1)}
+          onNext={() => step(1)}
+        />
+      )}
+    </section>
+  )
+}
