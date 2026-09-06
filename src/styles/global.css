@@ -754,11 +754,36 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
   display: block; font-size: 9px; letter-spacing: .3em; text-transform: uppercase;
   color: var(--humo); margin-bottom: 8px; transition: color .3s;
 }
-.field input, .field textarea {
+.field input, .field textarea, .field select {
   width: 100%; background: transparent; border: 0;
   border-bottom: 1px solid var(--linea-fuerte);
   padding: 8px 0; font-family: var(--sans); font-size: 14px; color: var(--hueso);
   transition: border-color .4s var(--ease);
+}
+/* El desplegable nativo se pinta solo en cada sistema: lo alineamos al resto */
+.field select {
+  appearance: none; cursor: pointer; border-radius: 0;
+  background-image: linear-gradient(45deg, transparent 50%, var(--humo) 50%),
+                    linear-gradient(135deg, var(--humo) 50%, transparent 50%);
+  background-position: right 8px center, right 3px center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 22px;
+}
+.field select:focus { outline: none; border-bottom-color: var(--amb-accent); }
+.field select option { background: #0C1A14; color: var(--hueso); }
+
+.link-inline {
+  color: var(--amb-accent); text-decoration: underline;
+  text-underline-offset: 3px; font-size: inherit; padding: 0;
+}
+
+/* Pantalla de confirmación, en lugar del formulario */
+.form-done { animation: rise .7s var(--ease) backwards; }
+.form-done-t {
+  font-family: var(--serif); white-space: pre-line;
+  font-size: clamp(24px, 3vw, 40px); line-height: 1.05;
+  letter-spacing: -.02em; color: var(--hueso); margin-top: 12px;
 }
 .field textarea { resize: none; min-height: clamp(60px, 12vh, 110px); line-height: 1.6; }
 .field input::placeholder, .field textarea::placeholder { color: rgba(143,167,155,.35); }

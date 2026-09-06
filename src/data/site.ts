@@ -390,8 +390,21 @@ export const contact = {
     'Colaboraciones, dirección creativa, consultoría de IA o simplemente una idea que no te deja dormir.',
   copyLabel: 'Copiar email',
   copiedLabel: 'Copiado',
-  formNote:
-    'Este formulario funciona en local: valida y prepara el mensaje sin enviarlo a ningún servidor. Al confirmar se abre tu cliente de correo.',
+  formNote: 'Te llega un correo con el siguiente paso: agendar 30 minutos por Zoom.',
+}
+
+/** Opciones del desplegable de presupuesto. La primera es el marcador vacío. */
+export const presupuestos = [
+  'Prefiero conversarlo',
+  'Menos de $3.000.000',
+  'Entre $3.000.000 y $10.000.000',
+  'Más de $10.000.000',
+]
+
+/** Franjas en que Nicolás atiende reuniones, en hora de Chile. */
+export const disponibilidad = {
+  resumen: 'Lunes a viernes desde las 20:30 · Sábados desde las 16:00 · Domingos todo el día',
+  agenda: 'https://cal.com/nicolas-golott-rojas-cnierq/30min?overlayCalendar=true',
 }
 
 /** Enlaces reales, tomados de elgolottlinks.carrd.co */

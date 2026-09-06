@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { MagneticButton } from './MagneticButton'
-import { brand, contact } from '../data/site'
+import { brand, contact, presupuestos } from '../data/site'
 
-type Values = { name: string; email: string; message: string }
+type Values = { name: string; email: string; budget: string; message: string }
 type Errors = Partial<Record<keyof Values, string>>
+type Estado = 'listo' | 'enviando' | 'enviado' | 'error'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i
 
@@ -16,22 +17,26 @@ function validate(v: Values): Errors {
 }
 
 /**
- * Formulario local: valida en el navegador y, al confirmar, arma un mailto con
- * los datos. No hay backend ni se envía nada a ningún servidor.
- * Se usa tanto en la escena de Contacto como dentro del panal de Trabajo.
+ * Formulario de contacto. Valida en el navegador y envía la solicitud a
+ * /api/contacto, que la reenvía al flujo de n8n: ahí se redacta el correo de
+ * respuesta con la propuesta de reunión y se guarda el contacto en la planilla.
+ *
+ * Si el envío falla, no se pierde nada: se ofrece abrir el correo a mano.
  */
 export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
-  const [values, setValues] = useState<Values>({ name: '', email: '', message: '' })
+  const [values, setValues] = useState<Values>({ name: '', email: '', budget: '', message: '' })
   const [errors, setErrors] = useState<Errors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
-  const [sent, setSent] = useState(false)
+  const [estado, setEstado] = useState<Estado>('listo')
+  const [trampa, setTrampa] = useState('')
 
   const set =
-    (key: keyof Values) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (key: keyof Values) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       const next = { ...values, [key]: e.target.value }
       setValues(next)
       if (touched[key]) setErrors(validate(next))
-      if (sent) setSent(false)
+      if (estado === 'error') setEstado('listo')
     }
 
   const blur = (key: keyof Values) => () => {
@@ -39,23 +44,64 @@ export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
     setErrors(validate(values))
   }
 
-  const onSubmit = (e: FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     e.preventDefault()
     const found = validate(values)
     setErrors(found)
     setTouched({ name: true, email: true, message: true })
     if (Object.keys(found).length > 0) return
-    setSent(true)
+
+    setEstado('enviando')
+    try {
+      const r = await fetch('/api/contacto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nombre: values.name.trim(),
+          email: values.email.trim(),
+          presupuesto: values.budget,
+          mensaje: values.message.trim(),
+          web: trampa,
+        }),
+      })
+      setEstado(r.ok ? 'enviado' : 'error')
+    } catch {
+      setEstado('error')
+    }
   }
 
   const mailto = () => {
     const subject = encodeURIComponent(`Contacto desde el portfolio — ${values.name}`)
-    const body = encodeURIComponent(`${values.message}\n\n—\n${values.name}\n${values.email}`)
+    const body = encodeURIComponent(
+      `${values.message}\n\nPresupuesto: ${values.budget || 'No indicado'}\n\n—\n${values.name}\n${values.email}`,
+    )
     window.location.href = `mailto:${brand.email}?subject=${subject}&body=${body}`
   }
 
   const err = (k: keyof Values) => (touched[k] ? errors[k] : undefined)
   const id = (k: string) => `${idPrefix}-${k}`
+
+  /* --- Confirmación: lo que la persona ve al enviar --- */
+  if (estado === 'enviado') {
+    return (
+      <div className="form-done" role="status">
+        <p className="eyebrow">Solicitud recibida</p>
+        <p className="form-done-t">
+          Gracias, {values.name.split(' ')[0]}.
+          {'\n'}
+          Revisa tu correo.
+        </p>
+        <p className="body" style={{ marginTop: 14 }}>
+          En un momento te llega un mensaje con el siguiente paso: agendar una reunión de 30 minutos
+          por Zoom para conversar tu proyecto. Si no lo ves, mira en spam.
+        </p>
+        <p className="form-note" style={{ marginTop: 16 }}>
+          Atiendo de lunes a viernes desde las 20:30, sábados desde las 16:00 y domingos todo el día
+          (hora de Chile).
+        </p>
+      </div>
+    )
+  }
 
   return (
     <form className="form" onSubmit={onSubmit} noValidate>
@@ -100,15 +146,26 @@ export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
         )}
       </div>
 
+      <div className="field">
+        <label htmlFor={id('budget')}>Presupuesto estimado</label>
+        <select id={id('budget')} name="budget" value={values.budget} onChange={set('budget')}>
+          {presupuestos.map((p) => (
+            <option key={p} value={p === presupuestos[0] ? '' : p}>
+              {p}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="field" data-invalid={!!err('message')}>
-        <label htmlFor={id('msg')}>Mensaje</label>
+        <label htmlFor={id('msg')}>Qué necesitas</label>
         <textarea
           id={id('msg')}
           name="message"
           value={values.message}
           onChange={set('message')}
           onBlur={blur('message')}
-          placeholder="Qué tienes en mente"
+          placeholder="Cuéntame el problema que quieres resolver"
           aria-invalid={!!err('message')}
           aria-describedby={err('message') ? id('e-msg') : undefined}
         />
@@ -119,23 +176,32 @@ export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
         )}
       </div>
 
+      {/* Trampa para robots: fuera de la vista y fuera del recorrido del teclado */}
+      <input
+        type="text"
+        className="sr-only"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        value={trampa}
+        onChange={(e) => setTrampa(e.target.value)}
+      />
+
       <div className="form-foot">
-        {!sent ? (
-          <>
-            <MagneticButton type="submit" className="btn">
-              Revisar mensaje <span className="arrow">→</span>
-            </MagneticButton>
-            <p className="form-note">{contact.formNote}</p>
-          </>
+        <MagneticButton type="submit" className="btn solid" disabled={estado === 'enviando'}>
+          {estado === 'enviando' ? 'Enviando…' : 'Enviar solicitud'} <span className="arrow">→</span>
+        </MagneticButton>
+
+        {estado === 'error' ? (
+          <p className="field-error" role="alert" style={{ maxWidth: '34ch' }}>
+            No se pudo enviar.{' '}
+            <button type="button" className="link-inline" onClick={mailto}>
+              Ábrelo en tu correo
+            </button>{' '}
+            y te respondo igual.
+          </p>
         ) : (
-          <>
-            <MagneticButton type="button" className="btn solid" onClick={mailto}>
-              Abrir en tu correo <span className="arrow">→</span>
-            </MagneticButton>
-            <p className="form-ok" role="status">
-              ✓ Todo correcto — listo para enviar
-            </p>
-          </>
+          <p className="form-note">{contact.formNote}</p>
         )}
       </div>
     </form>
