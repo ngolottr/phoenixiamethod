@@ -3,12 +3,6 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "crons": [
-    {
-      "path": "/api/publicar",
-      "schedule": "0 13 9 9 *"
-    }
-  ],
   "headers": [
     {
       "source": "/images/(.*)",
