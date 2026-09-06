@@ -20,7 +20,11 @@ export function SmartImage({ src, alt, tone = 'emerald', priority = false, zoom 
   const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading')
 
   return (
-    <div className={`img${zoom ? ' zoom' : ''}${className ? ` ${className}` : ''}`}>
+    <div
+      className={`img${zoom ? ' zoom' : ''}${status === 'ok' ? ' is-ready' : ''}${
+        className ? ` ${className}` : ''
+      }`}
+    >
       {status !== 'error' && (
         <img
           src={src}
