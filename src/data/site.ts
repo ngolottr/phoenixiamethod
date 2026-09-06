@@ -404,7 +404,6 @@ export const presupuestos = [
 /** Franjas en que Nicolás atiende reuniones, en hora de Chile. */
 export const disponibilidad = {
   resumen: 'Lunes a viernes desde las 20:30 · Sábados desde las 16:00 · Domingos todo el día',
-  agenda: 'https://cal.com/nicolas-golott-rojas-cnierq/30min?overlayCalendar=true',
 }
 
 /** Enlaces reales, tomados de elgolottlinks.carrd.co */

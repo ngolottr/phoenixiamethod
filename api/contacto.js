@@ -24,7 +24,6 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i
 const LIMITES = { nombre: 80, email: 160, mensaje: 2000, presupuesto: 80 }
 
 const REMITENTE = { name: 'Nicolás Golott', email: 'contacto.nicolaspk@gmail.com' }
-const AGENDA = 'https://cal.com/nicolas-golott-rojas-cnierq/30min?overlayCalendar=true'
 const HORARIO =
   'lunes a viernes desde las 20:30, sábados desde las 16:00 y domingos todo el día (hora de Chile)'
 
@@ -59,9 +58,9 @@ Gracias por escribir. Leí tu solicitud y esto fue lo que me llegó:
 
 Para dimensionarlo bien necesito conversarlo contigo en vivo: por correo se pierde justo lo que importa, que es entender cómo funciona hoy tu operación antes de proponer nada.
 
-El siguiente paso es una reunión de 30 minutos por Zoom. Puedes elegir el horario que te acomode acá:
+El siguiente paso es una reunión de 30 minutos por videollamada.
 
-${AGENDA}
+RESPONDE ESTE CORREO con dos o tres horarios que te acomoden y te mando la invitación al calendario con el enlace de la reunión.
 
 Atiendo ${HORARIO}.
 
@@ -92,13 +91,16 @@ NeuraIA`
   </td></tr>
   <tr><td style="padding:20px 32px 0;">
     <p style="margin:0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#B9C9C0;">Para dimensionarlo bien necesito conversarlo contigo en vivo: por correo se pierde justo lo que importa, que es entender cómo funciona hoy tu operación antes de proponer nada.</p>
-    <p style="margin:14px 0 0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#B9C9C0;">El siguiente paso es una reunión de <strong style="color:#EFE7D5;">30 minutos por Zoom</strong>. Elige el horario que te acomode:</p>
+    <p style="margin:14px 0 0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#B9C9C0;">El siguiente paso es una reunión de <strong style="color:#EFE7D5;">30 minutos por videollamada</strong>.</p>
   </td></tr>
-  <tr><td style="padding:26px 32px 0;">
-    <a href="${AGENDA}" style="display:inline-block;background:#2BE58F;color:#040D0A;text-decoration:none;padding:16px 30px;font:400 12px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;">Agendar los 30 minutos</a>
-  </td></tr>
-  <tr><td style="padding:22px 32px 0;">
-    <p style="margin:0;font:400 12px/1.7 Helvetica,Arial,sans-serif;color:#8FA79B;">Atiendo ${HORARIO}.</p>
+  <tr><td style="padding:24px 32px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #2BE58F;">
+      <tr><td style="padding:20px 22px;">
+        <p style="margin:0;font:400 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;color:#2BE58F;text-transform:uppercase;">Cómo seguimos</p>
+        <p style="margin:12px 0 0;font:400 16px/1.55 Helvetica,Arial,sans-serif;color:#EFE7D5;">Responde este correo con <strong>dos o tres horarios</strong> que te acomoden y te mando la invitación al calendario con el enlace de la reunión.</p>
+        <p style="margin:14px 0 0;font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#8FA79B;">Atiendo ${HORARIO}.</p>
+      </td></tr>
+    </table>
   </td></tr>
   <tr><td style="padding:26px 32px 32px;">
     <p style="margin:0;padding-top:20px;border-top:1px solid rgba(239,231,213,.12);font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#8FA79B;">
@@ -124,7 +126,10 @@ Presupuesto:  ${presupuesto || 'No indicado'}
 Qué necesita:
 ${mensaje}
 
-Ya se le envió el correo con el enlace de agenda.
+Ya se le pidió que responda con dos o tres horarios.
+Cuando lleguen, dile a Claude: "agenda con ${nombre} el <dia> a las <hora>"
+y queda el evento en tu Google Calendar con la invitación enviada.
+
 Responde directo a este mensaje para contestarle.`
 
   return { texto, html: `<pre style="font:14px/1.6 monospace;color:#111;">${escapar(texto)}</pre>` }
