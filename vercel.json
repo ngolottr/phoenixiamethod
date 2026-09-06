@@ -6,7 +6,6 @@
   "crons": [
     {
       "path": "/api/publicar",
-      "comment": "Lanzamiento: 9 de septiembre, 10:00 en Santiago = 13:00 UTC",
       "schedule": "0 13 9 9 *"
     }
   ],
