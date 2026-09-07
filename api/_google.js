@@ -1,9 +1,9 @@
 /* ============================================================================
    ACCESO A GOOGLE CALENDAR DESDE EL SERVIDOR
    ----------------------------------------------------------------------------
-   La web necesita leer tu agenda y crear eventos por su cuenta, sin ti delante.
-   Para eso Google usa una "cuenta de servicio": un usuario robot que tú
-   autorizas una vez compartiéndole el calendario.
+   La web necesita leer la agenda y crear eventos por su cuenta, sin nadie
+   delante. Para eso Google usa una "cuenta de servicio": un usuario robot que
+   se autoriza una vez compartiéndole el calendario.
 
    Acá se firma a mano el token que Google pide, usando el módulo de criptografía
    que ya trae Node. Así no hace falta instalar ninguna librería de Google.
@@ -16,6 +16,7 @@
      CALENDAR_ID            el calendario donde se agenda
      CALENDARIOS_OCUPACION  (opcional) otros calendarios a revisar para no
                             pisar compromisos, separados por coma
+     ENLACE_REUNION         (opcional) enlace fijo de videollamada
    ========================================================================== */
 
 import crypto from 'node:crypto'
@@ -28,12 +29,27 @@ const base64url = (buf) =>
   Buffer.from(buf).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
 
 /**
+ * Lee una variable de entorno y le quita la basura invisible.
+ *
+ * Al pegar valores en paneles web o al pasarlos por una terminal se cuelan
+ * marcas de orden de bytes y espacios de ancho cero. No se ven, pero convierten
+ * una URL válida en una rota y un identificador de calendario en uno que no
+ * existe. Se escriben como escapes (​…﻿) y no como los caracteres en
+ * sí, justamente porque son invisibles y cualquier editor podría comérselos.
+ */
+export function env(nombre, porDefecto = '') {
+  return String(process.env[nombre] ?? porDefecto)
+    .replace(/[​-‍﻿]/g, '')
+    .trim()
+}
+
+/**
  * Reconstruye la clave privada.
  *
  * Al pegar una clave en un panel web pasa de todo: los saltos de línea se
  * convierten en la secuencia \n literal, o en espacios, o desaparecen. Como
- * cualquiera de esos casos hace que la criptografía la rechace, acá se
- * descarta el formato que venga y se rearma el PEM desde cero: se toma solo el
+ * cualquiera de esos casos hace que la criptografía la rechace, acá se descarta
+ * el formato que venga y se rearma el PEM desde cero: se toma solo el
  * contenido, se le quita todo el espacio en blanco y se parte en líneas de 64
  * caracteres, que es como exige el estándar.
  */
@@ -43,7 +59,7 @@ function normalizarClave(clave) {
   texto = texto.replace(/\\n/g, '\n')
 
   const partes = texto.match(/-----BEGIN ([A-Z ]+)-----([\s\S]*?)-----END \1-----/)
-  if (!partes) return texto // no parece un PEM: se devuelve tal cual y que falle con su propio error
+  if (!partes) return texto // no parece un PEM: que falle con su propio error
 
   const tipo = partes[1]
   const cuerpo = partes[2].replace(/\s+/g, '')
@@ -58,8 +74,8 @@ export async function tokenDeGoogle() {
   const ahora = Math.floor(Date.now() / 1000)
   if (cache.token && cache.expira > ahora + 60) return cache.token
 
-  const email = process.env.GOOGLE_SA_EMAIL
-  const clave = normalizarClave(process.env.GOOGLE_SA_PRIVATE_KEY)
+  const email = env('GOOGLE_SA_EMAIL')
+  const clave = normalizarClave(env('GOOGLE_SA_PRIVATE_KEY'))
   if (!email || !clave) throw new Error('Faltan GOOGLE_SA_EMAIL o GOOGLE_SA_PRIVATE_KEY')
 
   const cabecera = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))
@@ -97,8 +113,8 @@ export async function tokenDeGoogle() {
 /** Devuelve los tramos ocupados de todos los calendarios que hay que respetar. */
 export async function tramosOcupados({ desde, hasta }) {
   const token = await tokenDeGoogle()
-  const principal = process.env.CALENDAR_ID
-  const otros = (process.env.CALENDARIOS_OCUPACION || '')
+  const principal = env('CALENDAR_ID')
+  const otros = env('CALENDARIOS_OCUPACION')
     .split(',')
     .map((c) => c.trim())
     .filter(Boolean)
@@ -130,7 +146,7 @@ export async function tramosOcupados({ desde, hasta }) {
 }
 
 /**
- * Crea el evento en el calendario de Nicolás.
+ * Crea el evento en el calendario de clientes.
  *
  * Importante: NO se agregan asistentes. Google prohíbe que una cuenta de
  * servicio invite a nadie salvo que la cuenta sea de Google Workspace de pago
@@ -139,12 +155,12 @@ export async function tramosOcupados({ desde, hasta }) {
  */
 export async function crearEvento({ resumen, descripcion, inicioISO, finISO }) {
   const token = await tokenDeGoogle()
-  const calendario = encodeURIComponent(process.env.CALENDAR_ID)
-  const enlaceFijo = process.env.ENLACE_REUNION || ''
+  const calendario = encodeURIComponent(env('CALENDAR_ID'))
+  const enlaceFijo = env('ENLACE_REUNION')
 
   const cuerpo = {
     summary: resumen,
-    description: descripcion,
+    description: enlaceFijo ? `${descripcion}\n\nEnlace: ${enlaceFijo}` : descripcion,
     start: { dateTime: inicioISO, timeZone: 'America/Santiago' },
     end: { dateTime: finISO, timeZone: 'America/Santiago' },
     reminders: {
