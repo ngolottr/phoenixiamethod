@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { SmartImage } from '../components/SmartImage'
 import { VideoLoop } from '../components/VideoLoop'
@@ -10,6 +10,18 @@ import { highlights, highlightsScene, type Highlight } from '../data/site'
    Visor de historias: barras segmentadas arriba, imagen al centro, frase abajo.
    Cada imagen tiñe el sitio entero con su color dominante.
    -------------------------------------------------------------------------- */
+
+/** Cuánto se queda una foto en pantalla antes de pasar sola, como en la app. */
+const FOTO_MS = 6000
+
+type Pieza = { src: string; tipo: 'video' | 'foto' }
+
+/** Los videos van primero: al abrir la colección, lo primero que corre es movimiento. */
+function armarPiezas(set: Highlight): Pieza[] {
+  const videos = (set.videos ?? []).map((src) => ({ src, tipo: 'video' as const }))
+  const fotos = set.items.map((src) => ({ src, tipo: 'foto' as const }))
+  return [...videos, ...fotos]
+}
 
 function StoryViewer({
   set,
@@ -23,10 +35,12 @@ function StoryViewer({
   const [i, setI] = useState(start)
   const ref = useRef<HTMLDivElement>(null)
   const opener = useRef<Element | null>(null)
+  const video = useRef<HTMLVideoElement>(null)
   const { paint } = useAmbientApi()
 
-  const total = set.items.length
-  const src = set.items[i]
+  const piezas = useMemo(() => armarPiezas(set), [set])
+  const total = piezas.length
+  const pieza = piezas[i]
   const note = set.notes[i % set.notes.length]
 
   const step = useCallback(
@@ -34,9 +48,30 @@ function StoryViewer({
     [total],
   )
 
+  // El color sale siempre de una foto: de un video no se puede muestrear
+  // sin cargarlo entero, así que los videos toman el tono de la portada.
   useEffect(() => {
-    paint(src)
-  }, [src, paint])
+    paint(pieza.tipo === 'foto' ? pieza.src : set.items[0])
+  }, [pieza, set.items, paint])
+
+  // Las fotos pasan solas a los 6 segundos; los videos, cuando terminan
+  useEffect(() => {
+    if (pieza.tipo !== 'foto') return
+    if (document.documentElement.dataset.motion === 'reduced') return
+    const t = window.setTimeout(() => {
+      setI((v) => (v + 1 < total ? v + 1 : v))
+    }, FOTO_MS)
+    return () => window.clearTimeout(t)
+  }, [pieza, i, total])
+
+  // Cada video arranca solo al entrar
+  useEffect(() => {
+    if (pieza.tipo !== 'video') return
+    const v = video.current
+    if (!v) return
+    v.currentTime = 0
+    v.play().catch(() => {})
+  }, [pieza])
 
   useEffect(() => {
     opener.current = document.activeElement
@@ -74,14 +109,14 @@ function StoryViewer({
     }
   }, [onClose, step])
 
-  // Precarga la siguiente para que el avance no parpadee
+  // Precarga la siguiente foto para que el avance no parpadee
   useEffect(() => {
-    const next = set.items[i + 1]
-    if (next) {
+    const next = piezas[i + 1]
+    if (next?.tipo === 'foto') {
       const img = new Image()
-      img.src = next
+      img.src = next.src
     }
-  }, [i, set.items])
+  }, [i, piezas])
 
   return createPortal(
     <div
@@ -92,8 +127,8 @@ function StoryViewer({
       ref={ref}
     >
       <div className="sv-bars" aria-hidden="true">
-        {set.items.map((it, n) => (
-          <span key={it} className={n <= i ? 'on' : undefined} />
+        {piezas.map((p, n) => (
+          <span key={p.src} className={n <= i ? 'on' : undefined} />
         ))}
       </div>
 
@@ -112,8 +147,24 @@ function StoryViewer({
       <div className="sv-stage">
         {/* zonas de toque a los costados, igual que en la app */}
         <button className="sv-zone left" onClick={() => step(-1)} aria-label="Anterior" disabled={i === 0} />
-        <div className="sv-frame" key={src}>
-          <SmartImage src={src} alt={`${set.title} — imagen ${i + 1}`} priority />
+        <div className="sv-frame" key={pieza.src}>
+          {pieza.tipo === 'video' ? (
+            <video
+              ref={video}
+              className="sv-video"
+              src={pieza.src}
+              poster={set.items[0]}
+              muted
+              playsInline
+              autoPlay
+              preload="auto"
+              aria-label={`${set.title} — video ${i + 1}`}
+              onEnded={() => setI((v) => (v + 1 < total ? v + 1 : v))}
+              onError={() => setI((v) => (v + 1 < total ? v + 1 : v))}
+            />
+          ) : (
+            <SmartImage src={pieza.src} alt={`${set.title} — imagen ${i + 1}`} priority />
+          )}
         </div>
         <button
           className="sv-zone right"
