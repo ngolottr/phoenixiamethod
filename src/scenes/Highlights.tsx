@@ -64,13 +64,27 @@ function StoryViewer({
     return () => window.clearTimeout(t)
   }, [pieza, i, total])
 
-  // Cada video arranca solo al entrar
+  /* Cada video arranca solo al entrar.
+     El navegador rechaza reproducir en una pestaña que no está a la vista, así
+     que si el visitante llegó con la pestaña en segundo plano se reintenta en
+     cuanto vuelve a ella. Sin esto, se quedaría mirando un cuadro congelado. */
   useEffect(() => {
     if (pieza.tipo !== 'video') return
     const v = video.current
     if (!v) return
+
+    const arrancar = () => {
+      v.play().catch(() => {})
+    }
     v.currentTime = 0
-    v.play().catch(() => {})
+    arrancar()
+
+    v.addEventListener('canplay', arrancar)
+    document.addEventListener('visibilitychange', arrancar)
+    return () => {
+      v.removeEventListener('canplay', arrancar)
+      document.removeEventListener('visibilitychange', arrancar)
+    }
   }, [pieza])
 
   useEffect(() => {
