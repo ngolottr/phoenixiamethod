@@ -131,60 +131,13 @@ html[data-motion='reduced'] .ambient { transition: background-color 1ms; }
    el centro, para que se lea como textura del material y no como un estampado.
    --------------------------------------------------------------------------- */
 
-.panal, .panal-hoyo {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background: var(--amb-accent);
-  -webkit-mask-size: 60px 34.64px;
-  mask-size: 60px 34.64px;
-  -webkit-mask-repeat: repeat;
-  mask-repeat: repeat;
-  transition: background-color 1.15s var(--ease);
-}
-
+/* El lienzo donde vive la malla. Se desvanece hacia los bordes para que no
+   compita con el menú ni con el texto de las esquinas. */
 .panal {
-  opacity: .1;
-  -webkit-mask-image: var(--panal-tile);
-  mask-image: var(--panal-tile);
-  animation: panalDeriva 90s linear infinite;
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  -webkit-mask-image: radial-gradient(86% 74% at 50% 46%, #000 30%, transparent 92%);
+  mask-image: radial-gradient(86% 74% at 50% 46%, #000 30%, transparent 92%);
 }
-
-/* el tejido se desplaza tan lento que no se nota moverse, solo respirar */
-@keyframes panalDeriva {
-  to { -webkit-mask-position: 60px 34.64px; mask-position: 60px 34.64px; }
-}
-html[data-motion='reduced'] .panal { animation: none; }
-
-/* Atenúa la trama en los bordes: al centro se lee, en las esquinas desaparece */
-.panal::after {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(78% 66% at 50% 45%, transparent 24%, var(--amb-bg) 94%);
-}
-
-/* --- La depresión que sigue al cursor ---
-   La malla solo aparece dentro de un círculo alrededor del puntero, y va
-   encogida con el origen en ese punto: las celdas se aprietan hacia el centro
-   y el tejido parece ceder. Las dos máscaras se cruzan, así que solo queda
-   dibujado lo que es malla Y está dentro del círculo. */
-.panal-hoyo {
-  --mx: -1000px;
-  --my: -1000px;
-  opacity: .5;
-  -webkit-mask-image: var(--panal-tile),
-    radial-gradient(circle 190px at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 42%, transparent 72%);
-  mask-image: var(--panal-tile),
-    radial-gradient(circle 190px at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 42%, transparent 72%);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
-  transform: scale(.84);
-  transform-origin: var(--mx) var(--my);
-  filter: blur(.3px);
-}
-
-/* Sin puntero fino —celulares y tablets— no hay cursor que seguir */
-@media (pointer: coarse) {
-  .panal-hoyo { display: none; }
-}
-html[data-motion='reduced'] .panal-hoyo { display: none; }
 
 .grain {
   position: fixed; inset: -60px; z-index: 900; pointer-events: none;
