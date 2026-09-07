@@ -700,12 +700,16 @@ html[data-motion='reduced'] .sello-anillo { animation: none; }
 
 .proyector { position: relative; display: flex; flex-direction: column; gap: 12px; }
 
+/* Marco vertical 9:16, el mismo formato en que están tomadas las fotos.
+   La imagen va contenida, no recortada: se ve entera, cabeza incluida. */
 .proyector-marco {
-  position: relative; width: 100%;
-  aspect-ratio: 3 / 4; max-height: min(64vh, 580px);
+  position: relative;
+  aspect-ratio: 9 / 16;
+  height: min(66vh, 620px); width: auto; max-width: 100%;
   overflow: hidden; border: 1px solid var(--linea);
   box-shadow: 0 40px 90px rgba(0, 0, 0, .65);
-  margin-left: auto;
+  margin-left: auto; margin-right: auto;
+  background: var(--amb-bg);
 }
 
 .proyector-cuadro {
@@ -715,7 +719,18 @@ html[data-motion='reduced'] .sello-anillo { animation: none; }
   pointer-events: none;
 }
 .proyector-cuadro.on { opacity: 1; transform: scale(1); }
-.proyector-cuadro .img { position: absolute; inset: 0; }
+.proyector-cuadro .img { position: absolute; inset: 0; background: none; }
+.proyector-cuadro .img::before { display: none; }
+/* la foto entera, sin recorte */
+.proyector-cuadro .img img { object-fit: contain; }
+
+/* el relleno desenfocado que evita las franjas vacías */
+.proyector-fondo {
+  position: absolute; inset: -8%;
+  background-size: cover; background-position: center;
+  filter: blur(26px) saturate(1.15) brightness(.5);
+  opacity: .85;
+}
 
 /* El destello: blanco, breve y tenue. Se remonta en cada cambio por la key. */
 .proyector-destello {
@@ -750,7 +765,8 @@ html[data-motion='reduced'] .proyector-cuadro { transition: opacity .01ms; }
 
 @media (max-width: 900px) {
   .about-grid { grid-template-columns: 1fr; align-content: start; }
-  .proyector-marco { aspect-ratio: 4 / 3; max-height: 34vh; }
+  .proyector-marco { height: 40vh; }
+  .proyector-marcas { justify-content: center; }
 }
 
 /* ===========================================================================

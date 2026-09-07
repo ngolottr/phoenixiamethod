@@ -78,6 +78,14 @@ export function About() {
                   className={`proyector-cuadro${n === i ? ' on' : ''}`}
                   aria-hidden={n !== i}
                 >
+                  {/* La misma foto, ampliada y desenfocada, rellena el marco
+                      cuando la proporción no calza. Así la foto de arriba se ve
+                      completa y el cuadro nunca queda con franjas vacías. */}
+                  <span
+                    className="proyector-fondo"
+                    style={{ backgroundImage: `url(${f.src})` }}
+                    aria-hidden="true"
+                  />
                   <SmartImage src={f.src} alt={n === i ? f.alt : ''} />
                 </div>
               ))}
