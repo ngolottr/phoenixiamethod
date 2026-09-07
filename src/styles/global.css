@@ -1296,6 +1296,7 @@ html[data-motion='reduced'] .work-vista-foto { animation: none; }
 
 .caso {
   position: fixed; inset: 0; z-index: 815;
+  bottom: auto; height: var(--vh);
   background: color-mix(in srgb, var(--amb-bg) 95%, black);
   display: grid; place-items: center;
   padding: clamp(14px, 3vh, 40px) var(--edge);
@@ -2099,6 +2100,11 @@ html[data-motion='reduced'] .vortex { display: none; }
 
 .hive {
   position: fixed; inset: 0; z-index: 810;
+  /* Con el teclado abierto, "inset: 0" sigue midiendo la pantalla entera y la
+     mitad de abajo del panel queda detrás del teclado. --vh es lo que se ve de
+     verdad, teclado descontado, así que el formulario se desplaza dentro de lo
+     que hay y el botón de enviar siempre se alcanza. */
+  bottom: auto; height: var(--vh);
   background: color-mix(in srgb, var(--amb-bg) 94%, black);
   display: grid; place-items: center;
   padding: clamp(16px, 4vh, 44px) var(--edge);
@@ -2126,7 +2132,14 @@ html[data-motion='reduced'] .hive::before { animation: none; }
   width: min(1080px, 100%); max-height: 100%;
   display: flex; flex-direction: column; gap: clamp(16px, 3vh, 30px);
   overflow-y: auto; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch; scrollbar-width: thin;
+  /* Aire al final: el botón de enviar no queda pegado al borde del panel */
+  padding-bottom: 4px;
 }
+.hive-inner::-webkit-scrollbar { width: 3px; }
+.hive-inner::-webkit-scrollbar-thumb { background: var(--linea-fuerte); }
+.caso-inner::-webkit-scrollbar { width: 3px; }
+.caso-inner::-webkit-scrollbar-thumb { background: var(--linea-fuerte); }
 .hive-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
 .hive-body {
   display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1fr);

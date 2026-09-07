@@ -83,19 +83,52 @@ export default function App() {
   }, [scene.id, resetAmbient])
 
   /* Ningún gesto debe mover el documento… pero sí los paneles que llevan su
-     propio desplazamiento. Cancelar el touchmove en la raíz mataba también el
-     scroll de adentro: en el teléfono la galería y el texto de "Sobre mí"
-     quedaban cortados y no había forma de llegar al resto. */
+     propio desplazamiento.
+
+     Esto se decidía con una lista de nombres de clase, y la lista se quedó
+     corta: el formulario de "Trabajemos juntos" vive en otro panel y no estaba
+     nombrado, así que en el teléfono no se podía deslizar hasta el botón de
+     enviar. Una lista escrita a mano siempre se va a quedar corta. Ahora se
+     pregunta lo único que importa de verdad: ¿hay algún contenedor por encima
+     del dedo que pueda desplazarse? La respuesta se calcula UNA vez, al empezar
+     el gesto, no en cada uno de los sesenta avisos por segundo que manda el
+     navegador mientras se arrastra. */
   useEffect(() => {
-    const DESPLAZABLES = '.pane-scroll, .gal-strip, .work-list, [data-desplazable]'
-    const block = (e: TouchEvent) => {
-      const el = e.target as HTMLElement | null
-      if (el?.closest?.(DESPLAZABLES)) return
-      e.preventDefault()
+    const puedeDesplazarse = (el: HTMLElement) => {
+      const cs = getComputedStyle(el)
+      const desbordaY = el.scrollHeight > el.clientHeight + 1
+      const desbordaX = el.scrollWidth > el.clientWidth + 1
+      return (
+        (desbordaY && /auto|scroll/.test(cs.overflowY)) ||
+        (desbordaX && /auto|scroll/.test(cs.overflowX))
+      )
     }
-    const target = document.getElementById('root')
-    target?.addEventListener('touchmove', block as EventListener, { passive: false })
-    return () => target?.removeEventListener('touchmove', block as EventListener)
+
+    let permitido = false
+
+    const alTocar = (e: TouchEvent) => {
+      permitido = false
+      let n = e.target as HTMLElement | null
+      while (n && n !== document.body) {
+        if (puedeDesplazarse(n)) {
+          permitido = true
+          return
+        }
+        n = n.parentElement
+      }
+    }
+
+    const alMover = (e: TouchEvent) => {
+      if (!permitido) e.preventDefault()
+    }
+
+    const raiz = document.getElementById('root')
+    raiz?.addEventListener('touchstart', alTocar as EventListener, { passive: true })
+    raiz?.addEventListener('touchmove', alMover as EventListener, { passive: false })
+    return () => {
+      raiz?.removeEventListener('touchstart', alTocar as EventListener)
+      raiz?.removeEventListener('touchmove', alMover as EventListener)
+    }
   }, [])
 
   /* Al abrir el teclado, iOS empuja el documento entero hacia arriba para
