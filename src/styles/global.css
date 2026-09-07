@@ -806,6 +806,106 @@ html[data-motion='reduced'] .lb-frame { animation: none; }
 }
 .work-row .wd { font-size: 12.5px; line-height: 1.7; color: var(--humo); max-width: 42ch; }
 .work-row .wm { font-size: 9px; letter-spacing: .26em; text-transform: uppercase; color: var(--humo); white-space: nowrap; }
+.work-row .wt-mas {
+  font-family: var(--sans); font-size: 8px; letter-spacing: .28em; text-transform: uppercase;
+  color: var(--amb-accent); vertical-align: middle; margin-left: 14px;
+  opacity: 0; transform: translateX(-6px);
+  transition: opacity .4s var(--ease), transform .4s var(--ease);
+}
+.work-row:hover .wt-mas, .work-row:focus-visible .wt-mas { opacity: 1; transform: translateX(0); }
+
+/* ===========================================================================
+   EL EXPEDIENTE — datos reales del proyecto, sacados del vault
+   =========================================================================== */
+
+.caso {
+  position: fixed; inset: 0; z-index: 815;
+  background: color-mix(in srgb, var(--amb-bg) 95%, black);
+  display: grid; place-items: center;
+  padding: clamp(14px, 3vh, 40px) var(--edge);
+  animation: hiveIn .55s var(--ease) backwards;
+  overflow: hidden;
+}
+.caso-inner {
+  position: relative; z-index: 2;
+  width: min(1120px, 100%); max-height: 100%;
+  display: flex; flex-direction: column; gap: clamp(14px, 2.6vh, 26px);
+  overflow-y: auto; overscroll-behavior: contain;
+}
+
+.caso-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+.caso-id { display: flex; gap: clamp(14px, 2vw, 28px); align-items: flex-start; }
+.caso-num {
+  font-family: var(--serif); font-size: clamp(30px, 4vw, 56px);
+  line-height: 1; color: var(--laton); opacity: .55;
+}
+.caso-titulo { margin-top: 8px; }
+.caso-estado {
+  display: inline-block; margin-top: 10px;
+  font-size: 9px; letter-spacing: .28em; text-transform: uppercase;
+  color: var(--amb-bg); background: var(--amb-accent); padding: 5px 11px;
+}
+
+.caso-cuerpo {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(20px, 3.4vw, 52px); align-items: start;
+}
+.caso-col { display: flex; flex-direction: column; gap: clamp(18px, 3vh, 30px); min-width: 0; }
+.caso-resumen { max-width: 54ch; }
+
+.caso-cifras { display: flex; gap: clamp(16px, 2.6vw, 40px); flex-wrap: wrap; }
+.caso-cifra { display: flex; flex-direction: column; gap: 4px; }
+.cc-v { font-family: var(--serif); font-size: clamp(26px, 3.4vw, 44px); line-height: 1; color: var(--amb-accent); }
+.cc-e { font-size: 9px; letter-spacing: .26em; text-transform: uppercase; color: var(--hueso); }
+.cc-n { font-size: 10px; line-height: 1.5; color: var(--humo); max-width: 22ch; }
+
+.caso-bloque { display: flex; flex-direction: column; gap: 12px; }
+
+.caso-pasos { list-style: none; counter-reset: paso; display: flex; flex-direction: column; gap: 9px; }
+.caso-pasos li {
+  counter-increment: paso; position: relative; padding-left: 30px;
+  font-size: 12.5px; line-height: 1.65; color: var(--humo);
+}
+.caso-pasos li::before {
+  content: counter(paso, decimal-leading-zero);
+  position: absolute; left: 0; top: 1px;
+  font-family: var(--sans); font-size: 9px; letter-spacing: .16em; color: var(--laton);
+}
+
+.caso-hallazgos { display: flex; flex-direction: column; gap: 14px; }
+.caso-hallazgo {
+  display: flex; flex-direction: column; gap: 5px;
+  padding-left: 14px; border-left: 1px solid var(--amb-accent);
+}
+.ch-t { font-family: var(--serif); font-size: clamp(15px, 1.5vw, 19px); color: var(--hueso); }
+.ch-d { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--amb-accent); }
+.ch-p { font-size: 12px; line-height: 1.6; color: var(--humo); }
+
+.caso-notas { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.caso-notas li {
+  position: relative; padding-left: 16px;
+  font-size: 12.5px; line-height: 1.65; color: var(--humo);
+}
+.caso-notas li::before { content: '—'; position: absolute; left: 0; color: var(--laton); }
+
+.caso-fuente {
+  font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(143, 167, 155, .55); padding-top: 12px; border-top: 1px solid var(--linea);
+}
+
+/* La fotografía queda de telón, muy atrás */
+.caso-foto {
+  position: absolute; right: 0; bottom: 0; z-index: 0;
+  width: min(46%, 520px); aspect-ratio: 3/4;
+  opacity: .1; pointer-events: none;
+  mask-image: linear-gradient(to left, black, transparent 78%);
+}
+.caso-foto .img { position: absolute; inset: 0; }
+
+@media (max-width: 700px) {
+  .caso-foto { display: none; }
+  .caso-num { display: none; }
+}
 .work-row:hover, .work-row:focus-visible, .work-row[data-open='true'] { padding-left: clamp(8px, 1.4vw, 22px); }
 .work-row:hover .wt, .work-row:focus-visible .wt, .work-row[data-open='true'] .wt { color: var(--amb-accent); }
 

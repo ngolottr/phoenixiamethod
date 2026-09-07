@@ -3,13 +3,16 @@ import { SmartImage } from '../components/SmartImage'
 import { Vortex } from '../components/Vortex'
 import { ContactForm } from '../components/ContactForm'
 import { MagneticButton } from '../components/MagneticButton'
+import { CasoPanel } from '../components/CasoPanel'
 import { useCopy } from '../hooks/useCopy'
-import { brand, contact, work } from '../data/site'
+import { brand, contact } from '../data/site'
+import { casos, type Caso } from '../data/proyectos'
 
 const TONES = ['emerald', 'midnight', 'brass'] as const
 
 export function Work({ onLockNav }: { onLockNav: (locked: boolean) => void }) {
   const [active, setActive] = useState<string | null>(null)
+  const [abierto, setAbierto] = useState<Caso | null>(null)
   const [entrando, setEntrando] = useState(false)
   const [panel, setPanel] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -73,36 +76,37 @@ export function Work({ onLockNav }: { onLockNav: (locked: boolean) => void }) {
       </div>
 
       <div className="work-list rise" data-d="2">
-        {work.map((w, i) => {
-          const Row = w.url ? 'a' : 'div'
-          return (
-            <Row
-              key={w.index}
-              className="work-row"
-              data-open={active === w.index}
-              tabIndex={0}
-              role={w.url ? undefined : 'group'}
-              {...(w.url ? { href: w.url, target: '_blank', rel: 'noopener noreferrer' } : {})}
-              onMouseEnter={() => setActive(w.index)}
-              onMouseLeave={() => setActive(null)}
-              onFocus={() => setActive(w.index)}
-              onBlur={() => setActive(null)}
-            >
-              <span className="wi">{w.index}</span>
-              <span className="wt">
-                {w.title}
-                {w.url && <span aria-hidden="true"> ↗</span>}
+        {casos.map((c, i) => (
+          <button
+            key={c.index}
+            className="work-row"
+            data-open={active === c.index}
+            onClick={() => {
+              setAbierto(c)
+              onLockNav(true)
+            }}
+            onMouseEnter={() => setActive(c.index)}
+            onMouseLeave={() => setActive(null)}
+            onFocus={() => setActive(c.index)}
+            onBlur={() => setActive(null)}
+            aria-label={`Abrir el proyecto ${c.title}`}
+          >
+            <span className="wi">{c.index}</span>
+            <span className="wt">
+              {c.title}
+              <span className="wt-mas" aria-hidden="true">
+                ver
               </span>
-              <span className="wd">{w.description}</span>
-              <span className="wm">
-                {w.category} · {w.meta}
-              </span>
-              <span className="work-ghost" aria-hidden="true">
-                <SmartImage src={w.image} alt="" tone={TONES[i % TONES.length]} />
-              </span>
-            </Row>
-          )
-        })}
+            </span>
+            <span className="wd">{c.description}</span>
+            <span className="wm">
+              {c.category} · {c.meta}
+            </span>
+            <span className="work-ghost" aria-hidden="true">
+              <SmartImage src={c.image} alt="" tone={TONES[i % TONES.length]} />
+            </span>
+          </button>
+        ))}
       </div>
 
       {/* --- La llamada: es el único elemento de la página que insiste --- */}
@@ -122,6 +126,16 @@ export function Work({ onLockNav }: { onLockNav: (locked: boolean) => void }) {
           </span>
         </button>
       </div>
+
+      {abierto && (
+        <CasoPanel
+          caso={abierto}
+          onClose={() => {
+            setAbierto(null)
+            onLockNav(false)
+          }}
+        />
+      )}
 
       <Vortex activo={entrando} onDone={abrirPanel} />
 
