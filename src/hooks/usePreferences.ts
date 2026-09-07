@@ -115,12 +115,23 @@ export function useViewportHeight() {
     let ultimo = -1
     let raf = 0
 
+    /* La ventana visual: lo que el visitante ve de verdad, ya descontado el
+       teclado. En iOS, window.innerHeight NO cambia al abrirse el teclado, así
+       que el sitio seguía creyendo que tenía toda la pantalla: el panel del
+       formulario terminaba de desplazarse detrás del teclado y al botón de
+       enviar no había forma de llegar. */
+    const visual = window.visualViewport
+
     const medir = () => {
       raf = 0
-      const alto = window.innerHeight
+      // Al hacer zoom con dos dedos la ventana visual se achica sin que haya
+      // teclado alguno; ahí no se toca nada o el sitio se reacomodaría solo.
+      if (visual && visual.scale > 1.05) return
+
+      const alto = Math.round(visual ? visual.height : window.innerHeight)
       // En el teléfono, resize se dispara al aparecer y desaparecer la barra de
-      // direcciones, y también con el teclado. Si el alto no cambió no se toca
-      // la variable: escribirla obliga a recalcular el estilo de toda la página.
+      // direcciones. Si el alto no cambió no se toca la variable: escribirla
+      // obliga a recalcular el estilo de toda la página.
       if (alto === ultimo) return
       ultimo = alto
       document.documentElement.style.setProperty('--vh', `${alto}px`)
@@ -135,10 +146,12 @@ export function useViewportHeight() {
     medir()
     window.addEventListener('resize', pedir, { passive: true })
     window.addEventListener('orientationchange', pedir, { passive: true })
+    visual?.addEventListener('resize', pedir)
     return () => {
       if (raf) cancelAnimationFrame(raf)
       window.removeEventListener('resize', pedir)
       window.removeEventListener('orientationchange', pedir)
+      visual?.removeEventListener('resize', pedir)
     }
   }, [])
 }

@@ -1584,7 +1584,19 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
 }
 
 @media (max-width: 900px) {
-  .contact-grid { grid-template-columns: 1fr; align-content: start; }
+  /* El panel se desplaza, así que la rejilla tiene que MEDIR lo que de verdad
+     ocupa. Con flex:1 se encogía al alto de la pantalla, el formulario
+     desbordaba por dentro de la rejilla, y el panel no se enteraba: no había
+     nada que desplazar y el botón de enviar quedaba fuera de alcance. Es el
+     mismo arreglo que ya lleva la rejilla de "Sobre mí". */
+  .contact-grid {
+    grid-template-columns: 1fr; align-content: start;
+    flex: 0 0 auto; min-height: auto; align-items: start;
+    gap: clamp(22px, 4vh, 40px);
+  }
+  /* Aire al final para que el ultimo campo no quede pegado al borde y se pueda
+     seguir deslizando despues de escribir. */
+  .contact-grid > *:last-child { padding-bottom: 8px; }
 }
 
 /* ===========================================================================

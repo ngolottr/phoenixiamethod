@@ -34,9 +34,13 @@ export function useAvisoDeMas(
       const quedaY = p.scrollHeight - p.clientHeight - p.scrollTop
       const quedaX = p.scrollWidth - p.clientWidth - p.scrollLeft
       const hayY = quedaY > 8
+      // El eje lo decide en qué dirección puede desplazarse el panel, no lo que
+      // queda por recorrer: si no, al llegar abajo del todo la flecha se giraba
+      // hacia el lado justo mientras se apagaba.
+      const desplazaX = p.scrollWidth > p.clientWidth + 8
       const hayX = quedaX > 8
       c.dataset.mas = hayY || hayX ? 'si' : 'no'
-      c.dataset.eje = hayY ? 'y' : 'x'
+      c.dataset.eje = desplazaX ? 'x' : 'y'
     }
 
     medir()

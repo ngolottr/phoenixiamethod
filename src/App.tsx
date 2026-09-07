@@ -98,6 +98,26 @@ export default function App() {
     return () => target?.removeEventListener('touchmove', block as EventListener)
   }, [])
 
+  /* Al abrir el teclado, iOS empuja el documento entero hacia arriba para
+     enseñar el campo con foco — aunque el documento tenga el desplazamiento
+     desactivado— y después no lo devuelve: la cabecera se quedaba fuera de la
+     pantalla. En cuanto el campo suelta el foco, todo vuelve a su sitio. */
+  useEffect(() => {
+    const devolver = () => {
+      requestAnimationFrame(() => {
+        if (typingInField()) return
+        if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0)
+      })
+    }
+    const vv = window.visualViewport
+    window.addEventListener('focusout', devolver)
+    vv?.addEventListener('resize', devolver)
+    return () => {
+      window.removeEventListener('focusout', devolver)
+      vv?.removeEventListener('resize', devolver)
+    }
+  }, [])
+
   const renderScene = useCallback(() => {
     switch (scene.id) {
       case 'inicio':
