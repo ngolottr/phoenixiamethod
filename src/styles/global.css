@@ -675,10 +675,15 @@ html[data-motion='reduced'] .sello-anillo { animation: none; }
    ESCENA 02 — SOBRE MÍ
    =========================================================================== */
 
+/* Mitad y mitad, sin hueco muerto al centro: el texto usa todo su ancho y la
+   fotografía todo el suyo. */
 .about-grid {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .85fr);
-  gap: clamp(24px, 5vw, 80px); align-items: center; flex: 1; min-height: 0;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: clamp(20px, 3.2vw, 52px); align-items: center; flex: 1; min-height: 0;
 }
+/* En esta escena el texto no se limita a 46 caracteres: llena su columna */
+.about-grid .body { max-width: 100%; font-size: clamp(13px, 1.15vw, 16px); }
+.about-grid .display { font-size: clamp(34px, 5vw, 72px); }
 .about-stats { display: flex; gap: clamp(22px, 4vw, 56px); margin-top: clamp(20px, 4vh, 40px); flex-wrap: wrap; }
 .about-stat .v { font-family: var(--serif); font-size: clamp(28px, 3.4vw, 46px); line-height: 1; color: var(--laton); }
 .about-stat .l { font-size: 9px; letter-spacing: .26em; text-transform: uppercase; color: var(--humo); margin-top: 8px; }
@@ -698,17 +703,23 @@ html[data-motion='reduced'] .sello-anillo { animation: none; }
    diapositiva proyectada, no como un carrusel de sitio web.
    --------------------------------------------------------------------------- */
 
-.proyector { position: relative; display: flex; flex-direction: column; gap: 12px; }
+.proyector {
+  position: relative; display: flex; flex-direction: column; gap: 12px;
+  align-items: stretch; width: 100%;
+}
 
 /* Marco vertical 9:16, el mismo formato en que están tomadas las fotos.
    La imagen va contenida, no recortada: se ve entera, cabeza incluida. */
+/* Ocupa el ancho completo de su mitad; la altura la dicta la proporción, con
+   un techo para que nunca se salga de la escena. */
 .proyector-marco {
   position: relative;
   aspect-ratio: 9 / 16;
-  height: min(66vh, 620px); width: auto; max-width: 100%;
+  width: 100%; max-width: min(100%, 52vh);
+  max-height: 72vh;
   overflow: hidden; border: 1px solid var(--linea);
   box-shadow: 0 40px 90px rgba(0, 0, 0, .65);
-  margin-left: auto; margin-right: auto;
+  margin-inline: auto;
   background: var(--amb-bg);
 }
 
