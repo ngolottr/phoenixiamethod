@@ -244,6 +244,8 @@ export type Highlight = {
   /** frases por imagen; si hay menos que imágenes, se van repitiendo en ciclo */
   notes: string[]
   items: string[]
+  /** videos rescatados de esa colección, se reproducen en bucle en la portada */
+  videos?: string[]
 }
 
 export const highlights: Highlight[] = [
@@ -262,6 +264,7 @@ export const highlights: Highlight[] = [
       'Gratis, todos los días, a la misma hora.',
     ],
     items: highlightFiles.cielo,
+    videos: ['videos/cielo-01.mp4', 'videos/cielo-02.mp4'],
   },
   {
     slug: 'gym',
@@ -277,6 +280,7 @@ export const highlights: Highlight[] = [
       'Acá no hay atajo que sirva.',
     ],
     items: highlightFiles.gym,
+    videos: ['videos/gym-01.mp4', 'videos/gym-02.mp4'],
   },
   {
     slug: 'elgolott',
@@ -292,6 +296,7 @@ export const highlights: Highlight[] = [
       'Sin producción. Con intención.',
     ],
     items: highlightFiles.elgolott,
+    videos: ['videos/elgolott-01.mp4', 'videos/elgolott-02.mp4'],
   },
   {
     slug: 'memes',

@@ -1192,6 +1192,34 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
 .hl-ring .img { position: absolute; inset: 2px; overflow: hidden; }
 .hl-ring .img img { object-position: center 22%; }
 
+/* --- Portada en movimiento --- */
+
+.vloop { position: absolute; inset: 2px; overflow: hidden; background: var(--amb-bg2); }
+.vloop-poster { position: absolute; inset: 0; z-index: 1; transition: opacity .8s var(--ease); }
+.vloop-poster.oculto { opacity: 0; }
+.vloop-poster .img { position: absolute; inset: 0; }
+.vloop video {
+  position: absolute; inset: 0; z-index: 2;
+  width: 100%; height: 100%; object-fit: cover; object-position: center 30%;
+  opacity: 0; transition: opacity .8s var(--ease);
+}
+.vloop video.listo { opacity: 1; }
+
+/* Marca discreta de que eso se está reproduciendo */
+.hl-vivo {
+  position: absolute; right: 8px; bottom: 8px; z-index: 4;
+  width: 20px; height: 20px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: rgba(4, 13, 10, .72); color: var(--amb-accent);
+  font-size: 7px; letter-spacing: 0;
+  animation: latidoVivo 2.6s ease-in-out infinite;
+}
+@keyframes latidoVivo {
+  0%, 100% { opacity: .55; }
+  50%      { opacity: 1; }
+}
+html[data-motion='reduced'] .hl-vivo { display: none; }
+
 .hl-meta { display: flex; flex-direction: column; gap: 5px; }
 .hl-kind { font-size: 8px; letter-spacing: .3em; text-transform: uppercase; color: var(--laton); }
 .hl-title {

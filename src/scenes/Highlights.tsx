@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { SmartImage } from '../components/SmartImage'
+import { VideoLoop } from '../components/VideoLoop'
 import { MagneticButton } from '../components/MagneticButton'
 import { useAmbientApi } from '../hooks/useAmbient'
 import { highlights, highlightsScene, type Highlight } from '../data/site'
@@ -187,7 +188,16 @@ export function Highlights({ onLockNav }: { onLockNav: (locked: boolean) => void
             aria-label={`Abrir ${set.title}: ${set.items.length} historias. ${set.blurb}`}
           >
             <span className="hl-ring">
-              <SmartImage src={set.items[0]} alt="" />
+              {set.videos?.length ? (
+                <VideoLoop fuentes={set.videos} poster={set.items[0]} alt={`${set.title} en movimiento`} />
+              ) : (
+                <SmartImage src={set.items[0]} alt="" />
+              )}
+              {set.videos?.length ? (
+                <span className="hl-vivo" aria-hidden="true">
+                  ▶
+                </span>
+              ) : null}
             </span>
             <span className="hl-meta">
               <span className="hl-kind">{set.kind}</span>
