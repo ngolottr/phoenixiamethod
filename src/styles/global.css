@@ -565,6 +565,59 @@ html[data-motion='reduced'] .img::before { animation: none; }
 }
 @media (max-width: 760px) { .home-meta { display: none; } }
 
+/* ---------------------------------------------------------------------------
+   EL SELLO — la llamada circular del inicio.
+   Se ubica en el tercio derecho, a la altura del pecho de la figura: es donde
+   cae la mirada después de leer el nombre, y no tapa ni la cara ni el texto.
+   --------------------------------------------------------------------------- */
+
+.sello {
+  position: absolute; z-index: 6;
+  right: clamp(20px, 8vw, 132px);
+  top: 50%; transform: translateY(-50%);
+  width: clamp(116px, 13vw, 168px); aspect-ratio: 1;
+  display: grid; place-items: center;
+  border: 0; padding: 0; background: none;
+  border-radius: 50%;
+  transition: transform .5s var(--ease), filter .5s var(--ease);
+}
+.sello::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: radial-gradient(circle, rgba(4, 13, 10, .82) 40%, transparent 72%);
+  backdrop-filter: blur(3px);
+}
+.sello:hover, .sello:focus-visible { filter: drop-shadow(0 0 26px var(--amb-glow)); }
+
+.sello-anillo { position: absolute; inset: 0; animation: selloGira 22s linear infinite; }
+.sello-anillo svg { width: 100%; height: 100%; overflow: visible; }
+.sello-texto {
+  font-family: var(--sans); font-size: 15px; letter-spacing: .32em;
+  fill: var(--amb-accent); text-transform: uppercase;
+}
+@keyframes selloGira { to { transform: rotate(360deg); } }
+html[data-motion='reduced'] .sello-anillo { animation: none; }
+
+.sello-centro {
+  position: relative; z-index: 2;
+  width: 46%; aspect-ratio: 1; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--amb-accent); color: var(--amb-bg);
+  font-size: clamp(17px, 1.8vw, 22px);
+  transition: transform .45s var(--ease), background .45s var(--ease);
+}
+.sello:hover .sello-centro { transform: scale(1.12); background: var(--hueso); }
+.sello:active .sello-centro { transform: scale(.96); }
+
+/* En pantalla ancha la foto ocupa el panel derecho: el sello se corre al borde
+   izquierdo de esa foto, justo en el límite entre el texto y la imagen. */
+@media (min-width: 1100px) {
+  .sello { right: clamp(300px, 40vw, 620px); top: 62%; }
+}
+@media (max-width: 760px) {
+  .sello { top: auto; bottom: 30vh; right: 16px; transform: none; width: 112px; }
+  .sello-texto { font-size: 17px; }
+}
+
 /* ===========================================================================
    ESCENA 02 — SOBRE MÍ
    =========================================================================== */
@@ -577,18 +630,74 @@ html[data-motion='reduced'] .img::before { animation: none; }
 .about-stat .v { font-family: var(--serif); font-size: clamp(28px, 3.4vw, 46px); line-height: 1; color: var(--laton); }
 .about-stat .l { font-size: 9px; letter-spacing: .26em; text-transform: uppercase; color: var(--humo); margin-top: 8px; }
 
-.about-frames { position: relative; height: min(62vh, 560px); }
-.about-frames .f1 {
-  position: absolute; top: 0; right: 0; width: 68%; height: 82%;
-  border: 1px solid var(--linea);
+.about-hub {
+  display: inline-block; margin-top: clamp(18px, 3vh, 30px);
+  font-size: 10px; letter-spacing: .26em; text-transform: uppercase;
+  color: var(--amb-accent); border-bottom: 1px solid currentColor; padding-bottom: 4px;
+  transition: opacity .3s;
 }
-.about-frames .f2 {
-  position: absolute; bottom: 0; left: 0; width: 46%; height: 46%;
-  border: 1px solid rgba(200,160,90,.4); box-shadow: 0 40px 90px rgba(0,0,0,.7);
+.about-hub:hover { opacity: .7; }
+
+/* ---------------------------------------------------------------------------
+   EL PROYECTOR — los cuadros pasan uno tras otro.
+   El cambio no es un corte seco: la foto entrante crece apenas mientras un
+   velo de luz blanca la barre y se apaga. La idea es que se sienta como una
+   diapositiva proyectada, no como un carrusel de sitio web.
+   --------------------------------------------------------------------------- */
+
+.proyector { position: relative; display: flex; flex-direction: column; gap: 12px; }
+
+.proyector-marco {
+  position: relative; width: 100%;
+  aspect-ratio: 3 / 4; max-height: min(64vh, 580px);
+  overflow: hidden; border: 1px solid var(--linea);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, .65);
+  margin-left: auto;
 }
+
+.proyector-cuadro {
+  position: absolute; inset: 0;
+  opacity: 0; transform: scale(1.06);
+  transition: opacity 1.1s var(--ease), transform 4.4s linear;
+  pointer-events: none;
+}
+.proyector-cuadro.on { opacity: 1; transform: scale(1); }
+.proyector-cuadro .img { position: absolute; inset: 0; }
+
+/* El destello: blanco, breve y tenue. Se remonta en cada cambio por la key. */
+.proyector-destello {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .30) 50%, transparent 70%);
+  background-size: 260% 100%;
+  animation: destello 1.15s cubic-bezier(.25, .8, .3, 1) backwards;
+}
+@keyframes destello {
+  0%   { background-position: 150% 50%; opacity: 0; }
+  22%  { opacity: 1; }
+  100% { background-position: -60% 50%; opacity: 0; }
+}
+html[data-motion='reduced'] .proyector-destello { display: none; }
+html[data-motion='reduced'] .proyector-cuadro { transition: opacity .01ms; }
+
+.proyector-pie {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
+  display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
+  padding: 34px 16px 14px;
+  background: linear-gradient(180deg, transparent, rgba(4, 13, 10, .9));
+}
+.proyector-t { font-family: var(--serif); font-size: clamp(15px, 1.6vw, 20px); color: var(--hueso); }
+.proyector-n { font-size: 9px; letter-spacing: .26em; color: var(--amb-accent); }
+
+.proyector-marcas { display: flex; gap: 4px; justify-content: flex-end; }
+.proyector-marcas span {
+  display: block; height: 1px; width: 12px; background: var(--linea-fuerte);
+  transition: width .5s var(--ease), background .5s var(--ease);
+}
+.proyector-marcas span.on { width: 26px; background: var(--amb-accent); }
+
 @media (max-width: 900px) {
-  .about-grid { grid-template-columns: 1fr; align-content: center; }
-  .about-frames { display: none; }
+  .about-grid { grid-template-columns: 1fr; align-content: start; }
+  .proyector-marco { aspect-ratio: 4 / 3; max-height: 34vh; }
 }
 
 /* ===========================================================================
@@ -809,22 +918,68 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
    ESCENA 07 — REDES
    =========================================================================== */
 
-.social-list { display: flex; flex-direction: column; justify-content: center; flex: 1; min-height: 0; }
-.social-row {
-  display: flex; align-items: baseline; justify-content: space-between; gap: 20px;
-  padding: clamp(10px, 1.8vh, 22px) 0; border-top: 1px solid var(--linea);
-  transition: padding-left .5s var(--ease), color .4s var(--ease);
+.soc-head {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  gap: 24px; flex-wrap: wrap;
 }
-.social-row:last-child { border-bottom: 1px solid var(--linea); }
-.social-row .sl {
-  font-family: var(--serif); font-size: clamp(26px, 4vw, 62px); line-height: 1;
-  transition: color .4s var(--ease);
+.soc-hub {
+  font-size: 10px; letter-spacing: .26em; text-transform: uppercase;
+  color: var(--amb-accent); border-bottom: 1px solid currentColor;
+  padding-bottom: 4px; transition: opacity .3s;
 }
-.social-row .sh { font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: var(--humo); white-space: nowrap; }
-.social-row .sa { display: inline-block; transition: transform .45s var(--ease); margin-left: 10px; }
-.social-row:hover, .social-row:focus-visible { padding-left: clamp(8px, 1.6vw, 26px); }
-.social-row:hover .sl, .social-row:focus-visible .sl { color: var(--amb-accent); }
-.social-row:hover .sa { transform: translate(6px, -6px); }
+.soc-hub:hover { opacity: .7; }
+
+/* Tarjetas en rejilla: se leen de un vistazo y cada una dice qué hay adentro */
+.soc-grid {
+  display: grid; gap: clamp(8px, 1.2vw, 14px);
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  flex: 1; min-height: 0; align-content: center;
+  margin-top: clamp(16px, 3vh, 30px);
+}
+
+.soc-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 14px 10px 10px;
+  border: 1px solid var(--linea); min-width: 0;
+  transition: border-color .45s var(--ease), background .45s var(--ease), transform .45s var(--ease);
+}
+.soc-card:hover, .soc-card:focus-visible {
+  border-color: var(--amb-accent);
+  background: rgba(255, 255, 255, .03);
+  transform: translateY(-3px);
+}
+
+.soc-foto {
+  position: relative; flex: none;
+  width: clamp(54px, 5vw, 68px); aspect-ratio: 1;
+  overflow: hidden; border: 1px solid var(--linea);
+}
+.soc-foto .img { position: absolute; inset: 0; }
+.soc-foto .img img { transition: transform 1s var(--ease); }
+.soc-card:hover .soc-foto .img img { transform: scale(1.08); }
+
+.soc-txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.soc-top { display: flex; align-items: baseline; gap: 8px; }
+.soc-nombre {
+  font-family: var(--serif); font-size: clamp(19px, 1.9vw, 26px); line-height: 1;
+  color: var(--hueso); transition: color .35s var(--ease);
+}
+.soc-card:hover .soc-nombre { color: var(--amb-accent); }
+.soc-flecha { font-size: 12px; color: var(--humo); transition: transform .4s var(--ease); }
+.soc-card:hover .soc-flecha { transform: translate(4px, -4px); color: var(--amb-accent); }
+.soc-handle { font-size: 9px; letter-spacing: .24em; text-transform: uppercase; color: var(--laton); }
+.soc-que { font-size: 11.5px; line-height: 1.5; color: var(--humo); }
+
+.soc-pie {
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  margin-top: clamp(14px, 2.6vh, 28px);
+}
+
+@media (max-width: 760px) {
+  .soc-grid { grid-template-columns: 1fr; gap: 8px; }
+  .soc-que { display: none; }
+  .soc-foto { width: 48px; }
+}
 
 /* ===========================================================================
    FILTROS DE CATEGORÍA

@@ -9,7 +9,15 @@
 
 import { highlightFiles } from './highlightFiles'
 
-export type Social = { label: string; handle: string; url: string }
+export type Social = {
+  label: string
+  handle: string
+  url: string
+  /** qué se publica ahí, en pocas palabras */
+  que: string
+  /** foto que acompaña a la fila */
+  image: string
+}
 
 /** Las categorías con las que se ordena la galería. */
 export const categories = [
@@ -396,9 +404,9 @@ export const contact = {
 /** Opciones del desplegable de presupuesto. La primera es el marcador vacío. */
 export const presupuestos = [
   'Prefiero conversarlo',
-  'Menos de $3.000.000',
-  'Entre $3.000.000 y $10.000.000',
-  'Más de $10.000.000',
+  'Menos de $300.000',
+  'Entre $300.000 y $1.000.000',
+  'Más de $1.000.000',
 ]
 
 /** Franjas en que Nicolás atiende reuniones, en hora de Chile. */
@@ -408,16 +416,54 @@ export const disponibilidad = {
 
 /** Enlaces reales, tomados de elgolottlinks.carrd.co */
 export const socials: Social[] = [
-  { label: 'Instagram', handle: '@elgolott', url: 'https://www.instagram.com/elgolott/' },
-  { label: 'TikTok', handle: '@elgolott', url: 'https://www.tiktok.com/@elgolott' },
-  { label: 'YouTube', handle: '@ElGolott', url: 'https://www.youtube.com/@ElGolott' },
-  { label: 'Twitch', handle: '/elgolott', url: 'https://www.twitch.tv/elgolott' },
-  { label: 'X', handle: '@elgolott', url: 'https://x.com/elgolott' },
-  { label: 'Discord', handle: 'Comunidad', url: 'https://discord.gg/GPzXhQ972' },
+  {
+    label: 'Instagram',
+    handle: '@elgolott',
+    url: 'https://www.instagram.com/elgolott/',
+    que: 'El día a día, los cortes y lo que no alcanza a ser video.',
+    image: 'images/camara-verde.jpg',
+  },
+  {
+    label: 'TikTok',
+    handle: '@elgolott',
+    url: 'https://www.tiktok.com/@elgolott',
+    que: 'Vertical diario de Operación 100K. Lo que estoy construyendo, en público.',
+    image: 'images/dientes.jpg',
+  },
+  {
+    label: 'YouTube',
+    handle: '@ElGolott',
+    url: 'https://www.youtube.com/@ElGolott',
+    que: 'Lo largo: procesos completos, sin cortes convenientes.',
+    image: 'images/setup-gaming.jpg',
+  },
+  {
+    label: 'Twitch',
+    handle: '/elgolott',
+    url: 'https://www.twitch.tv/elgolott',
+    que: 'En vivo. Acá se ve cuando algo falla, que es la mitad del trabajo.',
+    image: 'images/minecraft-render.jpg',
+  },
+  {
+    label: 'Discord',
+    handle: 'La comunidad',
+    url: 'https://discord.gg/GPzXhQ972',
+    que: 'Donde se conversa de verdad. Preguntas, pruebas y lo que no publico.',
+    image: 'images/escalera.jpg',
+  },
   {
     label: 'LinkedIn',
     handle: 'Nicolás Golott Rojas',
     url: 'https://www.linkedin.com/in/nicol%C3%A1s-golott-rojas-0248782a9/',
+    que: 'El lado formal: IA aplicada, automatización y transformación digital.',
+    image: 'images/espejo-amarillo.jpg',
+  },
+  {
+    label: 'X',
+    handle: '@elgolott',
+    url: 'https://x.com/elgolott',
+    que: 'Ideas sueltas antes de que se conviertan en algo.',
+    image: 'images/semaforo-luna.jpg',
   },
 ]
 

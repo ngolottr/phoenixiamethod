@@ -84,7 +84,13 @@ export default function App() {
   const renderScene = useCallback(() => {
     switch (scene.id) {
       case 'inicio':
-        return <Home onEnter={() => goTo('sobre-mi')} onWork={() => goTo('trabajo')} />
+        return (
+          <Home
+            onEnter={() => goTo('sobre-mi')}
+            onWork={() => goTo('trabajo')}
+            onContacto={() => goTo('contacto')}
+          />
+        )
       case 'sobre-mi':
         return <About />
       case 'galeria':
