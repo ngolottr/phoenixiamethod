@@ -47,9 +47,10 @@
   --amb-glow: rgba(43, 229, 143, 0.16);
   --amb-ink: #EFE7D5;
 
-  /* Tejido hexagonal que se repite sin costuras. Se usa como máscara, por eso
-     va en blanco: lo que aquí es opaco, allá deja pasar el color. */
-  --panal-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cpath fill='%23ffffff' d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/svg%3E");
+  /* Malla hexagonal de trazo fino, dibujada solo con líneas. Tesela sin
+     costuras: el hexágono central más los conectores que enganchan con el
+     tile de al lado. Se usa como máscara, por eso va en blanco. */
+  --panal-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='34.64' viewBox='0 0 60 34.64'%3E%3Cpath fill='none' stroke='%23ffffff' stroke-width='0.9' d='M0 17.32 L10 17.32 L20 0 L40 0 L50 17.32 L60 17.32 M10 17.32 L20 34.64 L40 34.64 L50 17.32'/%3E%3C/svg%3E");
 }
 
 /* Modo "reducir movimiento": se activa por preferencia del sistema o por el
@@ -130,31 +131,60 @@ html[data-motion='reduced'] .ambient { transition: background-color 1ms; }
    el centro, para que se lea como textura del material y no como un estampado.
    --------------------------------------------------------------------------- */
 
-.panal {
+.panal, .panal-hoyo {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background: var(--amb-accent);
-  opacity: .085;
-  -webkit-mask-image: var(--panal-tile);
-  mask-image: var(--panal-tile);
-  -webkit-mask-size: 56px 98px;
-  mask-size: 56px 98px;
+  -webkit-mask-size: 60px 34.64px;
+  mask-size: 60px 34.64px;
   -webkit-mask-repeat: repeat;
   mask-repeat: repeat;
   transition: background-color 1.15s var(--ease);
+}
+
+.panal {
+  opacity: .1;
+  -webkit-mask-image: var(--panal-tile);
+  mask-image: var(--panal-tile);
   animation: panalDeriva 90s linear infinite;
 }
 
 /* el tejido se desplaza tan lento que no se nota moverse, solo respirar */
 @keyframes panalDeriva {
-  to { -webkit-mask-position: 56px 98px; mask-position: 56px 98px; }
+  to { -webkit-mask-position: 60px 34.64px; mask-position: 60px 34.64px; }
 }
 html[data-motion='reduced'] .panal { animation: none; }
 
 /* Atenúa la trama en los bordes: al centro se lee, en las esquinas desaparece */
 .panal::after {
   content: ''; position: absolute; inset: 0;
-  background: radial-gradient(75% 62% at 50% 45%, transparent 20%, var(--amb-bg) 92%);
+  background: radial-gradient(78% 66% at 50% 45%, transparent 24%, var(--amb-bg) 94%);
 }
+
+/* --- La depresión que sigue al cursor ---
+   La malla solo aparece dentro de un círculo alrededor del puntero, y va
+   encogida con el origen en ese punto: las celdas se aprietan hacia el centro
+   y el tejido parece ceder. Las dos máscaras se cruzan, así que solo queda
+   dibujado lo que es malla Y está dentro del círculo. */
+.panal-hoyo {
+  --mx: -1000px;
+  --my: -1000px;
+  opacity: .5;
+  -webkit-mask-image: var(--panal-tile),
+    radial-gradient(circle 190px at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 42%, transparent 72%);
+  mask-image: var(--panal-tile),
+    radial-gradient(circle 190px at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, .55) 42%, transparent 72%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  transform: scale(.84);
+  transform-origin: var(--mx) var(--my);
+  filter: blur(.3px);
+}
+
+/* Sin puntero fino —celulares y tablets— no hay cursor que seguir */
+@media (pointer: coarse) {
+  .panal-hoyo { display: none; }
+}
+html[data-motion='reduced'] .panal-hoyo { display: none; }
 
 .grain {
   position: fixed; inset: -60px; z-index: 900; pointer-events: none;

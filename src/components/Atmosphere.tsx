@@ -1,11 +1,13 @@
+import { Panal } from './Panal'
+
 /** Capas de atmósfera: grano analógico, viñeta profunda y el halo verde que respira. */
 export function Atmosphere() {
   return (
     <>
       {/* capa de color: adopta el tono de la foto que se esté mirando */}
       <div className="ambient" aria-hidden="true" />
-      {/* la trama de panal, tejida sobre todo el sitio */}
-      <div className="panal" aria-hidden="true" />
+      {/* la malla de panal, tejida sobre todo el sitio */}
+      <Panal />
       <div className="halo" aria-hidden="true" />
       <div className="vignette" aria-hidden="true" />
       <div className="grain" aria-hidden="true" />
