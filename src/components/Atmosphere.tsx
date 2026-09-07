@@ -4,6 +4,8 @@ export function Atmosphere() {
     <>
       {/* capa de color: adopta el tono de la foto que se esté mirando */}
       <div className="ambient" aria-hidden="true" />
+      {/* la trama de panal, tejida sobre todo el sitio */}
+      <div className="panal" aria-hidden="true" />
       <div className="halo" aria-hidden="true" />
       <div className="vignette" aria-hidden="true" />
       <div className="grain" aria-hidden="true" />
