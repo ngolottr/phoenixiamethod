@@ -194,19 +194,15 @@ export function Highlights({ onLockNav }: { onLockNav: (locked: boolean) => void
 
   return (
     <section className="scene" aria-labelledby="hl-title">
-      <div className="hl-head rise" data-d="1">
-        <div>
-          <p className="eyebrow">{highlightsScene.eyebrow}</p>
-          <h2 id="hl-title" className="display h-md" style={{ marginTop: 12 }}>
-            {highlightsScene.title}
-          </h2>
-        </div>
-        <p className="body" style={{ maxWidth: '38ch' }}>
-          {highlightsScene.intro}
-        </p>
+      <div className="hl-ancho hl-head rise" data-d="1">
+        <p className="eyebrow">{highlightsScene.eyebrow}</p>
+        <h2 id="hl-title" className="display h-md">
+          {highlightsScene.title}
+        </h2>
+        <p className="body">{highlightsScene.intro}</p>
       </div>
 
-      <div className="hl-grid rise" data-d="2">
+      <div className="hl-ancho hl-grid rise" data-d="2">
         {highlights.map((set) => (
           <button
             key={set.slug}
@@ -230,7 +226,7 @@ export function Highlights({ onLockNav }: { onLockNav: (locked: boolean) => void
         ))}
       </div>
 
-      <p className="gal-hint rise" data-d="3">
+      <p className="gal-hint hl-ancho rise" data-d="3" style={{ textAlign: 'center' }}>
         {total} videos rescatados · se reproducen solos · las flechas ← → recorren cada colección
       </p>
 

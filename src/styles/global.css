@@ -1293,16 +1293,26 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
    ESCENA — HISTORIAS DESTACADAS
    =========================================================================== */
 
-.hl-head {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  gap: 24px; flex-wrap: wrap;
+/* Tres colecciones, no cuatro: en vez de estirarlas a todo el ancho, la escena
+   se arma sobre una columna centrada. El encabezado ocupa exactamente el mismo
+   ancho que las láminas, así el texto y las imágenes comparten los mismos
+   márgenes en vez de flotar cada uno por su lado. */
+.hl-ancho {
+  width: 100%; max-width: min(1060px, 100%);
+  margin-inline: auto;
 }
 
+.hl-head {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 14px; text-align: center;
+}
+.hl-head .body { max-width: 56ch; }
+
 .hl-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: clamp(10px, 1.6vw, 26px);
-  flex: 1; min-height: 0; align-content: center;
-  margin-top: clamp(14px, 2.6vh, 32px);
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: clamp(10px, 1.6vw, 24px);
+  align-content: center;
+  margin-top: clamp(18px, 3.4vh, 40px);
 }
 
 .hl-card {
@@ -1371,13 +1381,11 @@ html[data-motion='reduced'] .hl-vivo { display: none; }
 .hl-count { font-size: 9px; letter-spacing: .24em; text-transform: uppercase; color: var(--humo); }
 .hl-blurb { font-size: 11.5px; line-height: 1.7; color: var(--humo); }
 
-@media (max-width: 900px) {
-  .hl-grid { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 820px) {
+  .hl-grid { grid-template-columns: 1fr; gap: 10px; }
+  .hl-card { flex-direction: row; align-items: center; gap: 14px; }
+  .hl-ring { width: 44%; flex: none; }
   .hl-blurb { display: none; }
-}
-@media (max-width: 460px) {
-  .hl-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-  .hl-card { padding: 12px; gap: 10px; }
 }
 
 /* --- Visor de historias --- */
