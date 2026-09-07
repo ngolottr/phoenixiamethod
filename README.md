@@ -212,10 +212,14 @@ así que frenan el abuso corriente —un bot repitiendo el formulario— pero no
 alguien decidido repartiendo la carga entre muchas IP. Para eso está el firewall
 de Vercel, que es una casilla en el panel:
 
-- [ ] Vercel → proyecto `elgolott` → **Firewall** → **Rate Limiting**: una regla
-      sobre `/api/*` de unas 20 peticiones por minuto por IP.
+- [x] **Hecho el 2026-09-07.** Vercel → proyecto `elgolott` → **Firewall** →
+      **Reglas** → regla `Límite de la API`: si la ruta empieza con `/api`,
+      ventana fija de 60 segundos, 20 solicitudes por dirección IP, y responde
+      *Demasiadas peticiones (429)*. Comprobada en producción: las 20 primeras
+      pasan y de la 21 en adelante devuelve 429. El plan Hobby permite **una
+      sola** regla de límite de velocidad, así que esa es la que hay.
 - [ ] Vercel → **Firewall** → activar **Attack Challenge Mode** si alguna vez ves
-      tráfico raro en los registros.
+      tráfico raro en los registros. Es un interruptor, no hay que configurarlo.
 
 **Mantención**
 
