@@ -528,20 +528,27 @@ html[data-motion='reduced'] .img::before { animation: none; }
     linear-gradient(180deg, rgba(4,13,10,.7) 0%, transparent 26%, transparent 62%, rgba(4,13,10,.92) 100%);
 }
 
-/* En pantalla ancha, una foto vertical recortada por el centro pierde justo lo
-   que importa: la figura entera. Por eso la imagen pasa a ocupar su propio
-   panel a la derecha y se muestra COMPLETA, sin recorte, con el texto al lado. */
+/* En pantalla ancha la foto sigue siendo el fondo de toda la escena —no un
+   panel al costado—, pero se muestra completa y anclada a la derecha, y un
+   degradado ancho oscurece el lado izquierdo. Así la figura se ve entera, el
+   texto cae sobre negro y no hay ninguna línea que corte la pantalla en dos. */
 @media (min-width: 1100px) {
-  .home-media { left: auto; right: 0; width: 46vw; }
-  .home-media .img img { object-fit: contain; object-position: center bottom; }
-  /* funde el borde izquierdo de la foto con el fondo, sin línea de corte */
+  .home-media .img img { object-fit: contain; object-position: right bottom; }
   .home-media::after {
     background:
-      linear-gradient(90deg, var(--amb-bg) 0%, rgba(4, 13, 10, 0) 26%),
-      linear-gradient(180deg, rgba(4, 13, 10, .55) 0%, transparent 20%);
+      linear-gradient(
+        90deg,
+        var(--amb-bg) 0%,
+        rgba(4, 13, 10, .96) 30%,
+        rgba(4, 13, 10, .72) 46%,
+        rgba(4, 13, 10, .2) 62%,
+        transparent 74%
+      ),
+      linear-gradient(180deg, rgba(4, 13, 10, .72) 0%, transparent 24%, transparent 68%, rgba(4, 13, 10, .8) 100%);
   }
-  .home-copy { padding-right: 50vw; }
-  .home-meta { right: auto; left: var(--edge); }
+  /* El texto no pasa del punto donde el degradado todavía es opaco */
+  .home-copy { padding-right: 46vw; }
+  .home-meta { right: auto; left: var(--edge); text-align: left; }
 }
 .home-copy {
   position: relative; z-index: 2; height: 100%;
@@ -572,15 +579,24 @@ html[data-motion='reduced'] .img::before { animation: none; }
    --------------------------------------------------------------------------- */
 
 .sello {
-  position: absolute; z-index: 6;
+  position: fixed; z-index: 705;
   right: clamp(20px, 8vw, 132px);
   top: 50%; transform: translateY(-50%);
   width: clamp(116px, 13vw, 168px); aspect-ratio: 1;
   display: grid; place-items: center;
   border: 0; padding: 0; background: none;
   border-radius: 50%;
+  cursor: grab;
+  touch-action: none; /* el navegador no debe interpretar el arrastre como scroll */
   transition: transform .5s var(--ease), filter .5s var(--ease);
 }
+/* Una vez que el visitante lo mueve, manda su posición y no la del diseño */
+.sello.is-suelto { right: auto; transform: none; }
+.sello.is-arrastrando {
+  cursor: grabbing; transition: none;
+  filter: drop-shadow(0 0 34px var(--amb-glow));
+}
+.sello.is-arrastrando .sello-centro { transform: scale(1.14); }
 .sello::before {
   content: ''; position: absolute; inset: 0; border-radius: 50%;
   background: radial-gradient(circle, rgba(4, 13, 10, .82) 40%, transparent 72%);
@@ -608,13 +624,14 @@ html[data-motion='reduced'] .sello-anillo { animation: none; }
 .sello:hover .sello-centro { transform: scale(1.12); background: var(--hueso); }
 .sello:active .sello-centro { transform: scale(.96); }
 
-/* En pantalla ancha la foto ocupa el panel derecho: el sello se corre al borde
-   izquierdo de esa foto, justo en el límite entre el texto y la imagen. */
+/* Posición de partida en pantalla ancha: a media altura, en la franja donde el
+   degradado ya se abrió y todavía no empieza la figura. */
 @media (min-width: 1100px) {
-  .sello { right: clamp(300px, 40vw, 620px); top: 62%; }
+  .sello:not(.is-suelto) { right: clamp(280px, 34vw, 540px); top: 60%; }
 }
 @media (max-width: 760px) {
-  .sello { top: auto; bottom: 30vh; right: 16px; transform: none; width: 112px; }
+  .sello:not(.is-suelto) { top: auto; bottom: 26vh; right: 16px; transform: none; }
+  .sello { width: 108px; }
   .sello-texto { font-size: 17px; }
 }
 
