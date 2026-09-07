@@ -866,11 +866,6 @@ html[data-motion='reduced'] .home-aura { animation: none; }
   .home-aura { right: -10%; width: 70vw; }
   .home-suelo { display: none; }
 }
-.home-copy {
-  position: relative; z-index: 2; height: 100%;
-  display: grid; align-content: center;
-  padding: 0 var(--edge);
-}
 .home-name { mix-blend-mode: normal; text-shadow: 0 24px 80px var(--sombra-alta); }
 .home-line {
   display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap;
@@ -882,10 +877,12 @@ html[data-motion='reduced'] .home-aura { animation: none; }
   border-left: 1px solid var(--amb-accent); padding-left: 20px;
 }
 .home-cta { margin-top: clamp(26px, 5vh, 52px); display: flex; gap: 12px; flex-wrap: wrap; }
-.home-meta {
-  position: absolute; right: var(--edge); bottom: clamp(84px, 13vh, 128px);
-  text-align: right; z-index: 2;
-}
+
+/* La línea de oficio y año va DEBAJO de los botones, en el flujo.
+   Estaba sacada del flujo y anclada al fondo de la columna de texto, y como
+   esa columna mide lo que mide el titular, terminaba aterrizando justo encima
+   de "Entrar" y "Ver trabajo". Un elemento posicionado a mano no sabe qué hay
+   debajo; uno en el flujo no puede pisar a nadie. */
 @media (max-width: 760px) { .home-meta { display: none; } }
 
 /* ---------------------------------------------------------------------------
