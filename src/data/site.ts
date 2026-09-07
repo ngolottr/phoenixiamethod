@@ -54,8 +54,9 @@ export const brand = {
 }
 
 export const hero = {
-  image: 'images/hero.jpg',
-  alt: 'Retrato en un pasillo de piedra bañado por luz verde esmeralda.',
+  /** figura recortada sobre fondo transparente: deja el texto libre */
+  image: 'images/hero-figura.png',
+  alt: 'Nicolás de pie, ajustándose los lentes, recortado sobre el fondo.',
   eyebrow: 'Portfolio · MMXXVI',
   cta: 'Entrar',
 }

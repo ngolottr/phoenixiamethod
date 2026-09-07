@@ -3,6 +3,15 @@ import { MagneticButton } from '../components/MagneticButton'
 import { Sello } from '../components/Sello'
 import { brand, hero } from '../data/site'
 
+/**
+ * La escena de entrada.
+ *
+ * La figura viene recortada sobre fondo transparente, así que ya no hace falta
+ * pelear con degradados para que el texto se lea: la fotografía no cubre nada.
+ * El fondo lo pone la propia atmósfera del sitio —negro verdoso y el halo que
+ * respira—, y bajo los pies se dibuja un resplandor para que la figura apoye en
+ * algo en vez de flotar recortada en el vacío.
+ */
 export function Home({
   onEnter,
   onWork,
@@ -14,8 +23,13 @@ export function Home({
 }) {
   return (
     <section className="scene home" aria-labelledby="home-title">
-      <div className="home-media">
-        <SmartImage src={hero.image} alt={hero.alt} tone="emerald" priority />
+      <div className="home-escena" aria-hidden="true">
+        <span className="home-suelo" />
+        <span className="home-aura" />
+      </div>
+
+      <div className="home-figura">
+        <SmartImage src={hero.image} alt={hero.alt} priority />
       </div>
 
       <div className="home-copy">
@@ -41,16 +55,13 @@ export function Home({
             Ver trabajo
           </MagneticButton>
         </div>
-      </div>
 
-      <div className="home-meta rise" data-d="5">
-        <p className="label">{brand.role}</p>
-        <p className="label" style={{ marginTop: 8, color: 'var(--laton)' }}>
-          {brand.year}
+        <p className="home-meta rise" data-d="5">
+          <span>{brand.role}</span>
+          <span className="home-anio">{brand.year}</span>
         </p>
       </div>
 
-      {/* Único elemento circular de la página, y además arrastrable. */}
       <Sello onClick={onContacto} />
     </section>
   )
