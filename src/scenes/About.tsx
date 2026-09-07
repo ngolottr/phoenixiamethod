@@ -28,6 +28,28 @@ export function About() {
     return () => reset()
   }, [i, fotos, paint, reset])
 
+  // La que sale y la que entra, en ese orden
+  const anterior = useRef(i)
+  useEffect(() => {
+    return () => {
+      anterior.current = i
+    }
+  }, [i])
+
+  const visibles =
+    anterior.current !== i && fotos[anterior.current]
+      ? [fotos[anterior.current], fotos[i]]
+      : [fotos[i]]
+
+  // Trae la siguiente con tiempo, para que el cambio no espere a la red
+  useEffect(() => {
+    const sig = fotos[(i + 1) % fotos.length]
+    if (sig) {
+      const img = new Image()
+      img.src = sig.src
+    }
+  }, [i, fotos])
+
   return (
     <section className="scene" aria-labelledby="about-title">
       <div className="pane pane-scroll">
@@ -72,11 +94,15 @@ export function About() {
           {/* --- El proyector: un cuadro tras otro, con destello al cambiar --- */}
           <div className="proyector rise" data-d="3">
             <div className="proyector-marco">
-              {fotos.map((f, n) => (
+              {/* Solo se montan dos cuadros: el que se ve y el que sale.
+                  Tener las 35 fotos en el documento hacía que el navegador
+                  intentara traerlas todas a la vez y la que tocaba mostrar
+                  llegaba tarde o no llegaba. */}
+              {visibles.map((f, n) => (
                 <div
                   key={f.src}
-                  className={`proyector-cuadro${n === i ? ' on' : ''}`}
-                  aria-hidden={n !== i}
+                  className={`proyector-cuadro${f.src === fotos[i].src ? ' on' : ''}`}
+                  aria-hidden={f.src !== fotos[i].src}
                 >
                   {/* La misma foto, ampliada y desenfocada, rellena el marco
                       cuando la proporción no calza. Así la foto de arriba se ve
@@ -86,7 +112,7 @@ export function About() {
                     style={{ backgroundImage: `url(${f.src})` }}
                     aria-hidden="true"
                   />
-                  <SmartImage src={f.src} alt={n === i ? f.alt : ''} />
+                  <SmartImage src={f.src} alt={n === visibles.length - 1 ? f.alt : ''} priority />
                 </div>
               ))}
               <span className="proyector-destello" key={i} aria-hidden="true" />
