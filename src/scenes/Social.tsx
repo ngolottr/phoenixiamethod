@@ -1,5 +1,6 @@
 import { SmartImage } from '../components/SmartImage'
 import { MagneticButton } from '../components/MagneticButton'
+import { PanelScroll } from '../components/PanelScroll'
 import { useAmbientApi } from '../hooks/useAmbient'
 import { brand, linkHub, socialScene, socials } from '../data/site'
 
@@ -15,7 +16,7 @@ export function Social({ onHome }: { onHome: () => void }) {
     <section className="scene" aria-labelledby="social-title">
       {/* Siete tarjetas no caben en la pantalla de un teléfono: el panel lleva
           su propio desplazamiento interno, sin que se mueva la página. */}
-      <div className="pane pane-scroll soc-pane">
+      <PanelScroll className="soc-pane">
         <div className="soc-head rise" data-d="1">
         <div>
           <p className="eyebrow">{socialScene.eyebrow}</p>
@@ -73,7 +74,7 @@ export function Social({ onHome }: { onHome: () => void }) {
             © {brand.year} {brand.legalName} · {brand.location}
           </span>
         </div>
-      </div>
+      </PanelScroll>
     </section>
   )
 }

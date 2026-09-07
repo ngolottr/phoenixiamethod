@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { SmartImage } from '../components/SmartImage'
+import { AvisoDeMas, useAvisoDeMas } from '../components/PanelScroll'
 import { Lightbox } from '../components/Lightbox'
 import { Spell, useSpell } from '../components/Spell'
 import { useAmbientApi } from '../hooks/useAmbient'
@@ -10,6 +11,9 @@ export function Gallery({ onLockNav }: { onLockNav: (locked: boolean) => void })
   const [open, setOpen] = useState<number | null>(null)
   const { paint, reset } = useAmbientApi()
   const spell = useSpell()
+  const caja = useRef<HTMLDivElement>(null)
+  const tira = useRef<HTMLDivElement>(null)
+  useAvisoDeMas(caja, tira, filter)
 
   const shots = useMemo(
     () => (filter === 'todo' ? gallery : gallery.filter((s) => s.category === filter)),
@@ -73,7 +77,10 @@ export function Gallery({ onLockNav }: { onLockNav: (locked: boolean) => void })
         </div>
       </div>
 
-      <div className="gal-strip rise" data-d="2" key={filter}>
+      {/* En el teléfono la tira se desliza: la caja avisa cuando queda galería
+          por debajo, para que una fila a medias no se lea como un corte. */}
+      <div className="pane-caja" ref={caja} data-mas="no">
+      <div className="gal-strip rise" data-d="2" key={filter} ref={tira}>
         {shots.map((shot, i) => (
           <button
             key={shot.src}
@@ -95,6 +102,8 @@ export function Gallery({ onLockNav }: { onLockNav: (locked: boolean) => void })
             </span>
           </button>
         ))}
+      </div>
+        <AvisoDeMas />
       </div>
 
       <p className="gal-hint rise" data-d="3">

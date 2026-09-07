@@ -1,5 +1,6 @@
 import { MagneticButton } from '../components/MagneticButton'
 import { ContactForm } from '../components/ContactForm'
+import { PanelScroll } from '../components/PanelScroll'
 import { useCopy } from '../hooks/useCopy'
 import { brand, contact, linkHub, socials } from '../data/site'
 
@@ -8,7 +9,7 @@ export function Contact() {
 
   return (
     <section className="scene" aria-labelledby="contact-title">
-      <div className="pane pane-scroll">
+      <PanelScroll>
         <div className="contact-grid">
           <div>
             <p className="eyebrow rise" data-d="1">
@@ -63,7 +64,7 @@ export function Contact() {
             <ContactForm idPrefix="contacto" />
           </div>
         </div>
-      </div>
+      </PanelScroll>
     </section>
   )
 }

@@ -18,10 +18,32 @@
      CONTACTO_EMAIL    a dónde te llega la copia. Si falta, usa el de abajo.
    ========================================================================== */
 
+import {
+  MAX_ENLACES,
+  RE_EMAIL,
+  cuentaEnlaces,
+  fallo,
+  ipDe,
+  limpiarLinea,
+  limpiarTexto,
+  pasaLosCupos,
+  sinCache,
+  vieneDeLaWeb,
+} from './_seguridad.js'
+
 export const config = { maxDuration: 20 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i
 const LIMITES = { nombre: 80, email: 160, mensaje: 2000, presupuesto: 80 }
+
+/* Cuánto se puede usar esta función. Cada solicitud gasta dos correos del cupo
+   diario de Brevo, que son 300: el tope global deja margen de sobra para las
+   personas reales y corta en seco a quien quiera vaciarlo. */
+const CUPO_IP = [3, 15 * 60000] // 3 envíos cada cuarto de hora desde una IP
+const CUPO_CORREO = [2, 24 * 3600000] // 2 al día por dirección
+const CUPO_TOTAL = [40, 24 * 3600000] // 40 al día en toda la web
+
+/** Lo que tarda una persona en llenar el formulario, como mínimo. */
+const SEGUNDOS_MINIMOS = 3
 
 const REMITENTE = { name: 'Nicolás Golott', email: 'contacto.nicolaspk@gmail.com' }
 const SITIO = process.env.SITIO_URL || 'https://elgolott.vercel.app'
@@ -32,13 +54,6 @@ const HORARIO =
 function enlaceAgenda({ nombre, email }) {
   const q = new URLSearchParams({ nombre, email })
   return `${SITIO}/agendar.html?${q.toString()}`
-}
-
-function limpiar(valor, max) {
-  return String(valor ?? '')
-    .replace(/\r/g, '')
-    .trim()
-    .slice(0, max)
 }
 
 /** Evita que un texto del visitante se cuele como etiquetas dentro del correo. */
@@ -111,7 +126,7 @@ NeuraIA`
         <p style="margin:0;font:400 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;color:#2BE58F;text-transform:uppercase;">Cómo seguimos</p>
         <p style="margin:12px 0 0;font:400 16px/1.55 Helvetica,Arial,sans-serif;color:#EFE7D5;">Elige tú mismo la hora que te acomode. Verás solo los horarios que tengo <strong>realmente libres</strong>.</p>
         <p style="margin:20px 0 6px;">
-          <a href="${agenda}" style="display:inline-block;background:#2BE58F;color:#040D0A;text-decoration:none;padding:16px 30px;font:400 12px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;">Elegir mi horario</a>
+          <a href="${escapar(agenda)}" style="display:inline-block;background:#2BE58F;color:#040D0A;text-decoration:none;padding:16px 30px;font:400 12px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;">Elegir mi horario</a>
         </p>
         <p style="margin:14px 0 0;font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#8FA79B;">Atiendo ${HORARIO}.</p>
       </td></tr>
@@ -181,34 +196,78 @@ async function enviar({ apiKey, para, nombrePara, asunto, texto, html, responder
 /* ------------------------------------------------------------------------- */
 
 export default async function handler(req, res) {
+  sinCache(res)
+
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Método no permitido' })
   }
 
-  const apiKey = process.env.BREVO_API_KEY
-  if (!apiKey) {
-    return res.status(500).json({ ok: false, error: 'Falta BREVO_API_KEY en Vercel.' })
+  // Esta función solo trabaja para el formulario de esta web.
+  if (!vieneDeLaWeb(req)) {
+    return fallo(res, 403, 'Envío no permitido desde aquí.')
   }
 
-  const cuerpo = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
+  const apiKey = process.env.BREVO_API_KEY
+  if (!apiKey) {
+    return fallo(res, 500, 'El correo no está disponible ahora.', 'Falta BREVO_API_KEY')
+  }
+
+  let cuerpo
+  try {
+    cuerpo = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
+  } catch {
+    return fallo(res, 400, 'No pude leer el formulario.')
+  }
 
   const datos = {
-    nombre: limpiar(cuerpo.nombre, LIMITES.nombre),
-    email: limpiar(cuerpo.email, LIMITES.email),
-    mensaje: limpiar(cuerpo.mensaje, LIMITES.mensaje),
-    presupuesto: limpiar(cuerpo.presupuesto, LIMITES.presupuesto),
+    // Nombre y presupuesto viajan al asunto y al remitente de respuesta: ahí un
+    // salto de línea es una inyección de cabeceras, no un salto de línea.
+    nombre: limpiarLinea(cuerpo.nombre, LIMITES.nombre),
+    email: limpiarLinea(cuerpo.email, LIMITES.email),
+    presupuesto: limpiarLinea(cuerpo.presupuesto, LIMITES.presupuesto),
+    mensaje: limpiarTexto(cuerpo.mensaje, LIMITES.mensaje),
   }
 
   const errores = []
   if (datos.nombre.length < 2) errores.push('nombre')
-  if (!EMAIL_RE.test(datos.email)) errores.push('email')
+  if (!RE_EMAIL.test(datos.email)) errores.push('email')
   if (datos.mensaje.length < 12) errores.push('mensaje')
   if (errores.length) {
     return res.status(400).json({ ok: false, error: `Datos incompletos: ${errores.join(', ')}` })
   }
 
+  /* --- Filtros de abuso --------------------------------------------------- */
+
   // Trampa para robots: un campo que ninguna persona ve ni llena.
-  if (limpiar(cuerpo.web, 10)) return res.status(200).json({ ok: true })
+  if (limpiarTexto(cuerpo.web, 10)) return res.status(200).json({ ok: true })
+
+  // Nadie escribe una solicitud en dos segundos. Un robot sí.
+  const abierto = Number(cuerpo.desde)
+  if (Number.isFinite(abierto) && abierto < SEGUNDOS_MINIMOS * 1000) {
+    return res.status(200).json({ ok: true })
+  }
+
+  /* Este correo le repite al visitante lo que escribió. Sin este filtro, la web
+     sirve para mandarle a cualquiera un mensaje lleno de enlaces desde una
+     dirección con buena reputación: phishing con la cara de Nicolás. */
+  if (cuentaEnlaces(datos.mensaje) > MAX_ENLACES) {
+    return res
+      .status(400)
+      .json({ ok: false, error: 'Deja los enlaces para la reunión y cuéntamelo con palabras.' })
+  }
+
+  const ip = ipDe(req)
+  const permitido = pasaLosCupos([
+    [`contacto:ip:${ip}`, ...CUPO_IP],
+    [`contacto:mail:${datos.email.toLowerCase()}`, ...CUPO_CORREO],
+    ['contacto:total', ...CUPO_TOTAL],
+  ])
+  if (!permitido) {
+    res.setHeader('Retry-After', '900')
+    return res
+      .status(429)
+      .json({ ok: false, error: 'Ya recibí tu mensaje. Dame un rato antes de mandar otro.' })
+  }
 
   const cliente = correoParaElCliente(datos)
   const aviso = correoParaNicolas(datos)
@@ -225,7 +284,9 @@ export default async function handler(req, res) {
       html: cliente.html,
     })
   } catch (e) {
-    return res.status(502).json({ ok: false, error: `No se pudo enviar: ${e.message}` })
+    // El detalle va al registro de Vercel. Al visitante, nada: la respuesta de
+    // Brevo trae pistas del remitente, del plan y de la clave.
+    return fallo(res, 502, 'No pude enviar el correo. Intenta de nuevo en unos minutos.', e.message)
   }
 
   // La copia interna es deseable, pero si falla no arruina la solicitud.

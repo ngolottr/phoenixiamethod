@@ -28,7 +28,25 @@ const estado = {
 }
 
 const escapar = (t: string) =>
-  t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  String(t ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+
+/**
+ * Un enlace que se va a poner en un href tiene que ser una dirección web.
+ * Escapar no basta: "javascript:…" no lleva ni comillas ni signos raros y
+ * escrito en un href se ejecuta igual.
+ */
+const enlaceSeguro = (url: unknown) => {
+  try {
+    return ['https:', 'http:'].includes(new URL(String(url)).protocol) ? String(url) : ''
+  } catch {
+    return ''
+  }
+}
 
 function tituloDia(d: Dia) {
   const [, m, dia] = d.fecha.split('-').map(Number)
@@ -61,7 +79,8 @@ la agenda.</h1>
     </main>`
 }
 
-function pintarListo(cuando: string, enlace: string) {
+function pintarListo(cuando: string, enlaceCrudo: string) {
+  const enlace = enlaceSeguro(enlaceCrudo)
   raiz.innerHTML = `
     <main class="ag">
       <p class="eyebrow">Reunión confirmada</p>
@@ -90,9 +109,9 @@ conversamos.</h1>
           .map((d, i) => {
             const t = tituloDia(d)
             return `<button class="ag-dia" role="tab" aria-selected="${i === estado.diaActivo}" data-dia="${i}">
-              <span class="ag-dia-n">${t.nombre}</span>
-              <span class="ag-dia-f">${t.numero}</span>
-              <span class="ag-dia-c">${d.horas.length}</span>
+              <span class="ag-dia-n">${escapar(t.nombre)}</span>
+              <span class="ag-dia-f">${escapar(t.numero)}</span>
+              <span class="ag-dia-c">${d.horas.length | 0}</span>
             </button>`
           })
           .join('')}
@@ -104,7 +123,7 @@ conversamos.</h1>
             ? dia.horas
                 .map(
                   (h) =>
-                    `<button class="ag-hora${estado.elegida?.inicio === h.inicio ? ' on' : ''}" data-inicio="${h.inicio}">${h.etiqueta}</button>`,
+                    `<button class="ag-hora${estado.elegida?.inicio === h.inicio ? ' on' : ''}" data-inicio="${escapar(h.inicio)}">${escapar(h.etiqueta)}</button>`,
                 )
                 .join('')
             : '<p class="body">No quedan horas libres en los próximos días.</p>'

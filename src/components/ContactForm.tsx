@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { MagneticButton } from './MagneticButton'
 import { brand, contact, presupuestos } from '../data/site'
 
@@ -29,6 +29,11 @@ export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [estado, setEstado] = useState<Estado>('listo')
   const [trampa, setTrampa] = useState('')
+
+  /* Cuándo se abrió el formulario. Se envía junto con los datos: una persona
+     tarda al menos unos segundos en escribir, un robot rellena y dispara al
+     instante, y el servidor descarta lo que llega demasiado rápido. */
+  const abierto = useRef(Date.now())
 
   const set =
     (key: keyof Values) =>
@@ -62,6 +67,7 @@ export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
           presupuesto: values.budget,
           mensaje: values.message.trim(),
           web: trampa,
+          desde: Date.now() - abierto.current,
         }),
       })
       setEstado(r.ok ? 'enviado' : 'error')

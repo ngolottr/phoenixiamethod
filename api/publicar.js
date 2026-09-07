@@ -16,7 +16,24 @@
    en el panel de Vercel, así no quedan escritas en el código ni en GitHub.
    ========================================================================== */
 
+import crypto from 'node:crypto'
+
 const GRAPH = 'https://graph.instagram.com/v23.0'
+
+/**
+ * Compara dos secretos sin delatar en cuánto se parecen.
+ *
+ * Un `===` corriente se detiene en el primer carácter distinto, así que el
+ * tiempo que tarda cuenta cuántos acertó quien está probando. Se comparan los
+ * resúmenes y no los textos, porque así ambos lados miden siempre lo mismo y la
+ * diferencia de largo tampoco dice nada.
+ */
+function mismoSecreto(a, b) {
+  if (!a || !b) return false
+  const ha = crypto.createHash('sha256').update(String(a)).digest()
+  const hb = crypto.createHash('sha256').update(String(b)).digest()
+  return crypto.timingSafeEqual(ha, hb)
+}
 
 /** Vercel permite hasta 60 segundos por ejecución; procesar el video usa varios. */
 export const config = { maxDuration: 60 }
@@ -88,14 +105,28 @@ async function publicarUno({ userId, token, videoUrl, caption, tipo }) {
 }
 
 export default async function handler(req, res) {
-  // --- Puerta: solo pasa el cron de Vercel o quien tenga la llave ---
-  const secreto = process.env.CRON_SECRET
-  const auth = req.headers.authorization || ''
-  const llaveEnUrl = req.query?.key || ''
-  const autorizado = secreto && (auth === `Bearer ${secreto}` || llaveEnUrl === secreto)
+  res.setHeader('Cache-Control', 'no-store, max-age=0')
 
-  if (!autorizado) {
+  /* --- Puerta -------------------------------------------------------------
+     La llave va SOLO en la cabecera. Antes también se aceptaba como ?key= en la
+     dirección, y eso la dejaba escrita en el registro de accesos de Vercel, en
+     el historial del navegador y en la cabecera Referer de cualquier enlace que
+     saliera de esa página. Una llave que queda anotada en cuatro lugares deja
+     de ser una llave.
+
+     Para dispararla a mano:
+       curl -X POST -H "Authorization: Bearer TU_CRON_SECRET" \
+            https://elgolott.vercel.app/api/publicar                         */
+  const secreto = process.env.CRON_SECRET
+  const auth = String(req.headers.authorization || '')
+  const presentada = auth.startsWith('Bearer ') ? auth.slice(7).trim() : ''
+
+  if (!mismoSecreto(secreto, presentada)) {
     return res.status(401).json({ ok: false, error: 'No autorizado' })
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ ok: false, error: 'Método no permitido' })
   }
 
   // --- Las llaves y el contenido ---
@@ -129,7 +160,6 @@ export default async function handler(req, res) {
   return res.status(todoBien ? 200 : 207).json({
     ok: todoBien,
     cuando: new Date().toISOString(),
-    video: videoUrl,
     resultados,
   })
 }

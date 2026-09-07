@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { VideoLoop } from '../components/VideoLoop'
 import { MagneticButton } from '../components/MagneticButton'
+import { PanelScroll } from '../components/PanelScroll'
 import { useAmbientApi } from '../hooks/useAmbient'
 import { highlights, highlightsScene, type Highlight } from '../data/site'
 
@@ -194,6 +195,7 @@ export function Highlights({ onLockNav }: { onLockNav: (locked: boolean) => void
 
   return (
     <section className="scene" aria-labelledby="hl-title">
+      <PanelScroll className="hl-pane">
       <div className="hl-ancho hl-head rise" data-d="1">
         <p className="eyebrow">{highlightsScene.eyebrow}</p>
         <h2 id="hl-title" className="display h-md">
@@ -229,6 +231,7 @@ export function Highlights({ onLockNav }: { onLockNav: (locked: boolean) => void
       <p className="gal-hint hl-ancho rise" data-d="3" style={{ textAlign: 'center' }}>
         {total} videos rescatados · se reproducen solos · las flechas ← → recorren cada colección
       </p>
+      </PanelScroll>
 
       {openSet && <StoryViewer set={openSet} start={0} onClose={close} />}
     </section>

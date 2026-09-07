@@ -10,11 +10,31 @@
 import { tramosOcupados, crearEvento } from './_google.js'
 import { esHuecoValido, DURACION_MIN, partesEnChile } from './_agenda.js'
 import { enviarCorreo, escapar, enlaceAgregarACalendario } from './_correo.js'
+import {
+  MAX_ENLACES,
+  RE_EMAIL,
+  cuentaEnlaces,
+  esEnlaceSeguro,
+  fallo,
+  ipDe,
+  limpiarLinea,
+  limpiarTexto,
+  pasaLosCupos,
+  sinCache,
+  vieneDeLaWeb,
+} from './_seguridad.js'
 
 export const config = { maxDuration: 20 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i
-const limpiar = (v, max) => String(v ?? '').replace(/\r/g, '').trim().slice(0, max)
+/* Esta función escribe en el calendario real de Nicolás. Sin tope, cualquiera
+   podía llenarle la agenda de reuniones falsas con las dos semanas que se
+   ofrecen y dejarlo sin una sola hora libre que mostrar. */
+const CUPO_IP = [4, 60 * 60000] // 4 reservas por hora desde una IP
+const CUPO_CORREO = [2, 24 * 3600000] // 2 al día por dirección
+const CUPO_TOTAL = [25, 24 * 3600000] // 25 al día en total
+
+/** Un instante en formato ISO, para no darle a Google cualquier cosa. */
+const RE_ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})$/
 
 const DIAS_LARGO = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
@@ -93,20 +113,57 @@ Ya está en tu calendario NeuraIA · Clientes.${enlaceReunion ? `\nEnlace: ${enl
 }
 
 export default async function handler(req, res) {
+  sinCache(res)
+
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Método no permitido' })
   }
 
-  const cuerpo = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
+  if (!vieneDeLaWeb(req)) {
+    return fallo(res, 403, 'Reserva no permitida desde aquí.')
+  }
 
-  const nombre = limpiar(cuerpo.nombre, 80)
-  const email = limpiar(cuerpo.email, 160)
-  const tema = limpiar(cuerpo.tema, 1000)
-  const inicioISO = limpiar(cuerpo.inicio, 40)
+  let cuerpo
+  try {
+    cuerpo = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
+  } catch {
+    return fallo(res, 400, 'No pude leer la reserva.')
+  }
+
+  const nombre = limpiarLinea(cuerpo.nombre, 80)
+  const email = limpiarLinea(cuerpo.email, 160)
+  const tema = limpiarTexto(cuerpo.tema, 1000)
+  const inicioISO = limpiarLinea(cuerpo.inicio, 40)
 
   if (nombre.length < 2) return res.status(400).json({ ok: false, error: 'Falta tu nombre.' })
-  if (!EMAIL_RE.test(email)) return res.status(400).json({ ok: false, error: 'Ese correo no es válido.' })
-  if (limpiar(cuerpo.web, 10)) return res.status(200).json({ ok: true })
+  if (!RE_EMAIL.test(email)) return res.status(400).json({ ok: false, error: 'Ese correo no es válido.' })
+
+  // Antes se le pasaba a Google cualquier cosa que llegara: una fecha ilegible
+  // reventaba la función y devolvía el error interno como respuesta.
+  if (!RE_ISO.test(inicioISO) || !Number.isFinite(new Date(inicioISO).getTime())) {
+    return res.status(400).json({ ok: false, error: 'Ese horario no se entiende. Elige otro.' })
+  }
+
+  if (limpiarTexto(cuerpo.web, 10)) return res.status(200).json({ ok: true })
+
+  // El tema queda escrito en la descripción del evento y en el correo interno:
+  // no es un lugar para que un desconocido deje enlaces.
+  if (cuentaEnlaces(tema) > MAX_ENLACES) {
+    return res.status(400).json({ ok: false, error: 'Cuéntamelo con palabras, sin tantos enlaces.' })
+  }
+
+  const ip = ipDe(req)
+  const permitido = pasaLosCupos([
+    [`reservar:ip:${ip}`, ...CUPO_IP],
+    [`reservar:mail:${email.toLowerCase()}`, ...CUPO_CORREO],
+    ['reservar:total', ...CUPO_TOTAL],
+  ])
+  if (!permitido) {
+    res.setHeader('Retry-After', '3600')
+    return res
+      .status(429)
+      .json({ ok: false, error: 'Ya tienes una reunión pedida. Escríbeme si necesitas otra.' })
+  }
 
   try {
     const margen = 3 * 3600000
@@ -131,7 +188,10 @@ export default async function handler(req, res) {
     })
 
     const cuando = enPalabras(revision.inicio)
-    const enlaceReunion = evento.hangoutLink || evento.location || ''
+    // Solo se pasa adelante si es una dirección web de verdad: este valor
+    // termina dentro de un href del correo y del enlace que ve el cliente.
+    const bruto = evento.hangoutLink || evento.location || ''
+    const enlaceReunion = esEnlaceSeguro(bruto) ? bruto : ''
 
     // El evento ya está en la agenda. Los correos son deseables, pero si Brevo
     // falla la reserva sigue siendo válida: no se le dice que no a la persona.
@@ -139,6 +199,8 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ ok: true, cuando, enlace: enlaceReunion })
   } catch (e) {
-    return res.status(500).json({ ok: false, error: e.message })
+    // Los errores de Google traen el identificador del calendario y el correo de
+    // la cuenta de servicio. Eso se queda en el registro, no en la respuesta.
+    return fallo(res, 500, 'No pude agendar la reunión. Intenta con otro horario.', e.message)
   }
 }

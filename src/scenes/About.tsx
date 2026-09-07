@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { SmartImage } from '../components/SmartImage'
+import { PanelScroll } from '../components/PanelScroll'
 import { useAmbientApi } from '../hooks/useAmbient'
 import { about, gallery, linkHub } from '../data/site'
 
@@ -52,7 +53,7 @@ export function About() {
 
   return (
     <section className="scene" aria-labelledby="about-title">
-      <div className="pane pane-scroll">
+      <PanelScroll>
         <div className="about-grid">
           <div>
             <p className="eyebrow rise" data-d="1">
@@ -131,7 +132,7 @@ export function About() {
             </div>
           </div>
         </div>
-      </div>
+      </PanelScroll>
 
       <span className="sr-only" aria-live="polite">
         {fotos[i].caption}

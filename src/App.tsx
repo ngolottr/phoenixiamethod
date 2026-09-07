@@ -73,9 +73,17 @@ export default function App() {
     resetAmbient()
   }, [scene.id, resetAmbient])
 
-  // Ningún gesto de scroll debe mover el documento
+  /* Ningún gesto debe mover el documento… pero sí los paneles que llevan su
+     propio desplazamiento. Cancelar el touchmove en la raíz mataba también el
+     scroll de adentro: en el teléfono la galería y el texto de "Sobre mí"
+     quedaban cortados y no había forma de llegar al resto. */
   useEffect(() => {
-    const block = (e: Event) => e.preventDefault()
+    const DESPLAZABLES = '.pane-scroll, .gal-strip, [data-desplazable]'
+    const block = (e: TouchEvent) => {
+      const el = e.target as HTMLElement | null
+      if (el?.closest?.(DESPLAZABLES)) return
+      e.preventDefault()
+    }
     const target = document.getElementById('root')
     target?.addEventListener('touchmove', block as EventListener, { passive: false })
     return () => target?.removeEventListener('touchmove', block as EventListener)
