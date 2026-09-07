@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { SmartImage } from '../components/SmartImage'
 import { VideoLoop } from '../components/VideoLoop'
 import { MagneticButton } from '../components/MagneticButton'
 import { useAmbientApi } from '../hooks/useAmbient'
@@ -10,18 +9,6 @@ import { highlights, highlightsScene, type Highlight } from '../data/site'
    Visor de historias: barras segmentadas arriba, imagen al centro, frase abajo.
    Cada imagen tiñe el sitio entero con su color dominante.
    -------------------------------------------------------------------------- */
-
-/** Cuánto se queda una foto en pantalla antes de pasar sola, como en la app. */
-const FOTO_MS = 6000
-
-type Pieza = { src: string; tipo: 'video' | 'foto' }
-
-/** Los videos van primero: al abrir la colección, lo primero que corre es movimiento. */
-function armarPiezas(set: Highlight): Pieza[] {
-  const videos = (set.videos ?? []).map((src) => ({ src, tipo: 'video' as const }))
-  const fotos = set.items.map((src) => ({ src, tipo: 'foto' as const }))
-  return [...videos, ...fotos]
-}
 
 function StoryViewer({
   set,
@@ -36,11 +23,10 @@ function StoryViewer({
   const ref = useRef<HTMLDivElement>(null)
   const opener = useRef<Element | null>(null)
   const video = useRef<HTMLVideoElement>(null)
-  const { paint } = useAmbientApi()
+  const { paintFromVideo } = useAmbientApi()
 
-  const piezas = useMemo(() => armarPiezas(set), [set])
-  const total = piezas.length
-  const pieza = piezas[i]
+  const total = set.videos.length
+  const src = set.videos[i]
   const note = set.notes[i % set.notes.length]
 
   const step = useCallback(
@@ -48,28 +34,11 @@ function StoryViewer({
     [total],
   )
 
-  // El color sale siempre de una foto: de un video no se puede muestrear
-  // sin cargarlo entero, así que los videos toman el tono de la portada.
-  useEffect(() => {
-    paint(pieza.tipo === 'foto' ? pieza.src : set.items[0])
-  }, [pieza, set.items, paint])
-
-  // Las fotos pasan solas a los 6 segundos; los videos, cuando terminan
-  useEffect(() => {
-    if (pieza.tipo !== 'foto') return
-    if (document.documentElement.dataset.motion === 'reduced') return
-    const t = window.setTimeout(() => {
-      setI((v) => (v + 1 < total ? v + 1 : v))
-    }, FOTO_MS)
-    return () => window.clearTimeout(t)
-  }, [pieza, i, total])
-
   /* Cada video arranca solo al entrar.
      El navegador rechaza reproducir en una pestaña que no está a la vista, así
      que si el visitante llegó con la pestaña en segundo plano se reintenta en
      cuanto vuelve a ella. Sin esto, se quedaría mirando un cuadro congelado. */
   useEffect(() => {
-    if (pieza.tipo !== 'video') return
     const v = video.current
     if (!v) return
 
@@ -85,7 +54,7 @@ function StoryViewer({
       v.removeEventListener('canplay', arrancar)
       document.removeEventListener('visibilitychange', arrancar)
     }
-  }, [pieza])
+  }, [src])
 
   useEffect(() => {
     opener.current = document.activeElement
@@ -123,14 +92,14 @@ function StoryViewer({
     }
   }, [onClose, step])
 
-  // Precarga la siguiente foto para que el avance no parpadee
+  // Precarga el siguiente video para que el avance no se corte
   useEffect(() => {
-    const next = piezas[i + 1]
-    if (next?.tipo === 'foto') {
-      const img = new Image()
-      img.src = next.src
-    }
-  }, [i, piezas])
+    const next = set.videos[i + 1]
+    if (!next) return
+    const v = document.createElement('video')
+    v.preload = 'auto'
+    v.src = next
+  }, [i, set.videos])
 
   return createPortal(
     <div
@@ -141,8 +110,8 @@ function StoryViewer({
       ref={ref}
     >
       <div className="sv-bars" aria-hidden="true">
-        {piezas.map((p, n) => (
-          <span key={p.src} className={n <= i ? 'on' : undefined} />
+        {set.videos.map((v, n) => (
+          <span key={v} className={n <= i ? 'on' : undefined} />
         ))}
       </div>
 
@@ -161,24 +130,21 @@ function StoryViewer({
       <div className="sv-stage">
         {/* zonas de toque a los costados, igual que en la app */}
         <button className="sv-zone left" onClick={() => step(-1)} aria-label="Anterior" disabled={i === 0} />
-        <div className="sv-frame" key={pieza.src}>
-          {pieza.tipo === 'video' ? (
-            <video
-              ref={video}
-              className="sv-video"
-              src={pieza.src}
-              poster={set.items[0]}
-              muted
-              playsInline
-              autoPlay
-              preload="auto"
-              aria-label={`${set.title} — video ${i + 1}`}
-              onEnded={() => setI((v) => (v + 1 < total ? v + 1 : v))}
-              onError={() => setI((v) => (v + 1 < total ? v + 1 : v))}
-            />
-          ) : (
-            <SmartImage src={pieza.src} alt={`${set.title} — imagen ${i + 1}`} priority />
-          )}
+        <div className="sv-frame" key={src}>
+          <video
+            ref={video}
+            className="sv-video"
+            src={src}
+            muted
+            playsInline
+            autoPlay
+            preload="auto"
+            aria-label={`${set.title} — video ${i + 1} de ${total}`}
+            /* el color de la escena sale del cuadro que se está viendo */
+            onLoadedData={(e) => paintFromVideo(e.currentTarget)}
+            onEnded={() => setI((v) => (v + 1 < total ? v + 1 : v))}
+            onError={() => setI((v) => (v + 1 < total ? v + 1 : v))}
+          />
         </div>
         <button
           className="sv-zone right"
@@ -211,7 +177,7 @@ function StoryViewer({
 
 export function Highlights({ onLockNav }: { onLockNav: (locked: boolean) => void }) {
   const [openSet, setOpenSet] = useState<Highlight | null>(null)
-  const { paint, reset } = useAmbientApi()
+  const { reset } = useAmbientApi()
 
   const open = (set: Highlight) => {
     setOpenSet(set)
@@ -224,7 +190,7 @@ export function Highlights({ onLockNav }: { onLockNav: (locked: boolean) => void
     reset()
   }, [onLockNav, reset])
 
-  const total = highlights.reduce((s, h) => s + h.items.length, 0)
+  const total = highlights.reduce((s, h) => s + h.videos.length, 0)
 
   return (
     <section className="scene" aria-labelledby="hl-title">
@@ -246,28 +212,18 @@ export function Highlights({ onLockNav }: { onLockNav: (locked: boolean) => void
             key={set.slug}
             className="hl-card"
             onClick={() => open(set)}
-            onMouseEnter={() => paint(set.items[0])}
-            onFocus={() => paint(set.items[0])}
-            onMouseLeave={() => !openSet && reset()}
-            onBlur={() => !openSet && reset()}
-            aria-label={`Abrir ${set.title}: ${set.items.length} historias. ${set.blurb}`}
+            aria-label={`Abrir ${set.title}: ${set.videos.length} videos. ${set.blurb}`}
           >
             <span className="hl-ring">
-              {set.videos?.length ? (
-                <VideoLoop fuentes={set.videos} poster={set.items[0]} alt={`${set.title} en movimiento`} />
-              ) : (
-                <SmartImage src={set.items[0]} alt="" />
-              )}
-              {set.videos?.length ? (
-                <span className="hl-vivo" aria-hidden="true">
-                  ▶
-                </span>
-              ) : null}
+              <VideoLoop fuentes={set.videos.slice(0, 3)} alt={`${set.title} en movimiento`} />
+              <span className="hl-vivo" aria-hidden="true">
+                ▶
+              </span>
             </span>
             <span className="hl-meta">
               <span className="hl-kind">{set.kind}</span>
               <span className="hl-title">{set.title}</span>
-              <span className="hl-count">{set.items.length} historias</span>
+              <span className="hl-count">{set.videos.length} videos</span>
             </span>
             <span className="hl-blurb">{set.blurb}</span>
           </button>
@@ -275,7 +231,7 @@ export function Highlights({ onLockNav }: { onLockNav: (locked: boolean) => void
       </div>
 
       <p className="gal-hint rise" data-d="3">
-        {total} historias rescatadas · las flechas ← → recorren cada colección
+        {total} videos rescatados · se reproducen solos · las flechas ← → recorren cada colección
       </p>
 
       {openSet && <StoryViewer set={openSet} start={0} onClose={close} />}

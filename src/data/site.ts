@@ -7,8 +7,6 @@
    El color de fondo NO se define aquí: el sitio lo extrae de cada imagen.
    ========================================================================== */
 
-import { highlightFiles } from './highlightFiles'
-
 export type Social = {
   label: string
   handle: string
@@ -238,15 +236,14 @@ export const gallery: Shot[] = [
    --------------------------------------------------------------------------- */
 
 export type Highlight = {
-  slug: keyof typeof highlightFiles
+  slug: string
   title: string
   kind: string
   blurb: string
-  /** frases por imagen; si hay menos que imágenes, se van repitiendo en ciclo */
+  /** una frase por video */
   notes: string[]
-  items: string[]
-  /** videos rescatados de esa colección, se reproducen en bucle en la portada */
-  videos?: string[]
+  /** los videos de la colección: es lo único que se muestra */
+  videos: string[]
 }
 
 export const highlights: Highlight[] = [
@@ -255,17 +252,23 @@ export const highlights: Highlight[] = [
     title: 'Cielo',
     kind: 'Contemplación',
     blurb:
-      'Miro para arriba todos los días. Santiago tiene un cielo que nadie fotografía porque siempre está apurado.',
+      'Miro para arriba todos los días. Santiago tiene un cielo que nadie mira porque siempre está apurado.',
     notes: [
-      'Mismo cielo, distinto día.',
       'Esto estaba ahí. Solo había que mirar.',
+      'Mismo cielo, distinto día.',
       'La ciudad tapa, pero no del todo.',
       'Atardecer sin filtro. No hace falta.',
       'Las palmeras de Santiago no piden permiso.',
       'Gratis, todos los días, a la misma hora.',
     ],
-    items: highlightFiles.cielo,
-    videos: ['videos/cielo-01.mp4', 'videos/cielo-02.mp4'],
+    videos: [
+      'videos/cielo-01.mp4',
+      'videos/cielo-02.mp4',
+      'videos/cielo-03.mp4',
+      'videos/cielo-04.mp4',
+      'videos/cielo-05.mp4',
+      'videos/cielo-06.mp4',
+    ],
   },
   {
     slug: 'gym',
@@ -279,9 +282,16 @@ export const highlights: Highlight[] = [
       'Repetición. Otra vez. Y otra.',
       'Progreso lento es progreso igual.',
       'Acá no hay atajo que sirva.',
+      'Esto no se delega.',
     ],
-    items: highlightFiles.gym,
-    videos: ['videos/gym-01.mp4', 'videos/gym-02.mp4'],
+    videos: [
+      'videos/gym-01.mp4',
+      'videos/gym-02.mp4',
+      'videos/gym-03.mp4',
+      'videos/gym-04.mp4',
+      'videos/gym-05.mp4',
+      'videos/gym-06.mp4',
+    ],
   },
   {
     slug: 'elgolott',
@@ -290,41 +300,21 @@ export const highlights: Highlight[] = [
     blurb:
       'El personaje y la persona, en el mismo cuadro. Acá vive lo que después se convierte en contenido.',
     notes: [
-      'Trabajando en algo que todavía no se puede mostrar.',
-      'El detrás de cámara es la mitad del trabajo.',
       'Documentar mientras pasa, no después.',
+      'El detrás de cámara es la mitad del trabajo.',
+      'Trabajando en algo que todavía no se puede mostrar.',
       'Esto también es marca personal.',
       'Sin producción. Con intención.',
+      'Lo que no se sube igual cuenta.',
     ],
-    items: highlightFiles.elgolott,
-    videos: ['videos/elgolott-01.mp4', 'videos/elgolott-02.mp4'],
-  },
-  {
-    slug: 'memes',
-    title: 'Memes',
-    kind: 'Humor',
-    blurb:
-      'La colección más honesta de todas. Si te vas a tomar en serio todo el rato, mejor no publiques nada.',
-    notes: [
-      'El montaje lo hice yo. Se nota, y me da lo mismo.',
-      'Ángulo elegido a conciencia.',
-      'El día me pasó por encima.',
-      'Contrapicado nivel mentón.',
-      'Recién salido. De todo.',
-      'Denle vuelta el celular, yo ya no puedo.',
-      'La corona es merecida.',
-      'Nadie me pidió esta foto.',
-      'Así se ve la inspiración a las tres de la tarde.',
-      'Esta la guardé para un momento importante. Este.',
-      'Ninguna cámara profesional habría logrado esto.',
-      'Documentar el proceso. Todo el proceso.',
-      'Autorretrato, técnica mixta.',
-      'Me reí solo antes de subirla.',
-      'La cara que pongo cuando dicen "marca personal".',
-      'Esto va a envejecer pésimo y está perfecto.',
-      'Fin de la colección. Gracias por llegar hasta acá.',
+    videos: [
+      'videos/elgolott-01.mp4',
+      'videos/elgolott-02.mp4',
+      'videos/elgolott-03.mp4',
+      'videos/elgolott-04.mp4',
+      'videos/elgolott-05.mp4',
+      'videos/elgolott-06.mp4',
     ],
-    items: highlightFiles.memes,
   },
 ]
 
@@ -332,7 +322,7 @@ export const highlightsScene = {
   eyebrow: 'Historias destacadas',
   title: 'Lo que\nno se borra.',
   intro:
-    'Cuatro colecciones rescatadas de Instagram. Pulsa una y el sitio entero se tiñe con el color de lo que estás mirando.',
+    'Tres colecciones rescatadas de Instagram. Pulsa una y los videos corren solos, mientras el sitio se tiñe con el color de lo que estás mirando.',
 }
 
 /* ------------------------------------------------------------------------- */

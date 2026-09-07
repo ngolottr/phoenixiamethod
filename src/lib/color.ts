@@ -55,13 +55,17 @@ export function ambientFromImage(img: HTMLImageElement): Ambient {
   if (!ctx) return neutralAmbient(160)
 
   ctx.drawImage(img, 0, 0, SIZE, SIZE)
+  return ambientFromCanvas(ctx, SIZE) ?? neutralAmbient(160)
+}
 
+/** El muestreo propiamente tal, ya con el lienzo dibujado. */
+function ambientFromCanvas(ctx: CanvasRenderingContext2D, SIZE: number): Ambient | null {
   let data: Uint8ClampedArray
   try {
     data = ctx.getImageData(0, 0, SIZE, SIZE).data
   } catch {
-    // canvas contaminado (imagen de otro origen): no se puede leer
-    return neutralAmbient(160)
+    // canvas contaminado (medio de otro origen): no se puede leer
+    return null
   }
 
   const weight = new Float64Array(HUE_BUCKETS + 1) // el último es el cubo neutro
@@ -90,7 +94,7 @@ export function ambientFromImage(img: HTMLImageElement): Ambient {
 
   let best = 0
   for (let i = 1; i <= HUE_BUCKETS; i++) if (weight[i] > weight[best]) best = i
-  if (weight[best] <= 0) return neutralAmbient(160)
+  if (weight[best] <= 0) return null
 
   let hue = (Math.atan2(vy[best], vx[best]) * 180) / Math.PI
   if (hue < 0) hue += 360
@@ -127,6 +131,28 @@ function neutralAmbient(hue: number): Ambient {
     ink: `hsl(${h} 6% 94%)`,
     hue: h,
     sat: 0.08,
+  }
+}
+
+/**
+ * Misma lectura, pero sobre un cuadro de video.
+ * Se usa en la galería de destacados: como ahí no hay fotografías, el color de
+ * la escena sale del propio video que se está reproduciendo.
+ */
+export function ambientFromVideo(video: HTMLVideoElement): Ambient | null {
+  if (!video.videoWidth) return null
+  const SIZE = 64
+  const canvas = document.createElement('canvas')
+  canvas.width = SIZE
+  canvas.height = SIZE
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })
+  if (!ctx) return null
+
+  try {
+    ctx.drawImage(video, 0, 0, SIZE, SIZE)
+    return ambientFromCanvas(ctx, SIZE)
+  } catch {
+    return null
   }
 }
 

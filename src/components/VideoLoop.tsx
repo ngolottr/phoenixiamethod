@@ -15,7 +15,8 @@ export function VideoLoop({
   alt,
 }: {
   fuentes: string[]
-  poster: string
+  /** opcional: si no hay, el propio video muestra su primer cuadro */
+  poster?: string
   alt: string
 }) {
   const ref = useRef<HTMLVideoElement>(null)
@@ -37,14 +38,24 @@ export function VideoLoop({
     return () => v.removeEventListener('loadeddata', arrancar)
   }, [i, permitido])
 
-  if (!permitido) return <SmartImage src={poster} alt={alt} />
+  if (!permitido) {
+    // Sin movimiento: si hay portada se muestra; si no, el primer cuadro del video
+    return poster ? (
+      <SmartImage src={poster} alt={alt} />
+    ) : (
+      <div className="vloop">
+        <video className="listo" src={fuentes[0]} muted playsInline preload="metadata" aria-label={alt} />
+      </div>
+    )
+  }
 
   return (
     <div className="vloop">
-      {/* la portada sostiene el cuadro hasta que el video tiene imagen */}
-      <div className={`vloop-poster${listo ? ' oculto' : ''}`}>
-        <SmartImage src={poster} alt={alt} />
-      </div>
+      {poster && (
+        <div className={`vloop-poster${listo ? ' oculto' : ''}`}>
+          <SmartImage src={poster} alt={alt} />
+        </div>
+      )}
       <video
         ref={ref}
         className={listo ? 'listo' : undefined}

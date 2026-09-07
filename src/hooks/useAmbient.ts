@@ -1,9 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
-import { ambientFromSrc, type Ambient } from '../lib/color'
+import { ambientFromSrc, ambientFromVideo, type Ambient } from '../lib/color'
 
 type AmbientApi = {
   /** tiñe todo el sitio con el color dominante de esa foto */
   paint: (src: string) => void
+  /** lo mismo, pero leyendo el cuadro actual de un video */
+  paintFromVideo: (video: HTMLVideoElement) => void
   /** vuelve a la paleta base de la marca */
   reset: () => void
   active: boolean
@@ -11,6 +13,7 @@ type AmbientApi = {
 
 export const AmbientContext = createContext<AmbientApi>({
   paint: () => {},
+  paintFromVideo: () => {},
   reset: () => {},
   active: false,
 })
@@ -57,6 +60,17 @@ export function useAmbientProvider(): AmbientApi {
     [apply],
   )
 
+  const paintFromVideo = useCallback(
+    (video: HTMLVideoElement) => {
+      const amb = ambientFromVideo(video)
+      if (!amb) return
+      token.current++
+      apply(amb)
+      setActive(true)
+    },
+    [apply],
+  )
+
   const reset = useCallback(() => {
     token.current++
     apply(null)
@@ -65,5 +79,5 @@ export function useAmbientProvider(): AmbientApi {
 
   useEffect(() => () => apply(null), [apply])
 
-  return { paint, reset, active }
+  return { paint, paintFromVideo, reset, active }
 }
