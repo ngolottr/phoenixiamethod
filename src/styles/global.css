@@ -805,10 +805,13 @@ html[data-motion='reduced'] .proyector-cuadro { transition: opacity .01ms; }
 }
 .proyector-marcas span.on { width: 26px; background: var(--amb-accent); }
 
+/* En el teléfono el texto se come la pantalla y la fotografía quedaba abajo,
+   fuera de la vista. Se sube: primero la imagen, después el relato. */
 @media (max-width: 900px) {
-  .about-grid { grid-template-columns: 1fr; align-content: start; }
+  .about-grid { grid-template-columns: 1fr; align-content: start; gap: 22px; }
   .about-stats { gap: 18px 26px; }
-  .proyector-marco { height: 34vh; width: auto; max-width: 100%; }
+  .proyector { order: -1; }
+  .proyector-marco { height: 30vh; width: auto; max-width: 100%; }
   .proyector-marcas { justify-content: center; }
 }
 
