@@ -19,6 +19,9 @@ export function Work({ onLockNav }: { onLockNav: (locked: boolean) => void }) {
   const boton = useRef<HTMLButtonElement | null>(null)
   const { copied, copy } = useCopy()
 
+  /** El proyecto que se está señalando, para la vista previa de al lado. */
+  const activo = casos.find((c) => c.index === active) ?? null
+
   /** Atravesar el panal: primero el vórtice, después el formulario. */
   const entrar = () => {
     setEntrando(true)
@@ -75,38 +78,56 @@ export function Work({ onLockNav }: { onLockNav: (locked: boolean) => void }) {
         </h2>
       </div>
 
-      <div className="work-list rise" data-d="2">
-        {casos.map((c, i) => (
-          <button
-            key={c.index}
-            className="work-row"
-            data-open={active === c.index}
-            onClick={() => {
-              setAbierto(c)
-              onLockNav(true)
-            }}
-            onMouseEnter={() => setActive(c.index)}
-            onMouseLeave={() => setActive(null)}
-            onFocus={() => setActive(c.index)}
-            onBlur={() => setActive(null)}
-            aria-label={`Abrir el proyecto ${c.title}`}
-          >
-            <span className="wi">{c.index}</span>
-            <span className="wt">
-              {c.title}
-              <span className="wt-mas" aria-hidden="true">
-                ver
+      {/* La lista y su vista previa. Antes la fotografía era un fantasma que se
+          dibujaba DENTRO de la fila, encima de la descripción y de la categoría:
+          ni se leía el texto ni se veía la foto. Ahora tiene columna propia, se
+          muestra entera y no pisa nada. */}
+      <div className="work-cuerpo rise" data-d="2">
+        <div className="work-list">
+          {casos.map((c) => (
+            <button
+              key={c.index}
+              className="work-row"
+              data-open={active === c.index}
+              onClick={() => {
+                setAbierto(c)
+                onLockNav(true)
+              }}
+              onMouseEnter={() => setActive(c.index)}
+              onMouseLeave={() => setActive(null)}
+              onFocus={() => setActive(c.index)}
+              onBlur={() => setActive(null)}
+              aria-label={`Abrir el proyecto ${c.title}`}
+            >
+              <span className="wi">{c.index}</span>
+              <span className="wt">
+                {c.title}
+                <span className="wt-mas" aria-hidden="true">
+                  ver
+                </span>
               </span>
-            </span>
-            <span className="wd">{c.description}</span>
-            <span className="wm">
-              {c.category} · {c.meta}
-            </span>
-            <span className="work-ghost" aria-hidden="true">
-              <SmartImage src={c.image} alt="" tone={TONES[i % TONES.length]} />
-            </span>
-          </button>
-        ))}
+              <span className="wd">{c.description}</span>
+              <span className="wm">
+                {c.category} · {c.meta}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Un solo marco para los cuatro proyectos: se monta el que corresponda
+            al que se está señalando, y se desmonta al salir. */}
+        <aside className="work-vista" aria-hidden="true">
+          {casos.map((c, i) =>
+            active === c.index ? (
+              <span className="work-vista-foto" key={c.index}>
+                <SmartImage src={c.image} alt="" tone={TONES[i % TONES.length]} />
+              </span>
+            ) : null,
+          )}
+          <span className="work-vista-pie">
+            {activo ? activo.title : 'Señala un proyecto'}
+          </span>
+        </aside>
       </div>
 
       {/* --- La llamada: es el único elemento de la página que insiste --- */}

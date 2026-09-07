@@ -575,6 +575,11 @@ html[data-motion='reduced'] .pane-mas b { animation: none; }
   position: relative; font-family: var(--sans); font-size: 10px;
   letter-spacing: .26em; text-transform: uppercase; color: var(--humo);
   padding: 8px 2px; transition: color .35s var(--ease);
+  /* "Sobre mí" se partía en dos renglones cuando la barra se apretaba, la
+     cabecera crecía de alto y el título de la escena se le metía debajo. Los
+     nombres de las escenas no se parten: si no caben, el menú entero se retira
+     (por debajo de 1140 px) y quedan las flechas. */
+  white-space: nowrap;
 }
 .menu-item::after {
   content: ''; position: absolute; left: 0; bottom: 2px; height: 1px; width: 100%;
@@ -1206,12 +1211,53 @@ html[data-motion='reduced'] .lb-frame { animation: none; }
    se alinean arriba y aparece el scroll interno. Con un center a secas las
    primeras filas se salían por encima del panel y se montaban sobre el
    titular — que es justo lo que pasaba en pantallas de poca altura. */
+/* La lista a la izquierda y la fotografía del proyecto señalado a la derecha.
+   La foto tiene su propia columna: nunca se cruza con el texto. */
+.work-cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(190px, 20vw, 290px);
+  /* La fila hay que declararla. Una fila implícita se mide por su contenido y
+     no cede: la lista dejaba de encogerse y empujaba la llamada a la acción
+     fuera de la escena — en apaisado se salía doscientos píxeles por abajo.
+     Con minmax(0, 1fr) la fila ocupa lo que hay y la lista se desplaza dentro. */
+  grid-template-rows: minmax(0, 1fr);
+  gap: clamp(18px, 3vw, 46px);
+  flex: 1; min-height: 0; align-items: stretch;
+}
+
 .work-list {
   display: flex; flex-direction: column;
   justify-content: safe center;
   flex: 1; min-height: 0;
   overflow-y: auto; overscroll-behavior: contain;
   scrollbar-width: thin;
+}
+
+/* El marco de la vista previa. Está siempre, vacío o con foto, para que la
+   lista no cambie de ancho al pasar el cursor por encima. */
+.work-vista {
+  position: relative; align-self: center; justify-self: end;
+  width: 100%; aspect-ratio: 4 / 5; max-height: 100%;
+  border: 1px solid var(--linea);
+  background: color-mix(in srgb, var(--amb-bg) 88%, var(--hueso));
+  overflow: hidden;
+  display: flex; align-items: flex-end;
+}
+
+.work-vista-foto { position: absolute; inset: 0; animation: vistaEntra .45s var(--ease); }
+.work-vista-foto .img { position: absolute; inset: 0; background: none; }
+.work-vista-foto .img::before { display: none; }
+/* Entera, sin recortar: es el proyecto lo que se está mirando, no una textura */
+.work-vista-foto .img img { object-fit: contain; }
+@keyframes vistaEntra { from { opacity: 0; } }
+html[data-motion='reduced'] .work-vista-foto { animation: none; }
+
+.work-vista-pie {
+  position: relative; z-index: 2; width: 100%;
+  padding: 22px 12px 10px;
+  background: linear-gradient(180deg, transparent, var(--velo-fuerte));
+  font-size: 9px; letter-spacing: .24em; text-transform: uppercase;
+  color: var(--humo); text-align: center;
 }
 .work-list::-webkit-scrollbar { width: 3px; }
 .work-list::-webkit-scrollbar-thumb { background: var(--linea-fuerte); }
@@ -1229,7 +1275,9 @@ html[data-motion='reduced'] .lb-frame { animation: none; }
 .work-row:last-of-type { border-bottom: 1px solid var(--linea); }
 .work-row .wi { font-family: var(--sans); font-size: 10px; letter-spacing: .22em; color: var(--laton); }
 .work-row .wt {
-  font-family: var(--serif); font-size: clamp(18px, min(3vw, 4.6vh), 44px); line-height: 1.05;
+  /* Con la fotografía ocupando su propia columna, la lista es más angosta: el
+     título se mide contra ese ancho, no contra la pantalla entera. */
+  font-family: var(--serif); font-size: clamp(18px, min(2.4vw, 4.2vh), 36px); line-height: 1.05;
   transition: color .4s var(--ease);
 }
 .work-row .wd { font-size: 12.5px; line-height: 1.7; color: var(--humo); max-width: 42ch; }
@@ -1337,21 +1385,14 @@ html[data-motion='reduced'] .lb-frame { animation: none; }
 .work-row:hover, .work-row:focus-visible, .work-row[data-open='true'] { padding-left: clamp(8px, 1.4vw, 22px); }
 .work-row:hover .wt, .work-row:focus-visible .wt, .work-row[data-open='true'] .wt { color: var(--amb-accent); }
 
-.work-ghost {
-  position: absolute; right: clamp(0px, 4vw, 60px); top: 50%; transform: translateY(-50%);
-  width: clamp(180px, 20vw, 300px); aspect-ratio: 4/5; z-index: -1;
-  opacity: 0; transition: opacity .6s var(--ease), transform .8s var(--ease);
-  filter: saturate(.7);
-}
-.work-row:hover .work-ghost, .work-row[data-open='true'] .work-ghost {
-  opacity: .42; transform: translateY(-50%) scale(1.02);
-}
-/* En pantallas medianas y en el teléfono la fila no se recorta: se dobla.
-   Antes se escondían la descripción y la categoría, y el visitante de móvil
-   se quedaba con una lista de títulos sin saber de qué iba cada proyecto —
-   una versión mutilada del sitio, no una adaptada. Ahora el número y el
-   título comparten la primera línea y el resto baja debajo. */
-@media (max-width: 980px) {
+/* La fila no se recorta nunca: se dobla.
+   Antes, por debajo de 980 px se escondían la descripción y la categoría, y el
+   visitante se quedaba con una lista de títulos sin saber de qué iba cada
+   proyecto — una versión mutilada, no una adaptada. Y las cuatro columnas
+   dejaron de caber antes de eso: con la fotografía en su propia columna, un
+   portátil de 1366 ya no tiene ancho para título, descripción y categoría en
+   una sola línea. El corte sube a 1400. */
+@media (max-width: 1400px) {
   .work-row {
     grid-template-columns: 34px minmax(0, 1fr);
     grid-template-areas:
@@ -1365,7 +1406,14 @@ html[data-motion='reduced'] .lb-frame { animation: none; }
   .work-row .wt { grid-area: titulo; }
   .work-row .wd { grid-area: desc; max-width: none; font-size: 12px; }
   .work-row .wm { grid-area: meta; white-space: normal; }
-  .work-ghost { display: none; }
+}
+
+/* Por debajo de 860 px la vista previa se queda sin ancho útil: se retira y la
+   lista ocupa todo. La fotografía sigue estando — al tocar una fila se abre el
+   expediente completo del proyecto, con foto y datos. */
+@media (max-width: 860px) {
+  .work-cuerpo { grid-template-columns: minmax(0, 1fr); }
+  .work-vista { display: none; }
 }
 
 /* Muy estrecho: el número deja de ocupar columna propia y se pone de sombrero */
@@ -2119,9 +2167,10 @@ html[data-motion='reduced'] .intro { display: none; }
   .util { padding: 8px 10px; gap: 0; }
 }
 
-/* Bajo 1140 px el menú completo se aprieta contra la marca: se retira y la
-   navegación queda en las flechas, el indicador inferior y el teclado. */
-@media (max-width: 1140px) {
+/* Bajo 1220 px el menú completo se aprieta contra la marca: se retira y la
+   navegación queda en las flechas, el indicador inferior y el teclado. Antes el
+   corte estaba en 1140 y en esa franja los nombres se partían en dos líneas. */
+@media (max-width: 1220px) {
   .menu { display: none; }
   .utils { margin-left: auto; }
   /* Con el menú fuera vuelve a haber sitio para los nombres */
