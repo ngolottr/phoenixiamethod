@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { MagneticButton } from '../components/MagneticButton'
+import { Emblema } from '../components/Emblema'
 import { manifesto } from '../data/site'
 
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI']
@@ -22,6 +23,10 @@ export function Manifesto() {
 
   return (
     <section className="scene mani" aria-labelledby="mani-title">
+      {/* La composición vive detrás del verso: sostiene el clima sin robarle
+          protagonismo a la tipografía, que es lo que manda en esta escena. */}
+      <Emblema indice={i} />
+
       <p className="eyebrow rise" data-d="1" id="mani-title">
         {manifesto.eyebrow}
       </p>

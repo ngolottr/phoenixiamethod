@@ -929,6 +929,61 @@ html[data-motion='reduced'] .lb-frame { animation: none; }
    =========================================================================== */
 
 .mani { align-items: center; justify-content: center; text-align: center; }
+
+/* ---------------------------------------------------------------------------
+   EMBLEMAS — una composición por verso, detrás del texto.
+   Se dibujan solas al entrar: el trazo principal se va trazando como si alguien
+   lo estuviera dibujando, y después queda respirando.
+   --------------------------------------------------------------------------- */
+
+.emblema {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(74vh, 62vw, 620px); aspect-ratio: 1;
+  z-index: 0; pointer-events: none;
+  opacity: .34;
+  animation: emblemaEntra 1.4s var(--ease) backwards;
+}
+.emblema svg { width: 100%; height: 100%; }
+
+@keyframes emblemaEntra {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(.9) rotate(-4deg); }
+  to   { opacity: .34; transform: translate(-50%, -50%) scale(1) rotate(0); }
+}
+
+/* El trazo protagonista se dibuja de un extremo al otro */
+.em-trazo { animation: emTrazo 2.4s var(--ease) .35s backwards; }
+@keyframes emTrazo {
+  from { stroke-dashoffset: 460; opacity: 0; }
+  40%  { opacity: 1; }
+  to   { stroke-dashoffset: 0; opacity: 1; }
+}
+
+.em-pulso { animation: emPulso 3.2s ease-in-out infinite; transform-origin: center; }
+@keyframes emPulso {
+  0%, 100% { opacity: .45; }
+  50%      { opacity: 1; }
+}
+
+/* Las barras de la onda suben una tras otra, de izquierda a derecha */
+.em-barra {
+  transform-origin: center;
+  animation: emBarra .7s var(--ease) backwards;
+  animation-delay: calc(var(--i) * 26ms + 200ms);
+}
+@keyframes emBarra {
+  from { transform: scaleY(.05); opacity: 0; }
+  to   { transform: scaleY(1); opacity: 1; }
+}
+
+html[data-motion='reduced'] .emblema,
+html[data-motion='reduced'] .em-trazo,
+html[data-motion='reduced'] .em-barra,
+html[data-motion='reduced'] .em-pulso { animation: none; }
+html[data-motion='reduced'] .emblema { opacity: .28; }
+
+/* El verso y sus controles siempre por delante del emblema */
+.mani .eyebrow, .mani-verse, .mani-note, .mani-controls { position: relative; z-index: 2; }
 .mani-verse {
   font-family: var(--serif); font-weight: 400; white-space: pre-line;
   font-size: clamp(46px, 10vw, 150px); line-height: .82; letter-spacing: -.045em;
