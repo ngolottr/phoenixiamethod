@@ -1200,10 +1200,12 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
 .soc-hub:hover { opacity: .7; }
 
 /* Tarjetas en rejilla: se leen de un vistazo y cada una dice qué hay adentro */
+.soc-pane { display: flex; flex-direction: column; justify-content: center; }
+
 .soc-grid {
   display: grid; gap: clamp(8px, 1.2vw, 14px);
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  flex: 1; min-height: 0; align-content: center;
+  align-content: center;
   margin-top: clamp(16px, 3vh, 30px);
 }
 
@@ -1245,10 +1247,16 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
   margin-top: clamp(14px, 2.6vh, 28px);
 }
 
+/* En el teléfono las siete van en una columna y se compactan: foto más chica,
+   menos aire y el panel con desplazamiento propio. */
 @media (max-width: 760px) {
-  .soc-grid { grid-template-columns: 1fr; gap: 8px; }
+  .soc-pane { justify-content: flex-start; }
+  .soc-grid { grid-template-columns: 1fr; gap: 6px; margin-top: 16px; }
   .soc-que { display: none; }
-  .soc-foto { width: 48px; }
+  .soc-card { padding: 7px 12px 7px 7px; gap: 12px; }
+  .soc-foto { width: 44px; }
+  .soc-nombre { font-size: 19px; }
+  .soc-pie { margin-top: 18px; flex-direction: column; align-items: flex-start; gap: 12px; }
 }
 
 /* ===========================================================================

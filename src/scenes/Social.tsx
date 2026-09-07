@@ -13,7 +13,10 @@ export function Social({ onHome }: { onHome: () => void }) {
 
   return (
     <section className="scene" aria-labelledby="social-title">
-      <div className="soc-head rise" data-d="1">
+      {/* Siete tarjetas no caben en la pantalla de un teléfono: el panel lleva
+          su propio desplazamiento interno, sin que se mueva la página. */}
+      <div className="pane pane-scroll soc-pane">
+        <div className="soc-head rise" data-d="1">
         <div>
           <p className="eyebrow">{socialScene.eyebrow}</p>
           <h2 id="social-title" className="display h-md" style={{ marginTop: 10 }}>
@@ -62,13 +65,14 @@ export function Social({ onHome }: { onHome: () => void }) {
         ))}
       </nav>
 
-      <div className="soc-pie rise" data-d="4">
-        <MagneticButton className="btn ghost" onClick={onHome}>
-          ↺ Volver al inicio
-        </MagneticButton>
-        <span className="label">
-          © {brand.year} {brand.legalName} · {brand.location}
-        </span>
+        <div className="soc-pie rise" data-d="4">
+          <MagneticButton className="btn ghost" onClick={onHome}>
+            ↺ Volver al inicio
+          </MagneticButton>
+          <span className="label">
+            © {brand.year} {brand.legalName} · {brand.location}
+          </span>
+        </div>
       </div>
     </section>
   )
