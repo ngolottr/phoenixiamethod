@@ -704,9 +704,17 @@ html[data-motion='reduced'] .sello-anillo { animation: none; }
   display: grid; grid-template-columns: 1fr 1fr;
   gap: clamp(20px, 3.2vw, 52px); align-items: center; flex: 1; min-height: 0;
 }
+/* En una rejilla, 1fr no baja del ancho mínimo de su contenido salvo que se
+   le permita: sin este min-width, una línea larga estira la columna y el texto
+   se sale de la pantalla en el teléfono. */
+.about-grid > * { min-width: 0; }
+
 /* En esta escena el texto no se limita a 46 caracteres: llena su columna */
-.about-grid .body { max-width: 100%; font-size: clamp(13px, 1.15vw, 16px); }
-.about-grid .display { font-size: clamp(34px, 5vw, 72px); }
+.about-grid .body {
+  max-width: 100%; font-size: clamp(13px, 1.15vw, 16px);
+  overflow-wrap: break-word;
+}
+.about-grid .display { font-size: clamp(30px, 5vw, 72px); }
 .about-stats { display: flex; gap: clamp(22px, 4vw, 56px); margin-top: clamp(20px, 4vh, 40px); flex-wrap: wrap; }
 .about-stat .v { font-family: var(--serif); font-size: clamp(28px, 3.4vw, 46px); line-height: 1; color: var(--laton); }
 .about-stat .l { font-size: 9px; letter-spacing: .26em; text-transform: uppercase; color: var(--humo); margin-top: 8px; }
@@ -799,7 +807,8 @@ html[data-motion='reduced'] .proyector-cuadro { transition: opacity .01ms; }
 
 @media (max-width: 900px) {
   .about-grid { grid-template-columns: 1fr; align-content: start; }
-  .proyector-marco { height: 40vh; }
+  .about-stats { gap: 18px 26px; }
+  .proyector-marco { height: 34vh; width: auto; max-width: 100%; }
   .proyector-marcas { justify-content: center; }
 }
 
