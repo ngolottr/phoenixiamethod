@@ -25,22 +25,32 @@ export function Cursor({ enabled }: { enabled: boolean }) {
       const el = e.target as HTMLElement | null
       const hot = !!el?.closest('a, button, [role="button"], input, textarea')
       ring.current?.classList.toggle('is-hot', hot)
+
+      if (!raf) raf = requestAnimationFrame(loop)
     }
 
-    const loop = () => {
-      eased.x += (target.x - eased.x) * 0.16
-      eased.y += (target.y - eased.y) * 0.16
+    /**
+     * El anillo persigue al punto con retardo. En cuanto lo alcanza, el bucle
+     * se detiene: antes seguía pidiendo cuadros para siempre, y con el ratón
+     * quieto encima de la página eso son sesenta cálculos por segundo para
+     * dibujar exactamente lo mismo. Lo vuelve a arrancar el siguiente
+     * movimiento del ratón.
+     */
+    function loop() {
+      const dx = target.x - eased.x
+      const dy = target.y - eased.y
+      eased.x += dx * 0.16
+      eased.y += dy * 0.16
       if (ring.current) {
         ring.current.style.transform = `translate(${eased.x.toFixed(2)}px, ${eased.y.toFixed(2)}px)`
       }
-      raf = requestAnimationFrame(loop)
+      raf = Math.abs(dx) + Math.abs(dy) < 0.2 ? 0 : requestAnimationFrame(loop)
     }
 
     window.addEventListener('mousemove', onMove, { passive: true })
-    raf = requestAnimationFrame(loop)
     return () => {
       window.removeEventListener('mousemove', onMove)
-      cancelAnimationFrame(raf)
+      if (raf) cancelAnimationFrame(raf)
     }
   }, [enabled])
 

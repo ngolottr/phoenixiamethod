@@ -2,6 +2,10 @@ import { useCallback, useEffect, useState } from 'react'
 
 const MOTION_KEY = 'elgolott:motion'
 const CURSOR_KEY = 'elgolott:cursor'
+const DRAG_KEY = 'elgolott:drag'
+const THEME_KEY = 'elgolott:theme'
+
+export type Theme = 'dark' | 'light'
 
 function readStored(key: string): string | null {
   try {
@@ -19,28 +23,44 @@ function store(key: string, value: string) {
   }
 }
 
+function media(query: string): boolean {
+  return typeof window !== 'undefined' && window.matchMedia(query).matches
+}
+
 /**
- * Preferencias de experiencia: reducir movimiento y cursor personalizado.
- * El valor inicial de "reducir movimiento" respeta prefers-reduced-motion
- * del sistema; el interruptor de la interfaz lo puede sobrescribir.
+ * Preferencias de experiencia.
+ *
+ * REGLA DE ARRANQUE: los efectos vienen APAGADOS. No todos los visitantes
+ * tienen un equipo potente, y el sitio tiene que abrir rápido y verse bien
+ * en cualquier máquina antes que lucirse. Cada efecto lo enciende el visitante
+ * desde la barra superior, y su elección queda guardada para la próxima visita.
+ *
+ * El tema sí respeta al sistema la primera vez: alguien que navega en claro a
+ * pleno día no debería recibir una pantalla negra por defecto.
  */
 export function usePreferences() {
+  // Movimiento: animaciones de entrada, cortinas, halos, grano.
   const [reduced, setReduced] = useState<boolean>(() => {
     const saved = readStored(MOTION_KEY)
     if (saved === 'reduced') return true
     if (saved === 'full') return false
-    return typeof window !== 'undefined'
-      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      : false
+    return true
   })
 
+  // Cursor propio (el punto y el anillo que persiguen al puntero).
   const [customCursor, setCustomCursor] = useState<boolean>(() => {
-    const saved = readStored(CURSOR_KEY)
-    if (saved === 'off') return false
-    if (saved === 'on') return true
-    return typeof window !== 'undefined'
-      ? window.matchMedia('(pointer: fine)').matches
-      : false
+    return readStored(CURSOR_KEY) === 'on'
+  })
+
+  // Arrastre: la estela de ondas que deja el puntero al pulsar y arrastrar.
+  const [drag, setDrag] = useState<boolean>(() => {
+    return readStored(DRAG_KEY) === 'on'
+  })
+
+  const [theme, setTheme] = useState<Theme>(() => {
+    const saved = readStored(THEME_KEY)
+    if (saved === 'light' || saved === 'dark') return saved
+    return media('(prefers-color-scheme: light)') ? 'light' : 'dark'
   })
 
   useEffect(() => {
@@ -53,10 +73,37 @@ export function usePreferences() {
     store(CURSOR_KEY, customCursor ? 'on' : 'off')
   }, [customCursor])
 
+  useEffect(() => {
+    document.documentElement.dataset.drag = drag ? 'on' : 'off'
+    store(DRAG_KEY, drag ? 'on' : 'off')
+  }, [drag])
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    store(THEME_KEY, theme)
+    // La barra del navegador en el teléfono se pinta con esto.
+    const meta = document.querySelector('meta[name="theme-color"]')
+    if (meta) meta.setAttribute('content', theme === 'light' ? '#F1F5F1' : '#040D0A')
+  }, [theme])
+
   const toggleMotion = useCallback(() => setReduced((v) => !v), [])
   const toggleCursor = useCallback(() => setCustomCursor((v) => !v), [])
+  const toggleDrag = useCallback(() => setDrag((v) => !v), [])
+  const toggleTheme = useCallback(
+    () => setTheme((v) => (v === 'dark' ? 'light' : 'dark')),
+    [],
+  )
 
-  return { reduced, customCursor, toggleMotion, toggleCursor }
+  return {
+    reduced,
+    customCursor,
+    drag,
+    theme,
+    toggleMotion,
+    toggleCursor,
+    toggleDrag,
+    toggleTheme,
+  }
 }
 
 /**
@@ -65,15 +112,33 @@ export function usePreferences() {
  */
 export function useViewportHeight() {
   useEffect(() => {
-    const set = () => {
-      document.documentElement.style.setProperty('--vh', `${window.innerHeight}px`)
+    let ultimo = -1
+    let raf = 0
+
+    const medir = () => {
+      raf = 0
+      const alto = window.innerHeight
+      // En el teléfono, resize se dispara al aparecer y desaparecer la barra de
+      // direcciones, y también con el teclado. Si el alto no cambió no se toca
+      // la variable: escribirla obliga a recalcular el estilo de toda la página.
+      if (alto === ultimo) return
+      ultimo = alto
+      document.documentElement.style.setProperty('--vh', `${alto}px`)
     }
-    set()
-    window.addEventListener('resize', set)
-    window.addEventListener('orientationchange', set)
+
+    // Un cuadro de espera agrupa la ráfaga de eventos que manda el navegador
+    // mientras se arrastra el borde de la ventana.
+    const pedir = () => {
+      if (!raf) raf = requestAnimationFrame(medir)
+    }
+
+    medir()
+    window.addEventListener('resize', pedir, { passive: true })
+    window.addEventListener('orientationchange', pedir, { passive: true })
     return () => {
-      window.removeEventListener('resize', set)
-      window.removeEventListener('orientationchange', set)
+      if (raf) cancelAnimationFrame(raf)
+      window.removeEventListener('resize', pedir)
+      window.removeEventListener('orientationchange', pedir)
     }
   }, [])
 }

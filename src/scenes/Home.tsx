@@ -16,10 +16,13 @@ export function Home({
   onEnter,
   onWork,
   onContacto,
+  arrastrable,
 }: {
   onEnter: () => void
   onWork: () => void
   onContacto: () => void
+  /** el visitante encendió el arrastre: el sello se puede mover */
+  arrastrable: boolean
 }) {
   return (
     <section className="scene home" aria-labelledby="home-title">
@@ -62,7 +65,7 @@ export function Home({
         </p>
       </div>
 
-      <Sello onClick={onContacto} />
+      <Sello onClick={onContacto} arrastrable={arrastrable} />
     </section>
   )
 }

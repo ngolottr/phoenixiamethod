@@ -29,8 +29,14 @@ export function useAvisoDeMas(
     if (!p || !c) return
 
     const medir = () => {
-      const queda = p.scrollHeight - p.clientHeight - p.scrollTop
-      c.dataset.mas = queda > 8 ? 'si' : 'no'
+      // Se miran los dos ejes: la galería se desliza de lado en el escritorio
+      // y hacia abajo en el teléfono, y el aviso tiene que apuntar bien.
+      const quedaY = p.scrollHeight - p.clientHeight - p.scrollTop
+      const quedaX = p.scrollWidth - p.clientWidth - p.scrollLeft
+      const hayY = quedaY > 8
+      const hayX = quedaX > 8
+      c.dataset.mas = hayY || hayX ? 'si' : 'no'
+      c.dataset.eje = hayY ? 'y' : 'x'
     }
 
     medir()
@@ -60,7 +66,8 @@ export function AvisoDeMas() {
     <>
       <span className="pane-velo" aria-hidden="true" />
       <span className="pane-mas" aria-hidden="true">
-        desliza <b>↓</b>
+        desliza <b className="pane-mas-y">↓</b>
+        <b className="pane-mas-x">→</b>
       </span>
     </>
   )

@@ -29,12 +29,25 @@
 
   /* --- Ritmo --- */
   --edge: clamp(20px, 5vw, 76px);      /* margen lateral de escena */
+  --medida: 1680px;                    /* ancho máximo del contenido de una escena */
   --dur-curtain: 460ms;
   --dur-in: 900ms;
   --ease: cubic-bezier(0.19, 1, 0.22, 1);
 
   --vh: 100vh;
   color-scheme: dark;
+
+  /* Velos: fondos semitransparentes que tapan lo que hay detrás (pastillas,
+     degradados de corte, visores). Van como variable porque en modo claro
+     tienen que tapar con claro, no con negro. */
+  --velo:        rgba(4, 13, 10, .72);
+  --velo-fuerte: rgba(4, 13, 10, .94);
+  --velo-total:  rgba(4, 13, 10, .98);
+  --sombra-foto: rgba(4, 13, 10, .82);
+  /* La viñeta que cierra los bordes de la escena. En claro no puede ser negra:
+     un marco oscuro alrededor de una página de papel se lee como suciedad. */
+  --vineta:      rgba(0, 0, 0, .92);
+  --sombra-alta: rgba(0, 0, 0, .75);
 
   /* --- Color ambiente ---
      Valores por defecto = la paleta de la marca. Cuando el usuario pulsa o
@@ -53,6 +66,47 @@
   --panal-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='34.64' viewBox='0 0 60 34.64'%3E%3Cpath fill='none' stroke='%23ffffff' stroke-width='0.9' d='M0 17.32 L10 17.32 L20 0 L40 0 L50 17.32 L60 17.32 M10 17.32 L20 34.64 L40 34.64 L50 17.32'/%3E%3C/svg%3E");
 }
 
+/* ===========================================================================
+   MODO CLARO
+   La misma escena a plena luz. No es el modo oscuro con los colores dados
+   vuelta: el esmeralda se oscurece hasta contrastar sobre papel, el latón
+   pierde brillo para no desaparecer, y la tipografía pasa a un negro con algo
+   de verde para que siga siendo la misma marca y no un tema genérico.
+   =========================================================================== */
+html[data-theme='light'] {
+  color-scheme: light;
+
+  --cripta:      #F1F5F1; /* papel con una gota de verde */
+  --cripta-2:    #E5EDE7; /* superficies */
+  --sepulcro:    #CCDCD1; /* medios tonos */
+  --veneno:      #0B7346; /* el esmeralda, legible sobre claro */
+  --veneno-soft: rgba(11, 115, 70, 0.12);
+  --medianoche:  #262F4A;
+  --laton:       #7A5B1E;
+  --hueso:       #0E1A14; /* tipografía principal */
+  --humo:        #4A5C52; /* texto secundario */
+  --linea:       rgba(14, 26, 20, 0.16);
+  --linea-fuerte:rgba(14, 26, 20, 0.34);
+
+  --amb-bg: #F1F5F1;
+  --amb-bg2: #D7E5DB;
+  --amb-accent: #0B7346;
+  --amb-glow: rgba(11, 115, 70, 0.14);
+  --amb-ink: #0E1A14;
+
+  --velo:        rgba(241, 245, 241, .82);
+  --velo-fuerte: rgba(241, 245, 241, .95);
+  --velo-total:  rgba(241, 245, 241, .98);
+  --sombra-foto: rgba(241, 245, 241, .86);
+  /* Apenas un cierre gris verdoso: marca el borde sin ensombrecer el papel */
+  --vineta:      rgba(38, 66, 52, .16);
+  --sombra-alta: rgba(38, 66, 52, .18);
+}
+
+/* El color ambiente sale de fotos oscuras. En modo claro solo se deja teñir el
+   acento — el filtrado se hace en useAmbient.ts, porque esas variables se
+   escriben como estilo en línea y ganarían a cualquier regla de aquí. */
+
 /* Modo "reducir movimiento": se activa por preferencia del sistema o por el
    interruptor de la interfaz (atributo en <html>). */
 html[data-motion='reduced'] {
@@ -64,8 +118,14 @@ html[data-motion='reduced'] {
 
 html, body, #root {
   height: 100%;
+  /* dvh es la altura visible de verdad en el teléfono, con la barra del
+     navegador puesta. Va antes que --vh para que el PRIMER pintado ya salga
+     bien, sin esperar a que JavaScript mida; --vh manda después y cubre a los
+     navegadores viejos que no entienden dvh. */
+  height: 100dvh;
   height: var(--vh);
   overflow: hidden;               /* NO hay scroll vertical en el documento */
+  overflow-x: clip;               /* y desbordar de lado tampoco es una opción */
   overscroll-behavior: none;
 }
 
@@ -139,6 +199,15 @@ html[data-motion='reduced'] .ambient { transition: background-color 1ms; }
   mask-image: radial-gradient(86% 74% at 50% 46%, #000 30%, transparent 92%);
 }
 
+/* El grano.
+   `mix-blend-mode` sobre una capa fija del tamaño de la pantalla obliga al
+   navegador a componer la página entera a través de la mezcla en cada pintado:
+   es de lo más caro que puede hacer una web, y aquí era por una textura. Se
+   queda solo mientras el movimiento está encendido —que es cuando el visitante
+   pidió expresamente la atmósfera completa— y con el movimiento apagado se
+   resuelve con opacidad, que sobre un fondo oscuro se ve casi igual y no
+   compone nada. En el teléfono no se pinta: a ese tamaño no se aprecia y sí se
+   nota en la batería. */
 .grain {
   position: fixed; inset: -60px; z-index: 900; pointer-events: none;
   opacity: .30; mix-blend-mode: overlay;
@@ -150,11 +219,15 @@ html[data-motion='reduced'] .ambient { transition: background-color 1ms; }
   50%  { transform: translate(-14px, 9px); }
   100% { transform: translate(8px, -11px); }
 }
-html[data-motion='reduced'] .grain { animation: none; opacity: .22; }
+html[data-motion='reduced'] .grain {
+  animation: none; opacity: .10; mix-blend-mode: normal;
+}
+/* Sobre papel el grano de mezcla ensucia el texto en vez de dar textura */
+html[data-theme='light'] .grain { opacity: .07; mix-blend-mode: normal; }
 
 .vignette {
   position: fixed; inset: 0; z-index: 880; pointer-events: none;
-  box-shadow: inset 0 0 clamp(120px, 22vw, 320px) clamp(30px, 8vw, 110px) rgba(0, 0, 0, .92);
+  box-shadow: inset 0 0 clamp(120px, 22vw, 320px) clamp(30px, 8vw, 110px) var(--vineta);
 }
 
 /* Halo esmeralda que respira detrás del contenido (la luz de la foto) */
@@ -297,6 +370,13 @@ html[data-motion='reduced'] .curtain { display: none; }
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
   padding: clamp(56px, 8vh, 92px) var(--edge) clamp(74px, 11vh, 108px);
+  /* En un monitor ultrapanorámico el margen lateral fijo dejaba las filas de
+     Trabajo estiradas a lo largo de tres mil píxeles: el número en un extremo
+     y la categoría en el otro, con un desierto en medio. A partir de --medida
+     el sobrante se reparte a los lados y el contenido queda centrado y a una
+     distancia legible. Por debajo de esa medida no cambia absolutamente nada. */
+  padding-inline: max(var(--edge), (100vw - var(--medida)) / 2);
+  overflow: hidden;
   /* backwards, no both: al terminar el elemento vuelve a su estilo natural
      (visible). Así nada queda invisible si el navegador frena la animación
      por tener la pestaña en segundo plano. */
@@ -358,7 +438,7 @@ html[data-motion='reduced'] .rise { animation: none !important; opacity: 1; tran
   display: flex; align-items: center; gap: 7px;
   padding: 5px 13px;
   border: 1px solid var(--linea-fuerte); border-radius: 999px;
-  background: rgba(4, 13, 10, .72);
+  background: var(--velo);
   backdrop-filter: blur(6px);
   font-size: 8.5px; letter-spacing: .26em; text-transform: uppercase;
   color: var(--amb-accent);
@@ -367,6 +447,19 @@ html[data-motion='reduced'] .rise { animation: none !important; opacity: 1; tran
 }
 .pane-caja[data-mas='si'] > .pane-mas { opacity: 1; }
 .pane-mas b { font-weight: 400; animation: panMas 1.9s ease-in-out infinite; }
+/* La flecha apunta hacia donde queda contenido */
+.pane-caja[data-eje='y'] .pane-mas-x, .pane-caja[data-eje='x'] .pane-mas-y { display: none; }
+.pane-caja[data-eje='x'] .pane-mas-x { animation-name: panMasX; }
+@keyframes panMasX {
+  0%, 100% { transform: translateX(-1px); opacity: .55; }
+  50%      { transform: translateX(3px);  opacity: 1; }
+}
+
+/* Con desplazamiento lateral el velo se corre al borde derecho */
+.pane-caja[data-eje='x'] > .pane-velo {
+  left: auto; top: 0; bottom: 0; width: 84px; height: auto;
+  background: linear-gradient(90deg, transparent, var(--amb-bg) 84%);
+}
 @keyframes panMas {
   0%, 100% { transform: translateY(-1px); opacity: .55; }
   50%      { transform: translateY(2px);  opacity: 1; }
@@ -394,9 +487,14 @@ html[data-motion='reduced'] .pane-mas b { animation: none; }
 }
 .display em { font-style: italic; color: var(--amb-accent); }
 
-.h-xl { font-size: clamp(58px, 12vw, 190px); }
-.h-lg { font-size: clamp(42px, 7vw, 104px); }
-.h-md { font-size: clamp(32px, 4.6vw, 66px); }
+/* La escena ocupa exactamente una pantalla y no hay scroll de documento, así
+   que el texto tiene que ceder ante la ALTURA igual que ante el ancho. Con
+   solo vw, un portátil de 1366×625 recibe el mismo titular que un monitor de
+   1440 de alto y el contenido se desborda por arriba. El min() hace que mande
+   la dimensión más apretada de las dos. */
+.h-xl { font-size: clamp(44px, min(12vw, 17vh), 190px); }
+.h-lg { font-size: clamp(34px, min(7vw, 11vh), 104px); }
+.h-md { font-size: clamp(26px, min(4.6vw, 7.4vh), 66px); }
 
 .body {
   font-size: clamp(13px, 1.05vw, 15px); line-height: 1.85;
@@ -448,10 +546,15 @@ html[data-motion='reduced'] .pane-mas b { animation: none; }
 .topnav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 700;
   display: flex; align-items: center; justify-content: space-between;
-  padding: clamp(16px, 2.4vh, 26px) var(--edge);
+  gap: clamp(12px, 2vw, 28px);
+  padding-block: clamp(16px, 2.4vh, 26px);
+  /* Las barras se alinean con el contenido: en un ultrapanorámico la marca no
+     se va a un extremo mientras el texto queda en el centro. */
+  padding-inline: max(var(--edge), (100vw - var(--medida)) / 2);
   pointer-events: none;
 }
 .topnav > * { pointer-events: auto; }
+.topnav .menu { min-width: 0; }
 
 /* La navegación se retira mientras el visor de galería está abierto */
 .topnav.is-away, .botnav.is-away {
@@ -484,19 +587,124 @@ html[data-motion='reduced'] .pane-mas b { animation: none; }
 .menu-item[aria-current='true']::after { transform: scaleX(1); }
 .menu-item .num { opacity: .5; margin-right: 6px; font-size: 9px; }
 
-.utils { display: flex; gap: 8px; align-items: center; }
+/* --- Barra: atajo de tema + panel de ajustes -----------------------------
+   Solo dos controles en la cabecera. El tema, que es lo que más se toca, y el
+   botón que abre todo lo demás. Cuatro interruptores sueltos no cabían en un
+   portátil de 1366 con el menú al lado, y en el teléfono terminaban en
+   cuadraditos de 34 píxeles: por debajo de lo que un dedo acierta. */
+.utils { display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; }
 .util {
+  display: inline-flex; align-items: center; gap: 7px;
   font-size: 9px; letter-spacing: .22em; text-transform: uppercase;
-  color: var(--humo); border: 1px solid var(--linea); padding: 7px 12px;
-  transition: color .3s, border-color .3s;
+  color: var(--humo);
+  border: 1px solid var(--linea); border-radius: 999px;
+  padding: 8px 13px; white-space: nowrap;
+  min-height: 34px;
+  background: var(--velo);
+  transition: color .3s, border-color .3s, background .3s;
 }
-.util:hover, .util[aria-pressed='true'] { color: var(--amb-accent); border-color: var(--amb-accent); }
+.util-icon { font-size: 12px; letter-spacing: 0; line-height: 1; }
+.util:hover, .util:focus-visible { color: var(--amb-accent); border-color: var(--amb-accent); }
+/* El tema no es un efecto que se enciende: es una elección entre dos. */
+.util-tema { color: var(--hueso); border-color: var(--linea-fuerte); }
+.util-tema:hover { color: var(--amb-accent); }
+.aj-boton[aria-expanded='true'] { color: var(--amb-accent); border-color: var(--amb-accent); }
+
+/* --- El panel de ajustes ------------------------------------------------- */
+
+.ajustes { position: relative; }
+
+.aj-panel {
+  position: absolute; top: calc(100% + 10px); right: 0; z-index: 40;
+  /* Nunca más ancho que la pantalla menos los márgenes: en un teléfono de
+     320 px el panel se estrecha en vez de empujar la página de lado. */
+  width: min(300px, calc(100vw - 2 * var(--edge)));
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 16px;
+  background: var(--velo-total);
+  border: 1px solid var(--linea-fuerte);
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, .6);
+  text-align: left;
+  animation: ajAbre .18s var(--ease);
+}
+@keyframes ajAbre { from { opacity: 0; transform: translateY(-6px); } }
+html[data-motion='reduced'] .aj-panel { animation: none; }
+
+.aj-titulo {
+  font-size: 8.5px; letter-spacing: .32em; text-transform: uppercase;
+  color: var(--humo);
+}
+.aj-titulo + * { margin-top: -2px; }
+
+/* Apariencia: dos opciones, una elegida. */
+.aj-tema { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.aj-tema-op {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 42px; padding: 0 10px;
+  font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--humo);
+  border: 1px solid var(--linea);
+  transition: color .25s, border-color .25s, background .25s;
+}
+.aj-tema-op:hover { color: var(--hueso); border-color: var(--linea-fuerte); }
+.aj-tema-op[aria-checked='true'] {
+  color: var(--amb-bg); background: var(--amb-accent); border-color: var(--amb-accent);
+}
+
+/* Efectos: una fila por efecto, con su interruptor. */
+.aj-efectos { display: flex; flex-direction: column; gap: 4px; }
+.aj-fila {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; min-height: 46px; padding: 8px 2px;
+  text-align: left;
+  border-bottom: 1px solid var(--linea);
+}
+.aj-efectos .aj-fila:last-child { border-bottom: 0; }
+.aj-fila-txt { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.aj-fila-n { font-size: 12px; letter-spacing: .04em; color: var(--hueso); }
+.aj-fila-d { font-size: 10px; line-height: 1.35; color: var(--humo); }
+.aj-fila-e {
+  font-size: 8px; letter-spacing: .18em; color: var(--humo); width: 22px; text-align: right;
+}
+.aj-fila[aria-checked='true'] .aj-fila-e { color: var(--amb-accent); }
+
+/* El interruptor. Una transición de transform y color: nada que componer. */
+.aj-sw {
+  position: relative; flex: none;
+  width: 38px; height: 21px; border-radius: 999px;
+  border: 1px solid var(--linea-fuerte);
+  transition: background .25s var(--ease), border-color .25s var(--ease);
+}
+.aj-sw-bola {
+  position: absolute; left: 2px; top: 50%;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--humo);
+  transform: translateY(-50%);
+  transition: transform .25s var(--ease), background .25s var(--ease);
+}
+.aj-fila[aria-checked='true'] .aj-sw {
+  background: var(--amb-accent); border-color: var(--amb-accent);
+}
+.aj-fila[aria-checked='true'] .aj-sw-bola {
+  background: var(--amb-bg); transform: translateY(-50%) translateX(17px);
+}
+.aj-fila:hover .aj-fila-n { color: var(--amb-accent); }
+
+.aj-nota {
+  font-size: 9.5px; line-height: 1.5; color: var(--humo);
+  padding-top: 10px; border-top: 1px solid var(--linea);
+}
 
 /* Barra inferior: flechas + indicador de escena */
 .botnav {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 700;
   display: flex; align-items: center; justify-content: space-between;
-  padding: clamp(14px, 2.2vh, 26px) var(--edge);
+  gap: clamp(12px, 2vw, 28px);
+  padding-block: clamp(14px, 2.2vh, 26px);
+  padding-inline: max(var(--edge), (100vw - var(--medida)) / 2);
+  /* En el teléfono la barra vive dentro del área segura, por encima de la
+     franja del gesto de inicio. */
+  padding-bottom: max(clamp(14px, 2.2vh, 26px), env(safe-area-inset-bottom));
   pointer-events: none;
 }
 .botnav > * { pointer-events: auto; }
@@ -598,7 +806,7 @@ html[data-motion='reduced'] .img::before { animation: none; }
 /* Resplandor detrás de la figura: recrea la luz verde de la cámara original */
 .home-aura {
   position: absolute; right: 6%; bottom: 0;
-  width: min(56vh, 46vw); aspect-ratio: 1;
+  width: min(56vh, 46vw, 92vw); aspect-ratio: 1;
   background: radial-gradient(circle at 50% 55%, var(--amb-glow), transparent 66%);
   filter: blur(10px);
   animation: breathe 9s ease-in-out infinite;
@@ -608,14 +816,18 @@ html[data-motion='reduced'] .img::before { animation: none; }
 .home-suelo {
   position: absolute; right: 14%; bottom: 6vh;
   width: min(34vh, 30vw); height: 5vh;
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, .85), transparent 70%);
+  background: radial-gradient(ellipse at center, var(--vineta), transparent 70%);
 }
 html[data-motion='reduced'] .home-aura { animation: none; }
 
 /* --- La figura --- */
 
 .home-figura {
-  position: absolute; right: 3vw; bottom: 0; z-index: 1;
+  position: absolute; bottom: 0; z-index: 1;
+  /* En un monitor ultrapanorámico la figura se quedaba pegada al borde de la
+     pantalla mientras el texto se centraba: quedaban a un metro el uno del
+     otro. Con el mismo reparto que usa la escena, los dos viajan juntos. */
+  right: max(3vw, (100vw - var(--medida)) / 2);
   height: 84vh; width: auto; aspect-ratio: 433 / 577;
   pointer-events: none;
   animation: figuraEntra 1.5s var(--ease) backwards;
@@ -624,7 +836,7 @@ html[data-motion='reduced'] .home-aura { animation: none; }
 .home-figura .img::before { display: none; } /* sin marcador de carga: es un recorte */
 .home-figura .img img {
   object-fit: contain; object-position: bottom center;
-  filter: drop-shadow(0 30px 60px rgba(0, 0, 0, .75));
+  filter: drop-shadow(0 30px 60px var(--sombra-alta));
 }
 @keyframes figuraEntra {
   from { opacity: 0; transform: translateY(28px) scale(1.02); }
@@ -659,7 +871,7 @@ html[data-motion='reduced'] .home-aura { animation: none; }
   display: grid; align-content: center;
   padding: 0 var(--edge);
 }
-.home-name { mix-blend-mode: normal; text-shadow: 0 24px 80px rgba(0,0,0,.75); }
+.home-name { mix-blend-mode: normal; text-shadow: 0 24px 80px var(--sombra-alta); }
 .home-line {
   display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap;
   margin-top: clamp(20px, 4vh, 44px); max-width: 640px;
@@ -703,7 +915,7 @@ html[data-motion='reduced'] .home-aura { animation: none; }
 .sello.is-arrastrando .sello-centro { transform: scale(1.14); }
 .sello::before {
   content: ''; position: absolute; inset: 0; border-radius: 50%;
-  background: radial-gradient(circle, rgba(4, 13, 10, .82) 40%, transparent 72%);
+  background: radial-gradient(circle, var(--sombra-foto) 40%, transparent 72%);
   backdrop-filter: blur(3px);
 }
 .sello:hover, .sello:focus-visible { filter: drop-shadow(0 0 26px var(--amb-glow)); }
@@ -841,7 +1053,7 @@ html[data-motion='reduced'] .proyector-cuadro { transition: opacity .01ms; }
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
   display: flex; justify-content: space-between; align-items: baseline; gap: 14px;
   padding: 34px 16px 14px;
-  background: linear-gradient(180deg, transparent, rgba(4, 13, 10, .9));
+  background: linear-gradient(180deg, transparent, var(--velo-fuerte));
 }
 .proyector-t { font-family: var(--serif); font-size: clamp(15px, 1.6vw, 20px); color: var(--hueso); }
 .proyector-n { font-size: 9px; letter-spacing: .26em; color: var(--amb-accent); }
@@ -883,11 +1095,23 @@ html[data-motion='reduced'] .proyector-cuadro { transition: opacity .01ms; }
    =========================================================================== */
 
 .gal-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+/* La tira. En escritorio va en horizontal, y con 35 fotos mide varios miles de
+   píxeles: antes las que no cabían quedaban recortadas y no había manera de
+   llegar a ellas —veintiséis fotografías invisibles—. Ahora la tira se desliza
+   de lado, con el mismo aviso que usan los paneles verticales. */
 .gal-strip {
   display: grid; grid-auto-flow: column; grid-auto-columns: minmax(150px, 1fr);
   gap: clamp(8px, 1.2vw, 18px); flex: 1; min-height: 0;
   align-items: center; margin-top: clamp(16px, 3vh, 34px);
+  overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity; scrollbar-width: thin;
+  /* Sitio para que el salto de la foto al pasar el cursor no quede recortado
+     contra el borde del contenedor que ahora se desplaza. */
+  padding: 10px 0 8px;
 }
+.gal-strip > * { scroll-snap-align: start; }
+.gal-strip::-webkit-scrollbar { height: 3px; }
+.gal-strip::-webkit-scrollbar-thumb { background: var(--linea-fuerte); }
 .gal-item {
   position: relative; display: block; width: 100%; height: 100%;
   border: 1px solid var(--linea); overflow: hidden;
@@ -906,7 +1130,7 @@ html[data-motion='reduced'] .proyector-cuadro { transition: opacity .01ms; }
 .gal-cap {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
   padding: 14px 14px 12px;
-  background: linear-gradient(180deg, transparent, rgba(4,13,10,.94));
+  background: linear-gradient(180deg, transparent, var(--velo-fuerte));
   opacity: 0; transform: translateY(10px);
   transition: opacity .45s var(--ease), transform .45s var(--ease);
 }
@@ -931,10 +1155,11 @@ html[data-motion='reduced'] .proyector-cuadro { transition: opacity .01ms; }
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: calc(var(--gal-col) * 4 / 3);
     gap: 8px;
-    overflow-y: auto; overscroll-behavior: contain;
+    overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+    scroll-snap-type: none;
     align-items: stretch; align-content: start;
-    padding-bottom: 10px;
+    padding: 0 0 10px;
   }
   .gal-item,
   .gal-item:nth-child(2n),
@@ -953,7 +1178,7 @@ html[data-motion='reduced'] .proyector-cuadro { transition: opacity .01ms; }
 /* --- Lightbox --- */
 .lb {
   position: fixed; inset: 0; z-index: 800;
-  background: rgba(4, 13, 10, .97);
+  background: var(--velo-total);
   display: grid; grid-template-rows: auto 1fr auto;
   padding: clamp(16px, 3vh, 30px) var(--edge);
   animation: lbIn .5s var(--ease) both;
@@ -980,20 +1205,34 @@ html[data-motion='reduced'] .lb-frame { animation: none; }
    ESCENA 04 — PROYECTOS
    =========================================================================== */
 
-.work-list { display: flex; flex-direction: column; justify-content: center; flex: 1; min-height: 0; }
+/* "safe center": mientras las filas caben se centran, y en cuanto desbordan
+   se alinean arriba y aparece el scroll interno. Con un center a secas las
+   primeras filas se salían por encima del panel y se montaban sobre el
+   titular — que es justo lo que pasaba en pantallas de poca altura. */
+.work-list {
+  display: flex; flex-direction: column;
+  justify-content: safe center;
+  flex: 1; min-height: 0;
+  overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.work-list::-webkit-scrollbar { width: 3px; }
+.work-list::-webkit-scrollbar-thumb { background: var(--linea-fuerte); }
+
 .work-row {
   position: relative; display: grid;
   grid-template-columns: 54px minmax(0, 1.1fr) minmax(0, 1fr) auto;
   gap: clamp(12px, 2.4vw, 34px); align-items: center;
   width: 100%; text-align: left;
-  padding: clamp(14px, 2.2vh, 26px) 0;
+  flex: 0 0 auto;
+  padding: clamp(10px, 1.9vh, 26px) 0;
   border-top: 1px solid var(--linea);
   transition: color .45s var(--ease), padding-left .5s var(--ease);
 }
 .work-row:last-of-type { border-bottom: 1px solid var(--linea); }
 .work-row .wi { font-family: var(--sans); font-size: 10px; letter-spacing: .22em; color: var(--laton); }
 .work-row .wt {
-  font-family: var(--serif); font-size: clamp(22px, 3vw, 44px); line-height: 1.05;
+  font-family: var(--serif); font-size: clamp(18px, min(3vw, 4.6vh), 44px); line-height: 1.05;
   transition: color .4s var(--ease);
 }
 .work-row .wd { font-size: 12.5px; line-height: 1.7; color: var(--humo); max-width: 42ch; }
@@ -1110,10 +1349,35 @@ html[data-motion='reduced'] .lb-frame { animation: none; }
 .work-row:hover .work-ghost, .work-row[data-open='true'] .work-ghost {
   opacity: .42; transform: translateY(-50%) scale(1.02);
 }
+/* En pantallas medianas y en el teléfono la fila no se recorta: se dobla.
+   Antes se escondían la descripción y la categoría, y el visitante de móvil
+   se quedaba con una lista de títulos sin saber de qué iba cada proyecto —
+   una versión mutilada del sitio, no una adaptada. Ahora el número y el
+   título comparten la primera línea y el resto baja debajo. */
 @media (max-width: 980px) {
-  .work-row { grid-template-columns: 40px 1fr; }
-  .work-row .wd, .work-row .wm { display: none; }
+  .work-row {
+    grid-template-columns: 34px minmax(0, 1fr);
+    grid-template-areas:
+      'num titulo'
+      '.   desc'
+      '.   meta';
+    gap: 6px clamp(10px, 2vw, 18px);
+    align-items: baseline;
+  }
+  .work-row .wi { grid-area: num; }
+  .work-row .wt { grid-area: titulo; }
+  .work-row .wd { grid-area: desc; max-width: none; font-size: 12px; }
+  .work-row .wm { grid-area: meta; white-space: normal; }
   .work-ghost { display: none; }
+}
+
+/* Muy estrecho: el número deja de ocupar columna propia y se pone de sombrero */
+@media (max-width: 460px) {
+  .work-row {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'num' 'titulo' 'desc' 'meta';
+    gap: 5px;
+  }
 }
 
 /* ===========================================================================
@@ -1477,7 +1741,7 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
   position: absolute; right: 8px; bottom: 8px; z-index: 4;
   width: 20px; height: 20px; border-radius: 50%;
   display: grid; place-items: center;
-  background: rgba(4, 13, 10, .72); color: var(--amb-accent);
+  background: var(--velo); color: var(--amb-accent);
   font-size: 7px; letter-spacing: 0;
   animation: latidoVivo 2.6s ease-in-out infinite;
 }
@@ -1707,8 +1971,17 @@ html[data-motion='reduced'] .cta-btn,
 html[data-motion='reduced'] .cta-btn-bg { animation: none; }
 
 @media (max-width: 700px) {
-  .cta { flex-direction: column; align-items: stretch; }
-  .cta-btn { justify-content: center; }
+  /* En vertical el bloque completo medía treinta píxeles más de los que le
+     dejaba la escena, y el botón terminaba pisando el indicador de escena de
+     la barra de abajo. Se aprieta el bloque, no el contenido. */
+  .cta {
+    flex-direction: column; align-items: stretch;
+    margin-top: clamp(10px, 2vh, 22px); padding-top: clamp(10px, 1.8vh, 18px);
+    gap: 14px;
+  }
+  .cta-line { font-size: clamp(15px, 4.4vw, 21px); max-width: none; }
+  .cta-kicker { margin-bottom: 6px; }
+  .cta-btn { justify-content: center; padding: 16px 22px; }
 }
 
 /* --- El vórtice: diez planos de panal viniendo hacia el espectador --- */
@@ -1841,18 +2114,35 @@ html[data-motion='reduced'] .intro { display: none; }
    RESPONSIVE — el impacto se mantiene, los controles bajan al pulgar
    =========================================================================== */
 
+/* Bajo 1240 px los dos controles ya no caben con su nombre al lado del menú de
+   ocho escenas: se quedan con el símbolo. El panel de ajustes sigue diciéndolo
+   todo con palabras, así que no se pierde información. */
+@media (max-width: 1240px) {
+  .util-long { display: none; }
+  .util { padding: 8px 10px; gap: 0; }
+}
+
 /* Bajo 1140 px el menú completo se aprieta contra la marca: se retira y la
    navegación queda en las flechas, el indicador inferior y el teclado. */
 @media (max-width: 1140px) {
   .menu { display: none; }
   .utils { margin-left: auto; }
+  /* Con el menú fuera vuelve a haber sitio para los nombres */
+  .util-long { display: inline; }
+  .util { padding: 8px 13px; gap: 7px; }
+}
+
+@media (max-width: 700px) {
+  .util-long { display: none; }
+  .util { padding: 8px 11px; gap: 0; }
 }
 
 @media (max-width: 760px) {
   :root { --edge: 20px; }
   /* Reserva para la barra inferior apilada: flechas de pulgar + indicador.
-     Justa, no generosa: cada píxel de más se lo quita al contenido. */
-  .scene { padding: 62px var(--edge) 130px; }
+     Solo el relleno vertical: el horizontal lo decide la medida del contenido
+     y no debe perderse aquí. */
+  .scene { padding-block: 62px 130px; }
   .botnav { flex-direction: column-reverse; gap: 14px; align-items: stretch; }
   .arrows { justify-content: space-between; }
   .arrows .hint { display: none; }
@@ -1865,15 +2155,71 @@ html[data-motion='reduced'] .intro { display: none; }
      se le metía debajo y perdía el final. Que corte antes y baje de línea. */
   .home-copy > .eyebrow { max-width: 64%; }
 
-  /* Los interruptores pasan a formato compacto para no comerse la marca */
-  .util { padding: 6px 9px; font-size: 8px; letter-spacing: .16em; }
+  /* Los dos controles pasan a solo símbolo, con la zona táctil que pide un
+     dedo. El teléfono tiene exactamente las mismas opciones que el escritorio:
+     el panel de ajustes es el mismo. */
+  .util {
+    padding: 0; font-size: 8px; letter-spacing: .16em;
+    width: 40px; height: 40px; min-height: 40px; justify-content: center; gap: 0;
+  }
   .util-long { display: none; }
+  .util-icon { font-size: 14px; }
+  .utils { gap: 6px; }
+  .wordmark { font-size: 10px; letter-spacing: .34em; }
+  .aj-panel { width: min(320px, calc(100vw - 2 * var(--edge))); padding: 15px; }
+
+  /* Atmósfera más barata en el teléfono. El grano no se aprecia a este tamaño
+     y cuesta un pintado de pantalla completa; la viñeta se cierra menos porque
+     con tan poco ancho se comía el texto de los bordes. */
+  .grain { display: none; }
+  .vignette { box-shadow: inset 0 0 90px 24px var(--vineta); }
+}
+
+/* Teléfonos estrechos: la marca se reduce antes que los controles */
+@media (max-width: 380px) {
+  .wordmark { font-size: 9px; letter-spacing: .22em; }
+  .util { width: 38px; height: 38px; min-height: 38px; }
+  .utils { gap: 5px; }
+}
+
+/* --- Pantallas de poca altura -------------------------------------------
+   El caso real que rompía la escena de Trabajo: un portátil de 1366×625.
+   Ancho de sobra y altura justa. Todo lo que se mide en vw sigue grande
+   mientras el alto se acaba. */
+@media (max-height: 720px) {
+  .work-row { padding: clamp(8px, 1.5vh, 18px) 0; }
+  .cta { gap: clamp(12px, 2vh, 26px); }
+}
+
+/* El recorte del relleno inferior vale SOLO donde la barra va en una sola fila.
+   En un teléfono de 700 px de alto se cumplían las dos condiciones a la vez, y
+   esta regla, que se escribió para un portátil de 1366×625, le quitaba a la
+   barra apilada treinta píxeles que sí necesita: el botón de "trabajemos
+   juntos" terminaba montado sobre el indicador de escena. */
+@media (max-height: 720px) and (min-width: 761px) {
+  .scene { padding-block: 58px 96px; }
 }
 
 @media (max-height: 620px) {
-  .scene { padding-top: 64px; padding-bottom: 78px; }
-  .h-xl { font-size: clamp(44px, 9vw, 96px); }
-  .mani-verse { font-size: clamp(34px, 7vw, 84px); }
+  .h-xl { font-size: clamp(40px, min(9vw, 15vh), 96px); }
+  .mani-verse { font-size: clamp(30px, min(7vw, 12vh), 84px); }
+  .botnav { padding-block: 8px 10px; }
+  .btn.icon { width: 44px; height: 44px; font-size: 13px; }
+}
+@media (max-height: 620px) and (min-width: 761px) {
+  .scene { padding-block: 54px 76px; }
+}
+
+/* Muy poca altura (móvil apaisado): el titular cede casi todo y la barra
+   vuelve a una fila — apilada se comería la mitad de la pantalla. */
+@media (max-height: 500px) {
+  .botnav { flex-direction: row; align-items: center; gap: 12px; }
+  .arrows { justify-content: flex-start; }
+  .ticker { justify-content: flex-end; }
+  .btn.icon { width: 42px; height: 42px; }
+  .scene { padding-block: 48px 72px; }
+  .h-md { font-size: clamp(20px, min(4.6vw, 8vh), 40px); }
+  .cta-line { font-size: clamp(14px, 3.4vh, 22px); }
 }
 
 /* Respeto de la preferencia del sistema como valor por defecto */

@@ -1,6 +1,8 @@
 import { MagneticButton } from './MagneticButton'
+import { Ajustes } from './Ajustes'
 import { SCENES, type SceneDef } from '../hooks/useSceneRouter'
 import { brand } from '../data/site'
+import type { Theme } from '../hooks/usePreferences'
 
 type Props = {
   index: number
@@ -12,6 +14,10 @@ type Props = {
   onToggleMotion: () => void
   customCursor: boolean
   onToggleCursor: () => void
+  drag: boolean
+  onToggleDrag: () => void
+  theme: Theme
+  onToggleTheme: () => void
   /** el visor de galería está abierto: la navegación se retira */
   hidden?: boolean
 }
@@ -26,6 +32,10 @@ export function Nav({
   onToggleMotion,
   customCursor,
   onToggleCursor,
+  drag,
+  onToggleDrag,
+  theme,
+  onToggleTheme,
   hidden = false,
 }: Props) {
   const isFirst = index === 0
@@ -52,24 +62,33 @@ export function Nav({
           ))}
         </nav>
 
+        {/* Un atajo directo al tema, que es lo que más se toca, y el resto
+            dentro del panel. Así la barra no crece con cada opción nueva. */}
         <div className="utils">
           <button
-            className="util"
-            onClick={onToggleMotion}
-            aria-pressed={reduced}
-            title="Reduce las animaciones y transiciones"
+            className="util util-tema"
+            onClick={onToggleTheme}
+            title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
           >
-            <span className="util-long">Movimiento&nbsp;</span>
-            {reduced ? 'off' : 'on'}
+            <span className="util-icon" aria-hidden="true">
+              {theme === 'dark' ? '☾' : '☀'}
+            </span>
+            <span className="util-long">{theme === 'dark' ? 'Oscuro' : 'Claro'}</span>
+            <span className="sr-only">
+              Apariencia: modo {theme === 'dark' ? 'oscuro' : 'claro'}. Pulsa para cambiar.
+            </span>
           </button>
-          <button
-            className="util"
-            onClick={onToggleCursor}
-            aria-pressed={customCursor}
-            title="Cursor personalizado"
-          >
-            Cursor
-          </button>
+
+          <Ajustes
+            reduced={reduced}
+            onToggleMotion={onToggleMotion}
+            customCursor={customCursor}
+            onToggleCursor={onToggleCursor}
+            drag={drag}
+            onToggleDrag={onToggleDrag}
+            theme={theme}
+            onToggleTheme={onToggleTheme}
+          />
         </div>
       </header>
 

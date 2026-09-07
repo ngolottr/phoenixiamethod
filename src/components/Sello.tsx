@@ -20,21 +20,31 @@ function leerGuardada(): Pos | null {
 /**
  * El sello de "Trabajemos juntos".
  *
- * Se puede arrastrar por toda la pantalla y se queda donde lo dejen: la
- * posición se guarda en el navegador de cada visitante, así que si vuelve, lo
- * encuentra donde él lo puso. Arrastrar no dispara el clic — solo cuenta como
- * clic si el dedo casi no se movió, que es como se comporta cualquier cosa
- * arrastrable bien hecha.
+ * Con el arrastre encendido se puede llevar por toda la pantalla y se queda
+ * donde lo dejen: la posición se guarda en el navegador de cada visitante, así
+ * que si vuelve, lo encuentra donde él lo puso. Arrastrar no dispara el clic —
+ * solo cuenta como clic si el dedo casi no se movió, que es como se comporta
+ * cualquier cosa arrastrable bien hecha.
+ *
+ * Con el arrastre apagado —que es como arranca— es un botón y nada más: no se
+ * registran manejadores de puntero, no se vigila el tamaño de la ventana y no
+ * se lee el almacenamiento. Un efecto apagado no debe costar nada.
  */
-export function Sello({ onClick }: { onClick: () => void }) {
+export function Sello({ onClick, arrastrable }: { onClick: () => void; arrastrable: boolean }) {
   const ref = useRef<HTMLButtonElement>(null)
   const [pos, setPos] = useState<Pos | null>(null)
   const [arrastrando, setArrastrando] = useState(false)
   const inicio = useRef({ x: 0, y: 0, px: 0, py: 0, movido: 0 })
 
   useEffect(() => {
+    if (!arrastrable) {
+      // Vuelve a su esquina de siempre mientras el efecto esté apagado.
+      setPos(null)
+      setArrastrando(false)
+      return
+    }
     setPos(leerGuardada())
-  }, [])
+  }, [arrastrable])
 
   // Si la ventana se achica, el sello no puede quedar fuera de la vista
   useEffect(() => {
@@ -52,9 +62,18 @@ export function Sello({ onClick }: { onClick: () => void }) {
           : p,
       )
     }
-    window.addEventListener('resize', acomodar)
+    window.addEventListener('resize', acomodar, { passive: true })
     return () => window.removeEventListener('resize', acomodar)
   }, [pos])
+
+  /* Sin arrastre: un botón normal. Ni un manejador de puntero de más. */
+  if (!arrastrable) {
+    return (
+      <button ref={ref} className="sello" onClick={onClick} aria-label={ETIQUETA}>
+        <Cara />
+      </button>
+    )
+  }
 
   const alPresionar = (e: React.PointerEvent<HTMLButtonElement>) => {
     const el = ref.current
@@ -111,9 +130,20 @@ export function Sello({ onClick }: { onClick: () => void }) {
           onClick()
         }
       }}
-      aria-label="Trabajemos juntos: ir al formulario de contacto. Puedes arrastrarlo para moverlo."
+      aria-label={`${ETIQUETA} Puedes arrastrarlo para moverlo.`}
       title="Arrástrame"
     >
+      <Cara />
+    </button>
+  )
+}
+
+const ETIQUETA = 'Trabajemos juntos: ir al formulario de contacto.'
+
+/** Lo que se ve del sello: el aro de texto girando y la flecha del centro. */
+function Cara() {
+  return (
+    <>
       <span className="sello-anillo" aria-hidden="true">
         <svg viewBox="0 0 200 200" aria-hidden="true">
           <defs>
@@ -133,6 +163,6 @@ export function Sello({ onClick }: { onClick: () => void }) {
       <span className="sello-centro" aria-hidden="true">
         →
       </span>
-    </button>
+    </>
   )
 }

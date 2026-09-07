@@ -32,20 +32,55 @@ const VARS: Array<[keyof Ambient, string]> = [
  * Estado global del color ambiente. Al pulsar una foto, el sitio entero
  * (fondo, halo, acentos, bordes, foco) adopta el color que domina esa imagen.
  */
+/**
+ * En modo claro solo se adopta el acento, y oscurecido para que contraste
+ * contra el papel. Los colores salen de fotos oscuras: dejarlos pintar el
+ * fondo apagaría el modo claro en cuanto alguien abre la galería.
+ */
+function varsParaTema(): Array<[keyof Ambient, string]> {
+  const claro = document.documentElement.dataset.theme === 'light'
+  return claro ? VARS.filter(([key]) => key === 'accent') : VARS
+}
+
+function valorParaTema(key: keyof Ambient, valor: string): string {
+  if (key === 'accent' && document.documentElement.dataset.theme === 'light') {
+    return `color-mix(in srgb, ${valor} 55%, #06301D)`
+  }
+  return valor
+}
+
 export function useAmbientProvider(): AmbientApi {
   const [active, setActive] = useState(false)
   const token = useRef(0)
+  /** el último ambiente aplicado, para poder repintarlo si cambia el tema */
+  const ultimo = useRef<Ambient | null>(null)
 
   const apply = useCallback((amb: Ambient | null) => {
     const root = document.documentElement
+    ultimo.current = amb
+    // Siempre se limpian TODAS: al pasar de oscuro a claro hay que soltar las
+    // que el tema anterior había fijado y este ya no usa.
+    VARS.forEach(([, cssVar]) => root.style.removeProperty(cssVar))
     if (!amb) {
-      VARS.forEach(([, cssVar]) => root.style.removeProperty(cssVar))
       root.dataset.ambient = 'off'
       return
     }
-    VARS.forEach(([key, cssVar]) => root.style.setProperty(cssVar, String(amb[key])))
+    varsParaTema().forEach(([key, cssVar]) =>
+      root.style.setProperty(cssVar, valorParaTema(key, String(amb[key]))),
+    )
     root.dataset.ambient = 'on'
   }, [])
+
+  // Si el visitante cambia de tema con una foto pintando, se repinta con las
+  // reglas del tema nuevo en vez de quedarse con las del anterior.
+  useEffect(() => {
+    const root = document.documentElement
+    const obs = new MutationObserver(() => {
+      if (ultimo.current) apply(ultimo.current)
+    })
+    obs.observe(root, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => obs.disconnect()
+  }, [apply])
 
   const paint = useCallback(
     (src: string) => {

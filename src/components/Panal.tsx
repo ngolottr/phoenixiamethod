@@ -5,10 +5,19 @@ import { useEffect, useRef } from 'react'
    ----------------------------------------------------------------------------
    Dibujada en un lienzo, no con un patrón de fondo repetido.
 
-   La diferencia importa: un patrón de CSS se puede mover o escalar entero, pero
-   no se puede tocar un pedazo. Acá cada vértice existe como un punto, así que
-   los que quedan cerca del cursor se corren hacia él y el tejido se abolla de
-   verdad, como una red cuando alguien la empuja con el dedo.
+   La diferencia importa cuando el efecto está encendido: un patrón de CSS se
+   puede mover o escalar entero, pero no se puede tocar un pedazo. Acá cada
+   vértice existe como un punto, así que los que quedan cerca del cursor se
+   corren hacia él y el tejido se abolla de verdad, como una red cuando alguien
+   la empuja con el dedo.
+
+   APAGADO ES APAGADO. Antes esta malla escuchaba el puntero pasara lo que
+   pasara y, además, releía los estilos calculados de la raíz cada 400 ms para
+   enterarse de un cambio de color. Eso son dos costes permanentes por una
+   textura de fondo: en un equipo modesto se notaba. Ahora, con el efecto
+   apagado, la malla se pinta UNA vez y no queda ni un oyente ni un temporizador
+   corriendo; el color se entera por observación, que solo despierta cuando algo
+   cambia de verdad.
    ========================================================================== */
 
 /** Lado del hexágono en píxeles. Más chico = malla más tupida y más costo. */
@@ -18,7 +27,7 @@ const RADIO = 230
 /** Cuánto se hunde en el punto exacto del cursor. */
 const FUERZA = 30
 
-export function Panal() {
+export function Panal({ interactivo }: { interactivo: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -27,7 +36,10 @@ export function Panal() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    const finoElPuntero = window.matchMedia('(pointer: fine)').matches
+    /* El hundido pide un puntero de verdad. En una pantalla táctil no hay nada
+       que seguir, así que ahí la malla es siempre la estática. */
+    const hundeAlPuntero = interactivo && window.matchMedia('(pointer: fine)').matches
+
     let ancho = 0
     let alto = 0
     let mx = -9999
@@ -41,6 +53,8 @@ export function Panal() {
     /* --- Construir la malla ---------------------------------------------- */
 
     const construir = () => {
+      // Se limita a 2 para no multiplicar por cuatro el trabajo en pantallas de
+      // mucha densidad, donde la diferencia visual de una línea fina es nula.
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
       ancho = window.innerWidth
       alto = window.innerHeight
@@ -92,7 +106,21 @@ export function Panal() {
 
     /* --- Pintar ------------------------------------------------------------ */
 
-    const pintar = () => {
+    /** La malla quieta. Es todo lo que se dibuja con el efecto apagado. */
+    const pintarQuieta = () => {
+      ctx.clearRect(0, 0, ancho, alto)
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      for (let i = 0; i < lineas.length; i += 4) {
+        ctx.moveTo(lineas[i], lineas[i + 1])
+        ctx.lineTo(lineas[i + 2], lineas[i + 3])
+      }
+      ctx.strokeStyle = `rgba(${color}, 0.10)`
+      ctx.stroke()
+      raf = 0
+    }
+
+    const pintarConMano = () => {
       ctx.clearRect(0, 0, ancho, alto)
       ctx.lineWidth = 1
 
@@ -129,30 +157,19 @@ export function Panal() {
       raf = 0
     }
 
+    const pintar = hundeAlPuntero ? pintarConMano : pintarQuieta
+
     const pedirPintado = () => {
       if (!raf) raf = requestAnimationFrame(pintar)
     }
 
-    /* --- Escuchas ---------------------------------------------------------- */
+    /* --- El color --------------------------------------------------------- */
 
-    const alMover = (e: PointerEvent) => {
-      mx = e.clientX
-      my = e.clientY
-      pedirPintado()
-    }
-
-    const alSalir = () => {
-      mx = -9999
-      my = -9999
-      pedirPintado()
-    }
-
-    const alRedimensionar = () => {
-      construir()
-      pedirPintado()
-    }
-
-    /** El color lo manda la foto o el video que se esté mirando. */
+    /**
+     * El color lo manda la foto o el video que se esté mirando, y también el
+     * tema. Leerlo obliga al navegador a recalcular estilos, así que se hace
+     * solo cuando algo pudo haber cambiado — nunca en bucle.
+     */
     const leerColor = () => {
       const v = getComputedStyle(document.documentElement).getPropertyValue('--amb-accent').trim()
       if (!v) return
@@ -170,29 +187,61 @@ export function Panal() {
       }
     }
 
+    /* --- Puesta en marcha -------------------------------------------------- */
+
     construir()
     leerColor()
     pintar()
 
-    // El color se consulta de a poco: preguntarlo en cada cuadro obliga al
-    // navegador a recalcular estilos y no vale la pena para algo que cambia
-    // como mucho una vez por segundo.
-    const reloj = window.setInterval(leerColor, 400)
+    /* El acento vive en el atributo style de la raíz (lo escribe useAmbient) y
+       cambia con data-theme. Observar esos dos atributos cuesta cero mientras
+       nadie los toca, al revés que preguntar cada tanto por si acaso. */
+    const ojo = new MutationObserver(leerColor)
+    ojo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['style', 'data-theme', 'data-ambient'],
+    })
 
-    if (finoElPuntero) {
-      window.addEventListener('pointermove', alMover, { passive: true })
-      document.addEventListener('pointerleave', alSalir)
+    /* El tamaño se recalcula al soltar, no en cada píxel del arrastre: rehacer
+       la malla es lo más caro de todo esto. */
+    let esperaTamano = 0
+    const alRedimensionar = () => {
+      window.clearTimeout(esperaTamano)
+      esperaTamano = window.setTimeout(() => {
+        construir()
+        pedirPintado()
+      }, 150)
     }
-    window.addEventListener('resize', alRedimensionar)
+    window.addEventListener('resize', alRedimensionar, { passive: true })
+
+    /* Los oyentes del puntero SOLO existen con el efecto encendido. */
+    let alMover: ((e: PointerEvent) => void) | null = null
+    let alSalir: (() => void) | null = null
+
+    if (hundeAlPuntero) {
+      alMover = (e: PointerEvent) => {
+        mx = e.clientX
+        my = e.clientY
+        pedirPintado()
+      }
+      alSalir = () => {
+        mx = -9999
+        my = -9999
+        pedirPintado()
+      }
+      window.addEventListener('pointermove', alMover, { passive: true })
+      document.addEventListener('pointerleave', alSalir, { passive: true })
+    }
 
     return () => {
-      window.clearInterval(reloj)
-      window.removeEventListener('pointermove', alMover)
-      document.removeEventListener('pointerleave', alSalir)
+      ojo.disconnect()
+      window.clearTimeout(esperaTamano)
       window.removeEventListener('resize', alRedimensionar)
+      if (alMover) window.removeEventListener('pointermove', alMover)
+      if (alSalir) document.removeEventListener('pointerleave', alSalir)
       if (raf) cancelAnimationFrame(raf)
     }
-  }, [])
+  }, [interactivo])
 
   return <canvas ref={ref} className="panal" aria-hidden="true" />
 }

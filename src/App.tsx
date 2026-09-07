@@ -30,7 +30,16 @@ function typingInField() {
 export default function App() {
   useViewportHeight()
 
-  const { reduced, customCursor, toggleMotion, toggleCursor } = usePreferences()
+  const {
+    reduced,
+    customCursor,
+    drag,
+    theme,
+    toggleMotion,
+    toggleCursor,
+    toggleDrag,
+    toggleTheme,
+  } = usePreferences()
   const { index, scene, direction, wiping, go, goTo, next, prev, home } = useSceneRouter(reduced)
   const ambient = useAmbientProvider()
 
@@ -78,7 +87,7 @@ export default function App() {
      scroll de adentro: en el teléfono la galería y el texto de "Sobre mí"
      quedaban cortados y no había forma de llegar al resto. */
   useEffect(() => {
-    const DESPLAZABLES = '.pane-scroll, .gal-strip, [data-desplazable]'
+    const DESPLAZABLES = '.pane-scroll, .gal-strip, .work-list, [data-desplazable]'
     const block = (e: TouchEvent) => {
       const el = e.target as HTMLElement | null
       if (el?.closest?.(DESPLAZABLES)) return
@@ -97,6 +106,7 @@ export default function App() {
             onEnter={() => goTo('sobre-mi')}
             onWork={() => goTo('trabajo')}
             onContacto={() => goTo('contacto')}
+            arrastrable={drag}
           />
         )
       case 'sobre-mi':
@@ -114,7 +124,7 @@ export default function App() {
       case 'redes':
         return <Social onHome={home} />
     }
-  }, [scene.id, goTo, home])
+  }, [scene.id, goTo, home, drag])
 
   return (
     <AmbientContext.Provider value={ambient}>
@@ -123,9 +133,9 @@ export default function App() {
       </a>
 
       <Intro reduced={reduced} />
-      <Atmosphere />
+      <Atmosphere cursorActivo={customCursor} />
       <Cursor enabled={customCursor} />
-      <Ripples enabled={!reduced} />
+      <Ripples enabled={drag} />
       <Curtain active={wiping} direction={direction} />
 
       <Nav
@@ -138,6 +148,10 @@ export default function App() {
         onToggleMotion={toggleMotion}
         customCursor={customCursor}
         onToggleCursor={toggleCursor}
+        drag={drag}
+        onToggleDrag={toggleDrag}
+        theme={theme}
+        onToggleTheme={toggleTheme}
         hidden={navLocked}
       />
 
