@@ -129,8 +129,15 @@ export async function tramosOcupados({ desde, hasta }) {
   return ocupados.sort((a, b) => a.inicio - b.inicio)
 }
 
-/** Crea el evento y envía la invitación al cliente. */
-export async function crearEvento({ resumen, descripcion, inicioISO, finISO, invitado }) {
+/**
+ * Crea el evento en el calendario de Nicolás.
+ *
+ * Importante: NO se agregan asistentes. Google prohíbe que una cuenta de
+ * servicio invite a nadie salvo que la cuenta sea de Google Workspace de pago
+ * con delegación de dominio, que no es el caso. Por eso al cliente se le avisa
+ * por correo, con un enlace para que él mismo lo agregue a su calendario.
+ */
+export async function crearEvento({ resumen, descripcion, inicioISO, finISO }) {
   const token = await tokenDeGoogle()
   const calendario = encodeURIComponent(process.env.CALENDAR_ID)
   const enlaceFijo = process.env.ENLACE_REUNION || ''
@@ -140,7 +147,6 @@ export async function crearEvento({ resumen, descripcion, inicioISO, finISO, inv
     description: descripcion,
     start: { dateTime: inicioISO, timeZone: 'America/Santiago' },
     end: { dateTime: finISO, timeZone: 'America/Santiago' },
-    attendees: invitado ? [{ email: invitado.email, displayName: invitado.nombre }] : [],
     reminders: {
       useDefault: false,
       overrides: [
@@ -150,17 +156,13 @@ export async function crearEvento({ resumen, descripcion, inicioISO, finISO, inv
     },
   }
 
-  // Si hay un enlace fijo de reunión configurado, va como ubicación del evento.
   if (enlaceFijo) cuerpo.location = enlaceFijo
 
-  const r = await fetch(
-    `${API}/calendars/${calendario}/events?sendUpdates=all&conferenceDataVersion=1`,
-    {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify(cuerpo),
-    },
-  )
+  const r = await fetch(`${API}/calendars/${calendario}/events`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(cuerpo),
+  })
 
   const datos = await r.json()
   if (!r.ok) throw new Error(`No se pudo crear el evento: ${datos.error?.message || r.status}`)
