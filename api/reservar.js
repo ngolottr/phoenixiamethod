@@ -9,7 +9,7 @@
 
 import { tramosOcupados, crearEvento } from './_google.js'
 import { esHuecoValido, DURACION_MIN, partesEnChile } from './_agenda.js'
-import { enviarCorreo, escapar, enlaceAgregarACalendario } from './_correo.js'
+import { CORREO_NICOLAS, enviarCorreo, escapar, enlaceAgregarACalendario } from './_correo.js'
 import {
   MAX_ENLACES,
   RE_EMAIL,
@@ -93,6 +93,10 @@ NeuraIA`
     asunto: `Reunión confirmada — ${cuando}`,
     texto,
     html,
+    // Este correo dice "¿Necesitas moverla? Responde este correo". Como el
+    // remitente es el subdominio de Brevo, sin esto la respuesta no llegaría
+    // a ninguna parte.
+    responderA: { email: CORREO_NICOLAS, name: 'Nicolás Golott' },
   })
 
   const aviso = `Nueva reunión agendada desde la web
@@ -104,7 +108,7 @@ ${tema ? `\nQué quiere resolver:\n${tema}\n` : ''}
 Ya está en tu calendario NeuraIA · Clientes.${enlaceReunion ? `\nEnlace: ${enlaceReunion}` : '\n\nOJO: el evento no tiene enlace de videollamada. Agrégalo antes de la reunión.'}`
 
   await enviarCorreo({
-    para: process.env.CONTACTO_EMAIL || 'contacto.nicolaspk@gmail.com',
+    para: CORREO_NICOLAS,
     nombrePara: 'Nicolás',
     asunto: `Reunión agendada — ${nombre}`,
     texto: aviso,

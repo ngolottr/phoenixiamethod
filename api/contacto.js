@@ -16,6 +16,10 @@
    Variables de entorno (panel de Vercel):
      BREVO_API_KEY     la clave de Brevo (Settings → SMTP & API → API Keys)
      CONTACTO_EMAIL    a dónde te llega la copia. Si falta, usa el de abajo.
+     REMITENTE_EMAIL   desde qué dirección sale el correo. Tiene que ser una que
+                       Brevo firme: su subdominio brevosend o un dominio propio
+                       verificado. Con una dirección gratuita (@gmail.com) Brevo
+                       acepta el envío y después lo marca "Bloqueado".
    ========================================================================== */
 
 import {
@@ -46,7 +50,16 @@ const CUPO_TOTAL = [40, 24 * 3600000] // 40 al día en toda la web
 /** Lo que tarda una persona en llenar el formulario, como mínimo. */
 const SEGUNDOS_MINIMOS = 3
 
-const REMITENTE = { name: 'Nicolás Golott', email: 'contacto.nicolaspk@gmail.com' }
+/* Brevo dejó de reescribir el remitente cuando es una dirección gratuita: desde
+   el 10/09 todo lo que sale con @gmail.com queda "Bloqueado" en su registro y no
+   llega a nadie —ni al visitante ni a Nicolás—, y la API igual responde que sí.
+   Por eso el remitente es ahora el subdominio que Brevo firma por su cuenta. Las
+   respuestas siguen llegando al Gmail de siempre: van por el replyTo. */
+const CORREO_NICOLAS = process.env.CONTACTO_EMAIL || 'contacto.nicolaspk@gmail.com'
+const REMITENTE = {
+  name: 'Nicolás Golott',
+  email: process.env.REMITENTE_EMAIL || 'contacto.nicolaspk@12068809.brevosend.com',
+}
 const SITIO = process.env.SITIO_URL || 'https://elgolott.vercel.app'
 const HORARIO =
   'lunes a viernes desde las 20:30, sábados desde las 16:00 y domingos todo el día (hora de Chile)'
@@ -300,7 +313,7 @@ export default async function handler(req, res) {
 
   const cliente = correoParaElCliente(datos)
   const aviso = correoParaNicolas(datos, sospechas)
-  const miCorreo = process.env.CONTACTO_EMAIL || REMITENTE.email
+  const miCorreo = CORREO_NICOLAS
 
   if (sospechas.length) {
     console.warn('[contacto] filtrada como robot:', sospechas.join(' · '), '→', datos.email)
@@ -329,6 +342,9 @@ export default async function handler(req, res) {
       asunto: `Agendemos 30 minutos, ${primerNombre(datos.nombre)}`,
       texto: cliente.texto,
       html: cliente.html,
+      // El remitente es el subdominio de Brevo: si el visitante responde, la
+      // respuesta tiene que caer en el Gmail de Nicolás, no en el vacío.
+      responderA: { email: CORREO_NICOLAS, name: 'Nicolás Golott' },
     })
   } catch (e) {
     // El detalle va al registro de Vercel. Al visitante, nada: la respuesta de

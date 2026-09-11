@@ -4,7 +4,14 @@
    por la confirmación de reserva.
    ========================================================================== */
 
-export const REMITENTE = { name: 'Nicolás Golott', email: 'contacto.nicolaspk@gmail.com' }
+/* Remitente: el subdominio que Brevo firma solo. Con una dirección gratuita
+   (@gmail.com) Brevo acepta el envío por API y después lo marca "Bloqueado", así
+   que no llega nunca. Las respuestas se dirigen al Gmail con el replyTo. */
+export const CORREO_NICOLAS = process.env.CONTACTO_EMAIL || 'contacto.nicolaspk@gmail.com'
+export const REMITENTE = {
+  name: 'Nicolás Golott',
+  email: process.env.REMITENTE_EMAIL || 'contacto.nicolaspk@12068809.brevosend.com',
+}
 
 export function escapar(texto) {
   return String(texto ?? '')
