@@ -363,8 +363,12 @@ export default async function handler(req, res) {
       html: aviso.html,
       responderA: { email: datos.email, name: datos.nombre },
     })
-  } catch {
-    /* el visitante ya recibió su correo; la copia se puede perder sin drama */
+  } catch (e) {
+    /* El visitante ya recibió su correo, así que la solicitud no se cae por
+       esto. Pero sin dejar rastro no había cómo distinguir "la copia se
+       demoró" de "la copia nunca salió", que es justo lo que costó horas de
+       diagnóstico el 11/09. */
+    console.error('[contacto] no llegó la copia interna →', e.message)
   }
 
   return res.status(200).json({ ok: true })
