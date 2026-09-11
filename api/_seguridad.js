@@ -74,17 +74,29 @@ export function pasaLosCupos(reglas) {
 
 /**
  * Los dominios desde los que se acepta un envío.
- * Vercel da una URL distinta a cada despliegue, así que además del dominio
- * propio se aceptan los *.vercel.app del proyecto.
+ *
+ * Vercel le da una URL distinta a cada despliegue, así que además del dominio
+ * propio hay que admitir los del proyecto. Antes eso se resolvía aceptando
+ * cualquier host terminado en `.vercel.app`, y eso no filtraba nada: Vercel
+ * regala subdominios, así que bastaba con crear un proyecto gratis para pasar
+ * el control y gastarle a Nicolás el cupo de correos o llenarle el calendario.
+ *
+ * Ahora la lista es explícita. Vercel publica el host de cada despliegue en
+ * estas variables, y no hay comodín que valga.
  */
 function anfitrionesPermitidos() {
-  const sitio = String(process.env.SITIO_URL || 'https://elgolott.vercel.app')
-  const propios = [sitio, process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '']
-  return propios
+  const desdeEntorno = [
+    process.env.SITIO_URL || 'https://elgolott.vercel.app',
+    process.env.VERCEL_URL,                       // este despliegue
+    process.env.VERCEL_BRANCH_URL,                // el de la rama
+    process.env.VERCEL_PROJECT_PRODUCTION_URL,    // el de producción
+  ]
+  return desdeEntorno
     .filter(Boolean)
     .map((u) => {
+      const con = String(u).startsWith('http') ? String(u) : `https://${u}`
       try {
-        return new URL(u).host
+        return new URL(con).host
       } catch {
         return ''
       }
@@ -104,11 +116,30 @@ export function vieneDeLaWeb(req) {
   const bruto = req.headers.origin || req.headers.referer || ''
   if (!bruto) return false
   try {
-    const host = new URL(bruto).host
-    return permitidos.includes(host) || host.endsWith('.vercel.app')
+    return permitidos.includes(new URL(bruto).host)
   } catch {
     return false
   }
+}
+
+/* --- Tamaño del envío ------------------------------------------------------ */
+
+/**
+ * Ningún formulario de esta web llega ni a 4 KB. Lo que venga por encima de
+ * esto no es una persona escribiendo: es alguien probando cuánto aguanta.
+ *
+ * Se corta ANTES de convertir el texto a objeto. Da igual que después los
+ * campos se recorten a su largo máximo — para llegar a recortarlos hay que
+ * haber leído y convertido el envío entero, y eso con megabytes es trabajo
+ * regalado que se paga en tiempo de ejecución.
+ */
+export const MAX_CUERPO = 32 * 1024
+
+export function cuerpoDemasiadoGrande(req) {
+  const largo = Number(req.headers['content-length'])
+  if (Number.isFinite(largo) && largo > MAX_CUERPO) return true
+  const crudo = typeof req.body === 'string' ? req.body : null
+  return crudo !== null && crudo.length > MAX_CUERPO
 }
 
 /* --- Forma del contenido --------------------------------------------------- */

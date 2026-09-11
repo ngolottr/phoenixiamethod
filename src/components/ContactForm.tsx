@@ -182,11 +182,17 @@ export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
         )}
       </div>
 
-      {/* Trampa para robots: fuera de la vista y fuera del recorrido del teclado */}
+      {/* Trampa para robots: fuera de la vista, fuera del recorrido del teclado
+          y de solo lectura. Lo último es lo que importa: el autocompletado del
+          teléfono llena campos aunque digan autocomplete="off", y si llenaba
+          este, el servidor descartaba en silencio la solicitud de una persona
+          real. Un campo de solo lectura no lo toca el autocompletado, pero un
+          robot que escribe directo en el DOM sí lo sigue llenando. */}
       <input
         type="text"
         className="sr-only"
         tabIndex={-1}
+        readOnly
         autoComplete="off"
         aria-hidden="true"
         value={trampa}

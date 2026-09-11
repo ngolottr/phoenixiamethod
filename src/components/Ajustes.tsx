@@ -25,6 +25,10 @@ type Props = {
   onToggleCursor: () => void
   drag: boolean
   onToggleDrag: () => void
+  musica: boolean
+  onToggleMusica: () => void
+  sonido: boolean
+  onToggleSonido: () => void
   theme: Theme
   onToggleTheme: () => void
 }
@@ -64,6 +68,10 @@ export function Ajustes({
   onToggleCursor,
   drag,
   onToggleDrag,
+  musica,
+  onToggleMusica,
+  sonido,
+  onToggleSonido,
   theme,
   onToggleTheme,
 }: Props) {
@@ -161,9 +169,25 @@ export function Ajustes({
             />
           </div>
 
+          <p className="aj-titulo">Audio</p>
+          <div className="aj-efectos">
+            <Fila
+              nombre="Música"
+              detalle="Cama lofi de fondo, en todo el recorrido"
+              on={musica}
+              onClick={onToggleMusica}
+            />
+            <Fila
+              nombre="Sonidos"
+              detalle="El portal al cambiar de verso en el manifiesto"
+              on={sonido}
+              onClick={onToggleSonido}
+            />
+          </div>
+
           <p className="aj-nota">
-            Vienen apagados para que el sitio abra liviano en cualquier equipo. Tu elección queda
-            guardada.
+            Todo viene apagado para que el sitio abra liviano en cualquier equipo: mientras un
+            efecto está apagado no se descarga su audio. Tu elección queda guardada.
           </p>
         </div>
       )}

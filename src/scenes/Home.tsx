@@ -14,12 +14,11 @@ import { brand, hero } from '../data/site'
  */
 export function Home({
   onEnter,
-  onWork,
   onContacto,
   arrastrable,
 }: {
+  /** entra al recorrido por el bloque de negocio: lo primero es el trabajo */
   onEnter: () => void
-  onWork: () => void
   onContacto: () => void
   /** el visitante encendió el arrastre: el sello se puede mover */
   arrastrable: boolean
@@ -50,12 +49,13 @@ export function Home({
           <p className="home-tag">{brand.tagline}</p>
         </div>
 
+        {/* Una sola puerta. Antes había dos botones que llevaban casi al mismo
+            sitio y obligaban a elegir antes de saber nada; ahora "Entrar" abre
+            el recorrido por el trabajo, y el sello —que gira en su esquina— es
+            el atajo para quien ya se decidió. */}
         <div className="home-cta rise" data-d="4">
           <MagneticButton className="btn solid" onClick={onEnter}>
             {hero.cta} <span className="arrow">→</span>
-          </MagneticButton>
-          <MagneticButton className="btn" onClick={onWork}>
-            Ver trabajo
           </MagneticButton>
         </div>
 

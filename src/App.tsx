@@ -7,7 +7,8 @@ import { Intro } from './components/Intro'
 import { Nav } from './components/Nav'
 
 import { usePreferences, useViewportHeight } from './hooks/usePreferences'
-import { SCENES, useSceneRouter } from './hooks/useSceneRouter'
+import { useMusica } from './hooks/useAudio'
+import { INICIO_DE_BLOQUE, SCENES, useSceneRouter } from './hooks/useSceneRouter'
 import { AmbientContext, useAmbientProvider } from './hooks/useAmbient'
 
 import { Home } from './scenes/Home'
@@ -34,12 +35,20 @@ export default function App() {
     reduced,
     customCursor,
     drag,
+    musica,
+    sonido,
     theme,
     toggleMotion,
     toggleCursor,
     toggleDrag,
+    toggleMusica,
+    toggleSonido,
     toggleTheme,
   } = usePreferences()
+
+  // La cama lofi vive acá arriba: el recorrido cambia de escena y la música no
+  // se entera, que es justo lo que se quiere de una música de fondo.
+  useMusica(musica)
   const { index, scene, direction, wiping, go, goTo, next, prev, home } = useSceneRouter(reduced)
   const ambient = useAmbientProvider()
 
@@ -156,8 +165,7 @@ export default function App() {
       case 'inicio':
         return (
           <Home
-            onEnter={() => goTo('sobre-mi')}
-            onWork={() => goTo('trabajo')}
+            onEnter={() => goTo(INICIO_DE_BLOQUE.negocio)}
             onContacto={() => goTo('contacto')}
             arrastrable={drag}
           />
@@ -169,15 +177,15 @@ export default function App() {
       case 'destacados':
         return <Highlights onLockNav={setNavLocked} />
       case 'trabajo':
-        return <Work onLockNav={setNavLocked} />
+        return <Work onLockNav={setNavLocked} onContacto={() => goTo('contacto')} />
       case 'manifiesto':
-        return <Manifesto />
+        return <Manifesto sonido={sonido} />
       case 'contacto':
         return <Contact />
       case 'redes':
         return <Social onHome={home} />
     }
-  }, [scene.id, goTo, home, drag])
+  }, [scene.id, goTo, home, drag, sonido])
 
   return (
     <AmbientContext.Provider value={ambient}>
@@ -203,6 +211,10 @@ export default function App() {
         onToggleCursor={toggleCursor}
         drag={drag}
         onToggleDrag={toggleDrag}
+        musica={musica}
+        onToggleMusica={toggleMusica}
+        sonido={sonido}
+        onToggleSonido={toggleSonido}
         theme={theme}
         onToggleTheme={toggleTheme}
         hidden={navLocked}

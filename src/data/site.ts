@@ -477,44 +477,10 @@ export type Work = {
   url?: string
 }
 
-export const work: Work[] = [
-  {
-    index: '01',
-    title: 'Operación 100K',
-    category: 'Contenido',
-    description:
-      'Sistema de producción diaria de contenido vertical: guion, grabación, edición y métricas en un solo pipeline documentado en público.',
-    meta: 'En curso · 2026',
-    image: 'images/setup-gaming.jpg',
-  },
-  {
-    index: '02',
-    title: 'Fénix IA Method',
-    category: 'Consultoría',
-    description:
-      'Metodología para meter IA y automatización en problemas reales de personas y organizaciones. Diagnóstico, rediseño y medición.',
-    meta: 'Metodología propia',
-    image: 'images/sepia-osb.jpg',
-  },
-  {
-    index: '03',
-    title: 'Agentes & Automatización',
-    category: 'Sistemas',
-    description:
-      'Flujos con n8n, transcripción local y agentes que cortan, escriben y publican. Menos clics, más output.',
-    meta: 'Infraestructura',
-    image: 'images/minecraft-render.jpg',
-  },
-  {
-    index: '04',
-    title: 'Dirección de arte',
-    category: 'Marca',
-    description:
-      'Identidad visual, dirección de fotografía y puesta en escena para marcas personales que no quieren parecerse a nadie.',
-    meta: 'Bajo pedido',
-    image: 'images/camara-verde.jpg',
-  },
-]
+/* Los proyectos NO viven aquí: viven en data/proyectos.ts, que es lo que la
+   escena de Trabajo lee de verdad. Había una copia en este archivo que ya no
+   usaba nadie y que además seguía anunciando un caso que ya no existe. Dos
+   listas del mismo contenido siempre terminan contando cosas distintas. */
 
 export const manifesto = {
   eyebrow: 'Manifiesto',

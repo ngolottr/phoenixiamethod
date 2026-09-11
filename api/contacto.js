@@ -22,6 +22,7 @@ import {
   MAX_ENLACES,
   RE_EMAIL,
   cuentaEnlaces,
+  cuerpoDemasiadoGrande,
   fallo,
   ipDe,
   limpiarLinea,
@@ -146,8 +147,22 @@ NeuraIA`
 
 /* --- La copia que te llega a ti ------------------------------------------ */
 
-function correoParaNicolas({ nombre, email, mensaje, presupuesto }) {
-  const texto = `Nueva solicitud desde elgolott.vercel.app
+function correoParaNicolas({ nombre, email, mensaje, presupuesto }, sospechas = []) {
+  const marcada = sospechas.length > 0
+  const encabezado = marcada
+    ? `SOLICITUD FILTRADA COMO POSIBLE ROBOT
+Motivo: ${sospechas.join(' · ')}
+NO se le envió el correo automático. Si es una persona real, respóndele tú
+desde este mensaje.
+
+`
+    : ''
+  const siguiente = marcada
+    ? 'No se le envió el enlace para agendar.'
+    : `Ya se le envió el enlace para que elija su horario.
+Cuando reserve, el evento aparece solo en tu calendario NeuraIA · Clientes.`
+
+  const texto = `${encabezado}Nueva solicitud desde elgolott.vercel.app
 
 Nombre:       ${nombre}
 Correo:       ${email}
@@ -156,8 +171,7 @@ Presupuesto:  ${presupuesto || 'No indicado'}
 Qué necesita:
 ${mensaje}
 
-Ya se le envió el enlace para que elija su horario.
-Cuando reserve, el evento aparece solo en tu calendario NeuraIA · Clientes.
+${siguiente}
 
 Si prefieres agendarlo tú, dile a Claude:
 "agenda con ${nombre} el <dia> a las <hora>, correo ${email}"
@@ -207,6 +221,13 @@ export default async function handler(req, res) {
     return fallo(res, 403, 'Envío no permitido desde aquí.')
   }
 
+  // Se descarta por tamaño antes de convertir nada: un envío de megabytes se
+  // recorta igual campo a campo, pero para llegar a recortarlo hay que haberlo
+  // leído entero, y eso es trabajo regalado.
+  if (cuerpoDemasiadoGrande(req)) {
+    return fallo(res, 413, 'El mensaje es demasiado largo.')
+  }
+
   const apiKey = process.env.BREVO_API_KEY
   if (!apiKey) {
     return fallo(res, 500, 'El correo no está disponible ahora.', 'Falta BREVO_API_KEY')
@@ -238,15 +259,6 @@ export default async function handler(req, res) {
 
   /* --- Filtros de abuso --------------------------------------------------- */
 
-  // Trampa para robots: un campo que ninguna persona ve ni llena.
-  if (limpiarTexto(cuerpo.web, 10)) return res.status(200).json({ ok: true })
-
-  // Nadie escribe una solicitud en dos segundos. Un robot sí.
-  const abierto = Number(cuerpo.desde)
-  if (Number.isFinite(abierto) && abierto < SEGUNDOS_MINIMOS * 1000) {
-    return res.status(200).json({ ok: true })
-  }
-
   /* Este correo le repite al visitante lo que escribió. Sin este filtro, la web
      sirve para mandarle a cualquiera un mensaje lleno de enlaces desde una
      dirección con buena reputación: phishing con la cara de Nicolás. */
@@ -269,9 +281,44 @@ export default async function handler(req, res) {
       .json({ ok: false, error: 'Ya recibí tu mensaje. Dame un rato antes de mandar otro.' })
   }
 
+  /* Señales de robot. Antes bastaba una para descartar la solicitud en
+     silencio, y el 11/09 eso se comió la de una persona real: el
+     autocompletado del teléfono llenó la trampa, el visitante vio "revisa tu
+     correo" y no salió ningún mensaje, ni para él ni para Nicolás.
+
+     Ahora una solicitud marcada no recibe el correo automático —no se le puede
+     mandar contenido a ciegas a una dirección que quizá no pidió nada— pero
+     llega igual a Nicolás con el motivo escrito, y queda en el registro de
+     Vercel. Los cupos ya se aplicaron más arriba, así que esta vía tampoco
+     sirve para inundar la bandeja. */
+  const abierto = Number(cuerpo.desde)
+  const sospechas = []
+  if (limpiarTexto(cuerpo.web, 10)) sospechas.push('campo trampa lleno')
+  if (Number.isFinite(abierto) && abierto < SEGUNDOS_MINIMOS * 1000) {
+    sospechas.push(`enviado en ${(abierto / 1000).toFixed(1)} s`)
+  }
+
   const cliente = correoParaElCliente(datos)
-  const aviso = correoParaNicolas(datos)
+  const aviso = correoParaNicolas(datos, sospechas)
   const miCorreo = process.env.CONTACTO_EMAIL || REMITENTE.email
+
+  if (sospechas.length) {
+    console.warn('[contacto] filtrada como robot:', sospechas.join(' · '), '→', datos.email)
+    try {
+      await enviar({
+        apiKey,
+        para: miCorreo,
+        nombrePara: 'Nicolás',
+        asunto: `Solicitud filtrada (posible robot) — ${datos.nombre}`,
+        texto: aviso.texto,
+        html: aviso.html,
+        responderA: { email: datos.email, name: datos.nombre },
+      })
+    } catch (e) {
+      console.error('[contacto] no pude avisar de la solicitud filtrada →', e.message)
+    }
+    return res.status(200).json({ ok: true })
+  }
 
   try {
     // Primero el de la persona: es el que no puede fallar.

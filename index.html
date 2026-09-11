@@ -10,8 +10,10 @@
     <meta property="og:type" content="website" />
     <meta property="og:image" content="./images/hero.jpg" />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23040D0A'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' fill='%232BE58F' text-anchor='middle'%3EG%3C/text%3E%3C/svg%3E" />
-    <!-- Precarga del hero: es lo primero que se ve. -->
-    <link rel="preload" as="image" href="./images/hero.jpg" fetchpriority="high" />
+    <!-- Precarga del hero: es lo primero que se ve. Apunta a la figura
+         recortada, que es la que se muestra de verdad; antes precargaba
+         hero.jpg —171 KB que ya nadie usaba— y el navegador avisaba. -->
+    <link rel="preload" as="image" href="./images/hero-figura.png" fetchpriority="high" />
     <title>ELGOLOTT — Dirección creativa</title>
   </head>
   <body>

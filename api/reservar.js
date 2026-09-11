@@ -14,6 +14,7 @@ import {
   MAX_ENLACES,
   RE_EMAIL,
   cuentaEnlaces,
+  cuerpoDemasiadoGrande,
   esEnlaceSeguro,
   fallo,
   ipDe,
@@ -121,6 +122,11 @@ export default async function handler(req, res) {
 
   if (!vieneDeLaWeb(req)) {
     return fallo(res, 403, 'Reserva no permitida desde aquí.')
+  }
+
+  // Igual que en el formulario: por tamaño se descarta antes de convertir nada.
+  if (cuerpoDemasiadoGrande(req)) {
+    return fallo(res, 413, 'La reserva trae demasiado texto.')
   }
 
   let cuerpo

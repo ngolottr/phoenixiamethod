@@ -90,9 +90,69 @@ export function CasoPanel({ caso, onClose }: { caso: Caso; onClose: () => void }
           </div>
 
           <div className="caso-col">
+            {/* La fotografía de origen con los colores señalados sobre ella.
+                El número del punto es el mismo de la lista de abajo: los globos
+                flotando sobre la imagen taparían justo lo que hay que mirar. */}
+            {caso.paleta && (
+              <div className="caso-bloque">
+                <p className="eyebrow">De dónde salió el color</p>
+
+                {/* Cada color, señalado donde se midió. Sin explicaciones: una
+                    paleta se entiende mirándola. */}
+                <figure className="paleta">
+                  <span className="paleta-foto">
+                    <SmartImage src={caso.paleta.image} alt={caso.paleta.alt} />
+                    {caso.paleta.marcas.map((m) => (
+                      <span
+                        key={m.nombre}
+                        className={`paleta-marca${m.izquierda ? ' a-la-izquierda' : ''}`}
+                        style={{ left: `${m.x}%`, top: `${m.y}%` }}
+                      >
+                        <span className="pm-punto" style={{ background: m.final }} />
+                        <span className="pm-clave">
+                          <span className="pm-n">{m.nombre}</span>
+                          <code>{m.final}</code>
+                        </span>
+                      </span>
+                    ))}
+                  </span>
+                </figure>
+              </div>
+            )}
+
+            {/* Con qué está construido: capturas de las herramientas trabajando
+                de verdad. Un logotipo lo pone cualquiera; esto muestra el
+                sistema andando, que es lo que el caso está afirmando. */}
+            {caso.herramientas && (
+              <div className="caso-bloque">
+                <p className="eyebrow">
+                  {caso.tituloHerramientas ?? 'Con qué está construido'}
+                </p>
+                <div className="caso-herramientas">
+                  {caso.herramientas.map((h) => (
+                    <figure className="herramienta" key={h.nombre}>
+                      {/* El marco toma la proporción de la imagen: con una fija,
+                          cualquier captura que no case deja franjas vacías. */}
+                      <span
+                        className="herramienta-foto"
+                        style={h.proporcion ? { aspectRatio: h.proporcion } : undefined}
+                      >
+                        <SmartImage src={h.image} alt={`${h.nombre} en uso`} />
+                      </span>
+                      <figcaption>
+                        <span className="herramienta-n">{h.nombre}</span>
+                        <span className="herramienta-r">{h.rol}</span>
+                        <span className="herramienta-p">{h.para}</span>
+                      </figcaption>
+                    </figure>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {caso.hallazgos && (
               <div className="caso-bloque">
-                <p className="eyebrow">Lo que muestran los datos</p>
+                <p className="eyebrow">Por qué está hecho así</p>
                 <div className="caso-hallazgos">
                   {caso.hallazgos.map((h) => (
                     <div className="caso-hallazgo" key={h.titulo}>
@@ -107,7 +167,7 @@ export function CasoPanel({ caso, onClose }: { caso: Caso; onClose: () => void }
 
             {caso.notas && (
               <div className="caso-bloque">
-                <p className="eyebrow brass">Criterio</p>
+                <p className="eyebrow brass">Lo que también hay que decir</p>
                 <ul className="caso-notas">
                   {caso.notas.map((n, i) => (
                     <li key={i}>{n}</li>
@@ -116,7 +176,6 @@ export function CasoPanel({ caso, onClose }: { caso: Caso; onClose: () => void }
               </div>
             )}
 
-            <p className="caso-fuente">{caso.fuente}</p>
           </div>
         </div>
 

@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { MagneticButton } from '../components/MagneticButton'
 import { Emblema } from '../components/Emblema'
+import { usePortal } from '../hooks/useAudio'
 import { manifesto } from '../data/site'
 
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI']
@@ -16,10 +17,19 @@ function render(line: string): ReactNode[] {
   )
 }
 
-export function Manifesto() {
+export function Manifesto({ sonido }: { sonido: boolean }) {
   const [i, setI] = useState(0)
   const verse = manifesto.verses[i]
   const total = manifesto.verses.length
+  const portal = usePortal(sonido)
+
+  /* El portal se dispara acá dentro, en el mismo clic que cambia el verso, y no
+     desde un efecto: colgando del gesto del visitante ningún navegador lo
+     bloquea por política de reproducción automática. */
+  const mover = (paso: number) => {
+    portal()
+    setI((v) => (v + paso + total) % total)
+  }
 
   return (
     <section className="scene mani" aria-labelledby="mani-title">
@@ -40,7 +50,7 @@ export function Manifesto() {
       <div className="mani-controls">
         <MagneticButton
           className="btn icon"
-          onClick={() => setI((v) => (v - 1 + total) % total)}
+          onClick={() => mover(-1)}
           aria-label="Verso anterior"
         >
           ←
@@ -52,7 +62,7 @@ export function Manifesto() {
 
         <MagneticButton
           className="btn icon"
-          onClick={() => setI((v) => (v + 1) % total)}
+          onClick={() => mover(1)}
           aria-label="Verso siguiente"
         >
           →

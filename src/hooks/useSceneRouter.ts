@@ -10,22 +10,45 @@ export type SceneId =
   | 'contacto'
   | 'redes'
 
+/**
+ * El sitio va en dos tiempos.
+ *
+ * `negocio` es lo que un cliente viene a buscar: qué hago, cómo contratarme y
+ * bajo qué criterio trabajo. `marca` es quién está detrás, y solo tiene sentido
+ * después de lo anterior — a nadie le importa tu biografía antes de saber si le
+ * sirves. Por eso el orden no es decorativo: el recorrido vende primero y se
+ * presenta después.
+ */
+export type Bloque = 'negocio' | 'marca'
+
 export type SceneDef = {
   id: SceneId
   label: string
   num: string
+  bloque: Bloque
 }
 
 export const SCENES: SceneDef[] = [
-  { id: 'inicio', label: 'Inicio', num: '01' },
-  { id: 'sobre-mi', label: 'Sobre mí', num: '02' },
-  { id: 'galeria', label: 'Galería', num: '03' },
-  { id: 'destacados', label: 'Destacados', num: '04' },
-  { id: 'trabajo', label: 'Trabajo', num: '05' },
-  { id: 'manifiesto', label: 'Manifiesto', num: '06' },
-  { id: 'contacto', label: 'Contacto', num: '07' },
-  { id: 'redes', label: 'Redes', num: '08' },
+  { id: 'inicio', label: 'Inicio', num: '01', bloque: 'negocio' },
+  { id: 'trabajo', label: 'Trabajo', num: '02', bloque: 'negocio' },
+  { id: 'contacto', label: 'Contacto', num: '03', bloque: 'negocio' },
+  { id: 'manifiesto', label: 'Manifiesto', num: '04', bloque: 'negocio' },
+  { id: 'sobre-mi', label: 'Sobre mí', num: '05', bloque: 'marca' },
+  { id: 'redes', label: 'Redes', num: '06', bloque: 'marca' },
+  { id: 'galeria', label: 'Galería', num: '07', bloque: 'marca' },
+  { id: 'destacados', label: 'Destacados', num: '08', bloque: 'marca' },
 ]
+
+export const BLOQUES: Record<Bloque, { titulo: string; pie: string }> = {
+  negocio: { titulo: 'Negocio', pie: 'Qué hago y cómo contratarme' },
+  marca: { titulo: 'Quién soy', pie: 'Con quién estás trabajando' },
+}
+
+/** Primera escena de cada bloque: a dónde salta "Entrar" y el paso entre bloques. */
+export const INICIO_DE_BLOQUE: Record<Bloque, SceneId> = {
+  negocio: 'trabajo',
+  marca: 'sobre-mi',
+}
 
 function indexFromHash(): number {
   const hash = window.location.hash.replace('#', '')

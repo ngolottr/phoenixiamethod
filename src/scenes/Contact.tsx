@@ -2,7 +2,7 @@ import { MagneticButton } from '../components/MagneticButton'
 import { ContactForm } from '../components/ContactForm'
 import { PanelScroll } from '../components/PanelScroll'
 import { useCopy } from '../hooks/useCopy'
-import { brand, contact, linkHub, socials } from '../data/site'
+import { brand, contact } from '../data/site'
 
 export function Contact() {
   const { copied, copy } = useCopy()
@@ -40,20 +40,10 @@ export function Contact() {
               </span>
             </div>
 
-            <div
-              className="rise"
-              data-d="5"
-              style={{ marginTop: 'clamp(20px, 4vh, 40px)', display: 'flex', gap: 18, flexWrap: 'wrap' }}
-            >
-              {socials.slice(0, 4).map((s) => (
-                <a key={s.label} className="label" href={s.url} target="_blank" rel="noopener noreferrer">
-                  {s.label} ↗
-                </a>
-              ))}
-              <a className="label" href={linkHub.url} target="_blank" rel="noopener noreferrer">
-                {linkHub.label} ↗
-              </a>
-            </div>
+            {/* Aquí no va ningún enlace a redes. Redes es una escena propia del
+                recorrido y las lista todas con su foto y su motivo; repetirlas
+                acá solo daba una salida del sitio en la única pantalla donde lo
+                que se busca es que la persona escriba. */}
 
             <span className="sr-only" aria-live="polite">
               {copied ? 'Correo copiado al portapapeles' : ''}

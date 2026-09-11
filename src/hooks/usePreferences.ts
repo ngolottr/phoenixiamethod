@@ -4,6 +4,8 @@ const MOTION_KEY = 'elgolott:motion'
 const CURSOR_KEY = 'elgolott:cursor'
 const DRAG_KEY = 'elgolott:drag'
 const THEME_KEY = 'elgolott:theme'
+const MUSICA_KEY = 'elgolott:musica'
+const SONIDO_KEY = 'elgolott:sonido'
 
 export type Theme = 'dark' | 'light'
 
@@ -57,6 +59,14 @@ export function usePreferences() {
     return readStored(DRAG_KEY) === 'on'
   })
 
+  // Música de fondo. Apagada de entrada por dos motivos que empujan igual: un
+  // sitio que suena solo es intrusivo, y los navegadores lo bloquean de todos
+  // modos hasta que hay un gesto del visitante.
+  const [musica, setMusica] = useState<boolean>(() => readStored(MUSICA_KEY) === 'on')
+
+  // Sonidos de interfaz: hoy, el portal del manifiesto.
+  const [sonido, setSonido] = useState<boolean>(() => readStored(SONIDO_KEY) === 'on')
+
   const [theme, setTheme] = useState<Theme>(() => {
     const saved = readStored(THEME_KEY)
     if (saved === 'light' || saved === 'dark') return saved
@@ -86,9 +96,20 @@ export function usePreferences() {
     if (meta) meta.setAttribute('content', theme === 'light' ? '#F1F5F1' : '#040D0A')
   }, [theme])
 
+  useEffect(() => {
+    store(MUSICA_KEY, musica ? 'on' : 'off')
+  }, [musica])
+
+  useEffect(() => {
+    document.documentElement.dataset.sonido = sonido ? 'on' : 'off'
+    store(SONIDO_KEY, sonido ? 'on' : 'off')
+  }, [sonido])
+
   const toggleMotion = useCallback(() => setReduced((v) => !v), [])
   const toggleCursor = useCallback(() => setCustomCursor((v) => !v), [])
   const toggleDrag = useCallback(() => setDrag((v) => !v), [])
+  const toggleMusica = useCallback(() => setMusica((v) => !v), [])
+  const toggleSonido = useCallback(() => setSonido((v) => !v), [])
   const toggleTheme = useCallback(
     () => setTheme((v) => (v === 'dark' ? 'light' : 'dark')),
     [],
@@ -98,10 +119,14 @@ export function usePreferences() {
     reduced,
     customCursor,
     drag,
+    musica,
+    sonido,
     theme,
     toggleMotion,
     toggleCursor,
     toggleDrag,
+    toggleMusica,
+    toggleSonido,
     toggleTheme,
   }
 }

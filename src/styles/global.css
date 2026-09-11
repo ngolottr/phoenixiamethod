@@ -554,7 +554,6 @@ html[data-motion='reduced'] .pane-mas b { animation: none; }
   pointer-events: none;
 }
 .topnav > * { pointer-events: auto; }
-.topnav .menu { min-width: 0; }
 
 /* La navegación se retira mientras el visor de galería está abierto */
 .topnav.is-away, .botnav.is-away {
@@ -570,27 +569,26 @@ html[data-motion='reduced'] .pane-mas b { animation: none; }
 /* La marca no cambia de color: es lo único fijo mientras todo lo demás se tiñe */
 .wordmark b { color: var(--veneno); font-weight: 400; }
 
-.menu { display: flex; gap: clamp(8px, 1.4vw, 22px); align-items: center; }
-.menu-item {
-  position: relative; font-family: var(--sans); font-size: 10px;
-  letter-spacing: .26em; text-transform: uppercase; color: var(--humo);
-  padding: 8px 2px; transition: color .35s var(--ease);
-  /* "Sobre mí" se partía en dos renglones cuando la barra se apretaba, la
-     cabecera crecía de alto y el título de la escena se le metía debajo. Los
-     nombres de las escenas no se parten: si no caben, el menú entero se retira
-     (por debajo de 1140 px) y quedan las flechas. */
-  white-space: nowrap;
+/* --- El bloque en curso, en la cabecera -----------------------------------
+   Reemplaza al antiguo menú de escenas. Ese menú ofrecía saltar a cualquier
+   parte y competía con el recorrido, que es la propuesta del sitio: primero el
+   trabajo y cómo contratarlo, después quién está detrás. Aquí solo se dice
+   dónde estás; para moverte están las flechas. */
+.topnav-bloque {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--sans); font-size: 9.5px; letter-spacing: .32em;
+  text-transform: uppercase; color: var(--humo);
+  white-space: nowrap; pointer-events: none;
 }
-.menu-item::after {
-  content: ''; position: absolute; left: 0; bottom: 2px; height: 1px; width: 100%;
-  background: var(--amb-accent); transform: scaleX(0); transform-origin: left;
-  transition: transform .45s var(--ease);
+.topnav-bloque-n {
+  font-size: 9px; letter-spacing: .1em; color: var(--amb-accent);
+  padding-right: 10px; border-right: 1px solid var(--linea-fuerte);
 }
-.menu-item:hover, .menu-item:focus-visible { color: var(--hueso); }
-.menu-item:hover::after { transform: scaleX(1); }
-.menu-item[aria-current='true'] { color: var(--amb-accent); }
-.menu-item[aria-current='true']::after { transform: scaleX(1); }
-.menu-item .num { opacity: .5; margin-right: 6px; font-size: 9px; }
+@media (max-width: 560px) { .topnav-bloque { display: none; } }
+
+.ticker-bloque { color: var(--humo); opacity: .7; }
+@media (max-width: 620px) { .ticker-bloque { display: none; } }
+/* El menú de escenas se eliminó: el recorrido lo llevan las flechas. */
 
 /* --- Barra: atajo de tema + panel de ajustes -----------------------------
    Solo dos controles en la cabecera. El tema, que es lo que más se toca, y el
@@ -626,6 +624,12 @@ html[data-motion='reduced'] .pane-mas b { animation: none; }
   width: min(300px, calc(100vw - 2 * var(--edge)));
   display: flex; flex-direction: column; gap: 10px;
   padding: 16px;
+  /* Con los interruptores de audio el panel creció, y en un teléfono apaisado
+     —375 px de alto— se salía por abajo sin forma de alcanzar el final. Se
+     desplaza dentro de sí mismo antes que desbordar la pantalla. */
+  max-height: calc(var(--vh) - 92px);
+  overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin;
   background: var(--velo-total);
   border: 1px solid var(--linea-fuerte);
   box-shadow: 0 24px 60px -20px rgba(0, 0, 0, .6);
@@ -715,6 +719,49 @@ html[data-motion='reduced'] .aj-panel { animation: none; }
 .botnav > * { pointer-events: auto; }
 
 .arrows { display: flex; gap: 10px; align-items: center; }
+
+/* --- Avanzar: el botón que sostiene el recorrido --------------------------
+   Sin menú, esta es la navegación. Dice a dónde lleva porque el visitante
+   tiene que poder decidir si sigue, y cuando el siguiente paso cruza al otro
+   bloque lo anuncia encima: es el único salto del sitio que cambia de asunto. */
+.avanzar {
+  display: inline-flex; align-items: center; gap: 16px;
+  min-height: 54px; padding: 0 22px 0 26px;
+  border: 1px solid var(--linea-fuerte); border-radius: 999px;
+  background: var(--velo);
+  color: var(--hueso); text-align: left;
+  transition: color .35s var(--ease), border-color .35s var(--ease),
+              background .35s var(--ease), transform .25s var(--ease);
+}
+.avanzar:hover, .avanzar:focus-visible {
+  color: var(--cripta); background: var(--amb-accent); border-color: var(--amb-accent);
+}
+.avanzar:active { transform: scale(.98); }
+.avanzar:disabled { opacity: .3; pointer-events: none; }
+
+.avanzar-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.avanzar-bloque {
+  font-family: var(--sans); font-size: 8px; letter-spacing: .3em;
+  text-transform: uppercase; color: var(--amb-accent);
+  transition: color .35s var(--ease);
+}
+.avanzar:hover .avanzar-bloque { color: var(--cripta); opacity: .72; }
+.avanzar-destino {
+  font-family: var(--sans); font-size: 11px; letter-spacing: .26em;
+  text-transform: uppercase; white-space: nowrap;
+}
+.avanzar-flecha { font-size: 15px; transition: transform .4s var(--ease); }
+.avanzar:hover .avanzar-flecha { transform: translateX(5px); }
+/* El cierre gira en vez de empujar: no lleva adelante, vuelve al principio */
+.avanzar.es-cierre:hover .avanzar-flecha { transform: rotate(-140deg); }
+
+/* El paso entre bloques se marca antes de darlo */
+.avanzar.cambia-bloque { border-color: var(--amb-accent); }
+
+@media (max-width: 760px) {
+  .avanzar { min-height: 60px; padding: 0 18px 0 20px; gap: 12px; }
+  .avanzar-destino { font-size: 10px; letter-spacing: .18em; }
+}
 
 .ticker { display: flex; align-items: center; gap: 14px; }
 .ticker-marks { display: flex; gap: 6px; align-items: center; }
@@ -865,11 +912,43 @@ html[data-motion='reduced'] .home-aura { animation: none; }
 }
 .home-anio { color: var(--laton); }
 
+/* --- El inicio en pantalla angosta ----------------------------------------
+   En el teléfono no hay dos columnas: la figura y el texto ocupan el mismo
+   sitio. Con 62vh de alto la figura llegaba hasta media pantalla y el titular
+   le caía encima — en modo claro, además, texto oscuro sobre ropa oscura.
+
+   Tres decisiones para que se lea TODO:
+     1. La figura se achica y se retira arriba a la derecha, con un tope de
+        ancho para que nunca cruce la página entera.
+     2. El texto se ancla abajo, en la mitad que la figura ya no ocupa.
+     3. Debajo del texto va un velo del color del fondo. Con la opacidad sola
+        no alcanzaba: una camisa oscura sigue siendo oscura al 40 %, y la
+        legibilidad no puede depender de qué haya en la foto. */
 @media (max-width: 900px) {
-  .home-figura { height: 62vh; right: -4vw; opacity: .58; }
-  .home-copy { max-width: none; padding-bottom: 6vh; align-content: end; }
+  .home-figura {
+    /* Tope de ancho pedido: la figura nunca pasa del 80 % del frente */
+    height: 52vh; max-width: 80vw;
+    right: -2vw; bottom: auto; top: 9vh;
+    opacity: .5;
+  }
+  .home-figura .img img { object-position: top center; }
+
+  .home-copy {
+    max-width: none; align-content: end;
+    padding-bottom: clamp(96px, 15vh, 150px);
+  }
+  /* El velo cubre la mitad baja, justo donde vive el texto */
+  .home-escena::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 62%;
+    background: linear-gradient(180deg, transparent, var(--amb-bg) 46%);
+  }
   .home-aura { right: -10%; width: 70vw; }
   .home-suelo { display: none; }
+}
+
+/* Teléfono bajo o apaisado: la figura estorba más de lo que aporta */
+@media (max-width: 900px) and (max-height: 620px) {
+  .home-figura { height: 42vh; opacity: .3; }
 }
 .home-name { mix-blend-mode: normal; text-shadow: 0 24px 80px var(--sombra-alta); }
 .home-line {
@@ -988,6 +1067,12 @@ html[data-motion='reduced'] .sello-anillo { animation: none; }
   transition: opacity .3s;
 }
 .about-hub:hover { opacity: .7; }
+
+/* En el teléfono se retira, igual que los enlaces de Contacto: Redes es la
+   escena siguiente del recorrido y allí están todas con su foto y su motivo.
+   Aquí solo era un atajo que además sacaba al visitante del sitio justo antes
+   de llegar a la escena que hace ese trabajo mejor. */
+@media (max-width: 900px) { .about-hub { display: none; } }
 
 /* ---------------------------------------------------------------------------
    EL PROYECTOR — los cuadros pasan uno tras otro.
@@ -1244,7 +1329,36 @@ html[data-motion='reduced'] .lb-frame { animation: none; }
   display: flex; align-items: flex-end;
 }
 
-.work-vista-foto { position: absolute; inset: 0; animation: vistaEntra .45s var(--ease); }
+/* --- El emblema del marco -------------------------------------------------
+   Cerebro y engranaje: pensar y construir. Ocupa el marco mientras no se
+   señala ningún proyecto, para que el hueco no se lea como una foto rota, y se
+   aparta en cuanto entra la fotografía de un proyecto. */
+.work-vista-marca {
+  position: absolute; inset: 0; z-index: 1;
+  display: grid; place-items: center; padding: 14% 16% 22%;
+  opacity: 1; transform: scale(1);
+  transition: opacity .45s var(--ease), transform .6s var(--ease);
+}
+.work-vista-marca.is-oculta { opacity: 0; transform: scale(.94); }
+
+.cerebro { width: 100%; height: auto; max-height: 100%; overflow: visible; }
+.cerebro-trazo, .cerebro-engranaje {
+  fill: none; stroke: var(--amb-accent);
+  stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
+}
+.cerebro-trazo { opacity: .42; }
+.cerebro-engranaje { opacity: .82; }
+/* Los dientes son piezas macizas, no contorno */
+.cerebro-engranaje rect { fill: var(--amb-accent); stroke: none; }
+.cerebro-eje { fill: var(--amb-accent); stroke: none; opacity: .5; }
+
+/* Gira despacio: la señal de que la máquina está andando. Con el movimiento
+   apagado se queda quieto, como todo lo demás. */
+.cerebro-engranaje { transform-origin: 129px 97px; animation: cerebroGira 26s linear infinite; }
+@keyframes cerebroGira { to { transform: rotate(360deg); } }
+html[data-motion='reduced'] .cerebro-engranaje { animation: none; }
+
+.work-vista-foto { position: absolute; inset: 0; z-index: 2; animation: vistaEntra .45s var(--ease); }
 .work-vista-foto .img { position: absolute; inset: 0; background: none; }
 .work-vista-foto .img::before { display: none; }
 /* Entera, sin recortar: es el proyecto lo que se está mirando, no una textura */
@@ -1328,6 +1442,9 @@ html[data-motion='reduced'] .work-vista-foto { animation: none; }
   gap: clamp(20px, 3.4vw, 52px); align-items: start;
 }
 .caso-col { display: flex; flex-direction: column; gap: clamp(18px, 3vh, 30px); min-width: 0; }
+/* Cuando la columna trae un solo bloque —un caso que se explica con una imagen
+   y nada más— se centra en vez de quedar arriba con la mitad del alto vacío. */
+.caso-col > .caso-bloque:only-child { margin-block: auto; }
 .caso-resumen { max-width: 54ch; }
 
 .caso-cifras { display: flex; gap: clamp(16px, 2.6vw, 40px); flex-wrap: wrap; }
@@ -1365,9 +1482,112 @@ html[data-motion='reduced'] .work-vista-foto { animation: none; }
 }
 .caso-notas li::before { content: '—'; position: absolute; left: 0; color: var(--laton); }
 
-.caso-fuente {
-  font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
-  color: rgba(143, 167, 155, .55); padding-top: 12px; border-top: 1px solid var(--linea);
+/* --- Con qué está construido ---------------------------------------------
+   Cada herramienta con su captura real trabajando. La imagen manda y el texto
+   la acompaña en una línea: si hiciera falta un párrafo para explicar la foto,
+   la foto no serviría. */
+.caso-herramientas { display: flex; flex-direction: column; gap: 18px; }
+
+.herramienta {
+  display: grid; grid-template-columns: minmax(0, 148px) minmax(0, 1fr);
+  gap: 16px; align-items: start; margin: 0;
+}
+.herramienta-foto {
+  /* Sin este `relative` la imagen —que va absoluta dentro— se cuelga del
+     panel entero y ocupa la pantalla completa. Pasó exactamente eso. */
+  position: relative;
+  display: block; overflow: hidden;
+  border: 1px solid var(--linea); background: var(--cripta-2);
+  aspect-ratio: 16 / 10;
+}
+.herramienta-foto .img { position: absolute; inset: 0; background: none; }
+.herramienta-foto .img::before { display: none; }
+.herramienta-foto .img img { object-fit: cover; object-position: center; }
+.herramienta:hover .herramienta-foto { border-color: var(--amb-accent); }
+.herramienta-foto, .herramienta:hover .herramienta-foto {
+  transition: border-color .4s var(--ease);
+}
+
+.herramienta figcaption { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.herramienta-n {
+  font-family: var(--serif); font-size: clamp(17px, 1.5vw, 21px);
+  line-height: 1.15; color: var(--hueso);
+}
+.herramienta-r {
+  font-family: var(--sans); font-size: 9px; letter-spacing: .26em;
+  text-transform: uppercase; color: var(--amb-accent);
+}
+.herramienta-p { font-size: 12.5px; line-height: 1.6; color: var(--humo); }
+
+/* Cuando la pieza es una sola, la imagen manda: un diagrama de flujo no se lee
+   en una miniatura de 150 px. Pasa a ancho completo con el texto debajo. */
+.herramienta:only-child { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+/* La proporción real la pone cada pieza desde el guion; esta es solo el
+   respaldo para una que no la declare. La imagen llena el marco por completo:
+   como el marco ya tiene su forma, `cover` no recorta nada. */
+.herramienta:only-child .herramienta-foto { aspect-ratio: 16 / 9; }
+.herramienta:only-child .herramienta-foto .img img { object-fit: cover; }
+
+@media (max-width: 860px) {
+  .herramienta { grid-template-columns: minmax(0, 108px) minmax(0, 1fr); gap: 13px; }
+  .herramienta-p { font-size: 12px; }
+  .herramienta:only-child { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --- La paleta señalada sobre su fotografía -------------------------------
+   El sitio afirma que su color salió de esta foto. En vez de pedir que se
+   crea, se señala cada punto y se muestran los dos valores: el medido en la
+   imagen y el que quedó en el CSS. */
+.paleta { margin: 0; }
+.paleta-foto {
+  /* Ancho explícito: dentro solo hay una imagen posicionada en absoluto, que
+     no aporta tamaño, así que con `fit-content` el marco colapsaba a cero y la
+     foto no aparecía. */
+  position: relative; display: block;
+  border: 1px solid var(--linea);
+  width: min(300px, 68%); aspect-ratio: 3 / 4;
+  margin-inline: auto;
+}
+/* Las etiquetas asoman fuera del marco: el recorte se aplica a la foto, no a
+   ellas, o la que va pegada al borde quedaría cortada por la mitad. */
+.paleta-foto .img { overflow: hidden; }
+.paleta-foto .img { position: absolute; inset: 0; background: none; }
+.paleta-foto .img::before { display: none; }
+.paleta-foto .img img { object-fit: cover; }
+
+/* La marca: el punto sobre el sitio exacto, y al lado la muestra con su clave */
+.paleta-marca {
+  position: absolute; z-index: 2; transform: translateY(-50%);
+  display: flex; align-items: center; gap: 8px;
+}
+/* Cerca del borde derecho la etiqueta se abre al otro lado, para no salirse */
+.paleta-marca.a-la-izquierda { flex-direction: row-reverse; transform: translate(-100%, -50%); }
+
+.pm-punto {
+  flex: none; width: 13px; height: 13px; border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .95);
+  box-shadow: 0 2px 9px rgba(0, 0, 0, .6);
+}
+.pm-clave {
+  display: flex; flex-direction: column; gap: 1px;
+  padding: 4px 8px; white-space: nowrap;
+  background: rgba(6, 14, 11, .82);
+  border: 1px solid rgba(255, 255, 255, .16);
+  backdrop-filter: blur(4px);
+}
+.pm-n {
+  font-family: var(--sans); font-size: 7.5px; letter-spacing: .2em;
+  text-transform: uppercase; color: rgba(239, 231, 213, .62);
+}
+.pm-clave code {
+  font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-size: 10.5px; letter-spacing: .03em; color: #EFE7D5;
+}
+
+@media (max-width: 860px) {
+  .pm-clave { padding: 3px 6px; }
+  .pm-clave code { font-size: 9.5px; }
+  .pm-n { font-size: 7px; }
 }
 
 /* La fotografía queda de telón, muy atrás */
@@ -1517,6 +1737,10 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
   display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
   margin-top: clamp(20px, 3.5vh, 36px);
 }
+
+/* Contacto ya no lleva enlaces a redes: Redes es una escena propia y aquí solo
+   daban una salida del sitio en la pantalla donde se busca que la persona
+   escriba. La clase se eliminó junto con el bloque. */
 .mail-value {
   font-family: var(--serif); font-size: clamp(15px, 1.5vw, 22px);
   color: var(--hueso); border-bottom: 1px solid var(--linea);
@@ -1546,15 +1770,35 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
 /* El desplegable nativo se pinta solo en cada sistema: lo alineamos al resto */
 .field select {
   appearance: none; cursor: pointer; border-radius: 0;
+  background-color: transparent;
   background-image: linear-gradient(45deg, transparent 50%, var(--humo) 50%),
                     linear-gradient(135deg, var(--humo) 50%, transparent 50%);
   background-position: right 8px center, right 3px center;
   background-size: 5px 5px, 5px 5px;
   background-repeat: no-repeat;
   padding-right: 22px;
+  /* La lista desplegada la dibuja el sistema operativo, no la página, y hereda
+     el esquema de color de este elemento: en oscuro para que el menú salga
+     sobre el verde profundo de la marca en los dos temas. */
+  color-scheme: dark;
 }
 .field select:focus { outline: none; border-bottom-color: var(--amb-accent); }
-.field select option { background: #0C1A14; color: var(--hueso); }
+
+/* El menú de presupuestos va sobre verde muy oscuro con el texto en BLANCO,
+   igual en modo claro que en oscuro. Antes el color del texto seguía al tema
+   (var(--hueso)) mientras el fondo estaba fijo en negro: al pasar a modo claro
+   quedaba casi negro sobre casi negro y la lista se veía vacía. Los dos
+   colores se fijan juntos para que ningún tema pueda descuadrarlos. */
+.field select option,
+.field select optgroup {
+  background-color: #0C1A14;
+  color: #FFFFFF;
+}
+.field select option:checked,
+.field select option:hover {
+  background-color: #123727;
+  color: #FFFFFF;
+}
 
 .link-inline {
   color: var(--amb-accent); text-decoration: underline;
@@ -1598,6 +1842,7 @@ html[data-motion='reduced'] .mani-verse { animation: none; }
   /* Aire al final para que el ultimo campo no quede pegado al borde y se pueda
      seguir deslizando despues de escribir. */
   .contact-grid > *:last-child { padding-bottom: 8px; }
+
 }
 
 /* ===========================================================================
@@ -2064,10 +2309,23 @@ html[data-motion='reduced'] .cta-btn-bg { animation: none; }
   display: grid; place-items: center;
 }
 
-/* Cada capa es una malla hexagonal que avanza desde el fondo girando */
+/* Cada capa es una malla hexagonal que avanza desde el fondo girando.
+
+   DOS NÚMEROS QUE NO SE PUEDEN TOCAR A LA LIGERA, porque tumbaron el sitio:
+
+   1. El `translateZ` final tiene que quedar POR DEBAJO del `perspective` del
+      contenedor (620px). Terminaba en 700px, o sea la capa cruzaba el plano de
+      la cámara, y ahí el factor de proyección —620/(620−z)— se vuelve negativo
+      y el tamaño proyectado se dispara sin límite.
+   2. El tamaño de la capa se multiplica por ese factor. Con 190vmax (unos
+      1.600 px en un teléfono) por scale(1.5) y por diez capas a la vez, WebKit
+      intentaba reservar una superficie de gigabytes y el sistema le mataba el
+      proceso: "ocurrió un problema varias veces" al entrar desde Instagram.
+      Chromium lo recortaba y sobrevivía, así que en el escritorio no se veía. */
 .vortex-layer {
   position: absolute;
-  width: 190vmax; height: 190vmax;
+  width: 64vmax; height: 64vmax;
+  backface-visibility: hidden;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='104' viewBox='0 0 60 104'%3E%3Cpath d='M30 0 L60 17.32 L60 51.96 L30 69.28 L0 51.96 L0 17.32 Z' fill='none' stroke='%232BE58F' stroke-width='2'/%3E%3C/svg%3E");
   background-size: 68px 118px;
   opacity: 0;
@@ -2078,7 +2336,9 @@ html[data-motion='reduced'] .cta-btn-bg { animation: none; }
   0%   { opacity: 0;   transform: translateZ(-2600px) rotate(0deg)   scale(.55); }
   22%  { opacity: .75; }
   70%  { opacity: .5; }
-  100% { opacity: 0;   transform: translateZ(700px)   rotate(190deg) scale(1.5); }
+  /* 470 < 620: la capa pasa cerquísima de la cámara —se amplía 4,1 veces— pero
+     nunca la atraviesa, que es lo que rompía la proyección. */
+  100% { opacity: 0;   transform: translateZ(470px)   rotate(190deg) scale(1.35); }
 }
 
 /* El corazón del panal: la luz al final del túnel */
@@ -2095,6 +2355,36 @@ html[data-motion='reduced'] .cta-btn-bg { animation: none; }
 }
 
 html[data-motion='reduced'] .vortex { display: none; }
+
+/* En teléfono el túnel se hace PLANO: sin perspectiva, sin transform-style 3D y
+   sin translateZ. Arriba ya está corregida la matemática que lo tumbaba, pero
+   esto no es un parche de más — es quitar de raíz toda la familia del problema
+   justo en los aparatos donde el navegador tiene menos memoria y donde no puedo
+   comprobarlo desde acá. Una ampliación en 2D la resuelve el compositor con una
+   textura del tamaño de la capa y punto: no hay proyección que se dispare.
+
+   Se ve casi igual —hexágonos que se abren girando— y cuesta una fracción. */
+@media (max-width: 760px), (pointer: coarse) {
+  .vortex { perspective: none; }
+  .vortex-tunnel { transform-style: flat; }
+  .vortex-layer {
+    width: 70vmax; height: 70vmax;
+    transform: rotate(0deg) scale(.25);
+    animation-name: vortexCapaPlana;
+  }
+  @keyframes vortexCapaPlana {
+    0%   { opacity: 0;   transform: rotate(0deg)   scale(.25); }
+    22%  { opacity: .75; }
+    70%  { opacity: .5; }
+    100% { opacity: 0;   transform: rotate(190deg) scale(3.2); }
+  }
+  /* el corazón también crecía nueve veces; a la mitad se lee igual */
+  @keyframes vortexCorazon {
+    0%   { transform: scale(.02); opacity: .2; }
+    60%  { transform: scale(.5);  opacity: .85; }
+    100% { transform: scale(4.5); opacity: 0; }
+  }
+}
 
 /* --- El formulario, ya dentro del panal --- */
 
@@ -2196,9 +2486,6 @@ html[data-motion='reduced'] .intro { display: none; }
    navegación queda en las flechas, el indicador inferior y el teclado. Antes el
    corte estaba en 1140 y en esa franja los nombres se partían en dos líneas. */
 @media (max-width: 1220px) {
-  .menu { display: none; }
-  .utils { margin-left: auto; }
-  /* Con el menú fuera vuelve a haber sitio para los nombres */
   .util-long { display: inline; }
   .util { padding: 8px 13px; gap: 7px; }
 }

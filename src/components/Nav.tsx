@@ -1,6 +1,6 @@
 import { MagneticButton } from './MagneticButton'
 import { Ajustes } from './Ajustes'
-import { SCENES, type SceneDef } from '../hooks/useSceneRouter'
+import { BLOQUES, SCENES, type SceneDef } from '../hooks/useSceneRouter'
 import { brand } from '../data/site'
 import type { Theme } from '../hooks/usePreferences'
 
@@ -16,6 +16,10 @@ type Props = {
   onToggleCursor: () => void
   drag: boolean
   onToggleDrag: () => void
+  musica: boolean
+  onToggleMusica: () => void
+  sonido: boolean
+  onToggleSonido: () => void
   theme: Theme
   onToggleTheme: () => void
   /** el visor de galería está abierto: la navegación se retira */
@@ -34,12 +38,20 @@ export function Nav({
   onToggleCursor,
   drag,
   onToggleDrag,
+  musica,
+  onToggleMusica,
+  sonido,
+  onToggleSonido,
   theme,
   onToggleTheme,
   hidden = false,
 }: Props) {
   const isFirst = index === 0
   const isLast = index === SCENES.length - 1
+  const siguiente = isLast ? null : SCENES[index + 1]
+  const anterior = isFirst ? null : SCENES[index - 1]
+  /** El paso siguiente cambia de bloque: conviene avisarlo antes de darlo. */
+  const cambiaBloque = siguiente ? siguiente.bloque !== scene.bloque : false
 
   return (
     <>
@@ -48,19 +60,13 @@ export function Nav({
           EL<b>GOLOTT</b>
         </button>
 
-        <nav className="menu" aria-label="Escenas del portfolio">
-          {SCENES.map((s, i) => (
-            <button
-              key={s.id}
-              className="menu-item"
-              aria-current={i === index}
-              onClick={() => onGo(i)}
-            >
-              <span className="num">{s.num}</span>
-              {s.label}
-            </button>
-          ))}
-        </nav>
+        {/* El menú de escenas se retiró a propósito: el recorrido es la
+            propuesta, no una lista de atajos. Se avanza con las flechas, y el
+            bloque en curso queda dicho aquí arriba para no perder el norte. */}
+        <p className="topnav-bloque" aria-hidden="true">
+          <span className="topnav-bloque-n">{scene.num}</span>
+          {BLOQUES[scene.bloque].titulo}
+        </p>
 
         {/* Un atajo directo al tema, que es lo que más se toca, y el resto
             dentro del panel. Así la barra no crece con cada opción nueva. */}
@@ -86,6 +92,10 @@ export function Nav({
             onToggleCursor={onToggleCursor}
             drag={drag}
             onToggleDrag={onToggleDrag}
+            musica={musica}
+            onToggleMusica={onToggleMusica}
+            sonido={sonido}
+            onToggleSonido={onToggleSonido}
             theme={theme}
             onToggleTheme={onToggleTheme}
           />
@@ -93,26 +103,51 @@ export function Nav({
       </header>
 
       <div className={`botnav${hidden ? ' is-away' : ''}`} aria-hidden={hidden || undefined}>
+        {/* Sin menú, estas flechas SON la navegación. Por eso la de avanzar
+            dice a dónde lleva: el visitante decide seguir sabiendo qué viene,
+            que es justo lo que una lista de atajos hacía a costa del recorrido. */}
         <div className="arrows">
           <MagneticButton
             className="btn icon"
             onClick={onPrev}
             disabled={isFirst}
-            aria-label="Escena anterior"
+            aria-label={anterior ? `Volver a ${anterior.label}` : 'Escena anterior'}
             style={isFirst ? { opacity: 0.3, pointerEvents: 'none' } : undefined}
           >
             ←
           </MagneticButton>
-          <MagneticButton
-            className="btn icon"
-            onClick={onNext}
-            disabled={isLast}
-            aria-label="Escena siguiente"
-            style={isLast ? { opacity: 0.3, pointerEvents: 'none' } : undefined}
+
+          {/* Al final del recorrido el botón no se apaga: cierra el círculo y
+              devuelve al inicio. Dejarlo muerto abandonaba al visitante en la
+              última escena sin ninguna salida a la vista. */}
+          <button
+            className={`avanzar${cambiaBloque ? ' cambia-bloque' : ''}${isLast ? ' es-cierre' : ''}`}
+            onClick={isLast ? () => onGo(0) : onNext}
+            aria-label={siguiente ? `Continuar a ${siguiente.label}` : 'Volver al inicio'}
           >
-            →
-          </MagneticButton>
-          <span className="hint" aria-hidden="true">← → cambian de escena · Esc vuelve al inicio</span>
+            <span className="avanzar-txt">
+              {siguiente ? (
+                <>
+                  {cambiaBloque && (
+                    <span className="avanzar-bloque">{BLOQUES[siguiente.bloque].titulo}</span>
+                  )}
+                  <span className="avanzar-destino">{siguiente.label}</span>
+                </>
+              ) : (
+                <>
+                  <span className="avanzar-bloque">Fin del recorrido</span>
+                  <span className="avanzar-destino">Volver al inicio</span>
+                </>
+              )}
+            </span>
+            <span className="avanzar-flecha" aria-hidden="true">
+              {isLast ? '↺' : '→'}
+            </span>
+          </button>
+
+          <span className="hint" aria-hidden="true">
+            ← → cambian de escena · Esc vuelve al inicio
+          </span>
         </div>
 
         <div className="ticker">
@@ -123,6 +158,7 @@ export function Nav({
           </div>
           <span className="ticker-count">
             <b>{scene.num}</b> / {SCENES.length.toString().padStart(2, '0')} — {scene.label}
+            <span className="ticker-bloque"> · {BLOQUES[scene.bloque].titulo}</span>
           </span>
         </div>
       </div>
