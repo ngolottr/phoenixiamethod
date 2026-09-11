@@ -191,7 +191,53 @@ Si prefieres agendarlo tú, dile a Claude:
 
 Responde directo a este mensaje para contestarle.`
 
-  return { texto, html: `<pre style="font:14px/1.6 monospace;color:#111;">${escapar(texto)}</pre>` }
+  /* Maquetado de verdad, no un <pre> suelto. El 11/09 esta copia salió como un
+     bloque monoespaciado sin estructura: Brevo la dio por entregada y Gmail la
+     aceptó y la descartó en silencio, sin dejarla ni en spam ni en la papelera.
+     El correo del visitante, con esta misma cuenta y el mismo remitente, llegó
+     sin problema. */
+  const fila = (etiqueta, valor) => `
+    <tr>
+      <td style="padding:2px 0;font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#6b6b66;width:120px;">${escapar(etiqueta)}</td>
+      <td style="padding:2px 0;font:400 14px/1.6 Helvetica,Arial,sans-serif;color:#111;">${escapar(valor)}</td>
+    </tr>`
+
+  const html = `<!doctype html>
+<html lang="es"><body style="margin:0;padding:0;background:#f4f4f2;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f2;padding:24px 12px;">
+<tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #e3e3df;">
+  <tr><td style="padding:24px 26px 0;">
+    <p style="margin:0;font:700 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.2em;color:${marcada ? '#b4531f' : '#1f7a4d'};text-transform:uppercase;">${marcada ? 'Solicitud filtrada' : 'Nueva solicitud'}</p>
+    <p style="margin:10px 0 0;font:400 22px/1.3 Helvetica,Arial,sans-serif;color:#111;">${escapar(nombre)}</p>
+  </td></tr>
+  ${
+    marcada
+      ? `<tr><td style="padding:16px 26px 0;">
+    <p style="margin:0;padding:12px 14px;background:#fdf1e7;border-left:3px solid #b4531f;font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#5c3a22;">
+      Filtrada como posible robot (${escapar(sospechas.join(' · '))}). No se le envió el correo automático; si es una persona real, respóndele tú desde este mensaje.
+    </p>
+  </td></tr>`
+      : ''
+  }
+  <tr><td style="padding:18px 26px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      ${fila('Correo', email)}
+      ${fila('Presupuesto', presupuesto || 'No indicado')}
+    </table>
+  </td></tr>
+  <tr><td style="padding:18px 26px 0;">
+    <p style="margin:0;font:400 12px/1 Helvetica,Arial,sans-serif;letter-spacing:.14em;color:#6b6b66;text-transform:uppercase;">Qué necesita</p>
+    <p style="margin:8px 0 0;font:400 15px/1.65 Helvetica,Arial,sans-serif;color:#111;">${escapar(mensaje).replace(/\n/g, '<br>')}</p>
+  </td></tr>
+  <tr><td style="padding:20px 26px 26px;">
+    <p style="margin:0;padding-top:16px;border-top:1px solid #ececE8;font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#6b6b66;">${escapar(siguiente)}</p>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>`
+
+  return { texto, html }
 }
 
 /* --- Envío por Brevo ------------------------------------------------------ */
@@ -315,6 +361,14 @@ export default async function handler(req, res) {
   const aviso = correoParaNicolas(datos, sospechas)
   const miCorreo = CORREO_NICOLAS
 
+  /* Responder al visitante, salvo cuando el visitante es uno mismo: un correo
+     cuyo replyTo repite al destinatario es una de las señales que Gmail mira
+     para descartar sin avisar. */
+  const responderAlVisitante =
+    datos.email.toLowerCase() === miCorreo.toLowerCase()
+      ? undefined
+      : { email: datos.email, name: datos.nombre }
+
   if (sospechas.length) {
     console.warn('[contacto] filtrada como robot:', sospechas.join(' · '), '→', datos.email)
     try {
@@ -325,7 +379,7 @@ export default async function handler(req, res) {
         asunto: `Solicitud filtrada (posible robot) — ${datos.nombre}`,
         texto: aviso.texto,
         html: aviso.html,
-        responderA: { email: datos.email, name: datos.nombre },
+        responderA: responderAlVisitante,
       })
     } catch (e) {
       console.error('[contacto] no pude avisar de la solicitud filtrada →', e.message)
@@ -361,7 +415,7 @@ export default async function handler(req, res) {
       asunto: `Nueva solicitud — ${datos.nombre}`,
       texto: aviso.texto,
       html: aviso.html,
-      responderA: { email: datos.email, name: datos.nombre },
+      responderA: responderAlVisitante,
     })
   } catch (e) {
     /* El visitante ya recibió su correo, así que la solicitud no se cae por
