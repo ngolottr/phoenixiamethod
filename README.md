@@ -221,10 +221,56 @@ de Vercel, que es una casilla en el panel:
 - [ ] Vercel → **Firewall** → activar **Attack Challenge Mode** si alguna vez ves
       tráfico raro en los registros. Es un interruptor, no hay que configurarlo.
 
+## El correo: por dónde sale y qué mirar cuando no llega
+
+Todo el correo del sitio —la respuesta al formulario, la copia interna y la
+confirmación de reuniones— sale por Brevo desde
+`contacto.nicolaspk@12068809.brevosend.com`, el subdominio que Brevo firma por su
+cuenta. Se puede cambiar con `REMITENTE_EMAIL`.
+
+**Nunca poner una dirección gratuita como remitente.** Hasta el 09/09 Brevo
+reescribía solo el `@gmail.com` por su subdominio. Desde el 10/09 dejó de
+hacerlo y marca esos envíos como **Bloqueado**: la API contesta que sí, el sitio
+muestra "revisa tu correo" y no llega nada, ni al visitante ni a Nicolás. Así se
+perdió la solicitud de un cliente real el 11/09, y no había forma de notarlo
+desde afuera.
+
+**El campo trampa del formulario es de solo lectura a propósito.** El
+autocompletado del teléfono llena campos aunque digan `autocomplete="off"`, y
+cuando llenaba la trampa el servidor descartaba la solicitud en silencio. Si
+alguna vez se saca ese `readOnly`, vuelve el problema. Hoy, además, una solicitud
+marcada como robot ya no desaparece: llega igual la copia con el motivo escrito.
+
+**Dónde mirar cuando alguien dice que no le llegó el correo:**
+
+1. **Brevo → Transaccional → Email → Logs.** Cada envío tiene su evento
+   (Enviado, Entregado, Bloqueado, Soft bounce) y el ojito de la izquierda
+   muestra el motivo. Ahí se ve si el correo salió y qué pasó después.
+2. **Registro del servidor:** `npx vercel logs <url del despliegue>`, o el panel
+   de Vercel. Aparecen `[contacto] filtrada como robot: …` cuando el filtro
+   antirrobots actúa y `[contacto] no llegó la copia interna → …` cuando falla
+   el aviso interno.
+3. **El Gmail de quien reclama**, buscando `in:anywhere brevosend`. Si no está
+   ahí, el correo nunca entró a esa casilla.
+
+**Pendiente conocido.** La copia interna al propio Gmail de Nicolás: Brevo la da
+por entregada y Gmail no la deja en ninguna carpeta, ni siquiera en spam o en la
+papelera. El correo del visitante, con la misma cuenta y el mismo remitente, sí
+llega. Si vuelve a pasar, la salida es mandar esa copia a otra dirección. Que
+falle no pierde solicitudes: el visitante recibe su correo y, si agenda, la
+reunión entra igual al calendario.
+
+**Cuando haya dominio propio** (por ejemplo `neuraia.cl`): verificarlo en Brevo
+con su DKIM y cambiar `REMITENTE_EMAIL`. Los correos se ven más serios y entran
+mejor que desde un subdominio compartido.
+
 **Mantención**
 
 - [ ] Rotar `BREVO_API_KEY` y `CRON_SECRET` si alguna vez se pegan en un chat, en
       una captura o en un correo.
+- [ ] Mirar el registro de Brevo después de cada cambio en el remitente o en las
+      plantillas de correo: un envío puede quedar "Bloqueado" sin que el sitio
+      dé ningún error.
 - [ ] Mantener la restricción de IP de Brevo desactivada solo mientras haga falta;
       si Brevo vuelve a ofrecer una lista de IP fijas de Vercel, activarla.
 - [ ] La clave privada de la cuenta de servicio de Google vive **solo** en las
