@@ -253,12 +253,18 @@ marcada como robot ya no desaparece: llega igual la copia con el motivo escrito.
 3. **El Gmail de quien reclama**, buscando `in:anywhere brevosend`. Si no está
    ahí, el correo nunca entró a esa casilla.
 
-**Pendiente conocido.** La copia interna al propio Gmail de Nicolás: Brevo la da
-por entregada y Gmail no la deja en ninguna carpeta, ni siquiera en spam o en la
-papelera. El correo del visitante, con la misma cuenta y el mismo remitente, sí
-llega. Si vuelve a pasar, la salida es mandar esa copia a otra dirección. Que
-falle no pierde solicitudes: el visitante recibe su correo y, si agenda, la
-reunión entra igual al calendario.
+**Pendiente conocido, y asumido a propósito.** La copia interna al propio Gmail
+de Nicolás: Brevo la da por entregada y Gmail no la deja en ninguna carpeta, ni
+siquiera en spam o en la papelera. El correo del visitante, con la misma cuenta,
+el mismo remitente y el mismo segundo, sí llega. Se descartaron las dos
+diferencias que tenía —iba sin maquetar y con el `replyTo` apuntando al propio
+destinatario— y siguió pasando, así que la causa está en cómo trata Gmail un
+correo automático que uno se manda a sí mismo desde un servicio externo.
+
+**Decisión del 11/09: se deja así.** No se pierde ninguna solicitud —el visitante
+recibe su correo y, si agenda, la reunión entra igual al calendario—, y el CRM va
+a tomar ese rol. Si alguna vez molesta, hay dos salidas: definir `CONTACTO_EMAIL`
+en Vercel con otra dirección, o verificar un dominio propio en Brevo.
 
 **Cuando haya dominio propio** (por ejemplo `neuraia.cl`): verificarlo en Brevo
 con su DKIM y cambiar `REMITENTE_EMAIL`. Los correos se ven más serios y entran
