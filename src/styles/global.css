@@ -2817,6 +2817,11 @@ html[data-motion='reduced'] .intro { display: none; }
 html, body { overflow-x: hidden; max-width: 100%; }
 img, svg, video, canvas { max-width: 100%; height: auto; }
 .home-aura { max-width: 100vw; }
+/* El aura y la figura del inicio se salen a propósito por el borde derecho
+   para que el resplandor no termine en una línea recta. A 320 px eso sumaba
+   32 px de ancho al documento. El escenario los recorta en su propio marco:
+   se conserva el sangrado y el ancho deja de crecer. */
+.home-escena { overflow: hidden; }
 
 /* --- 3. Piso de legibilidad en teléfonos ---------------------------------
    Las etiquetas en versalitas con mucho espaciado se ven bien en un monitor
