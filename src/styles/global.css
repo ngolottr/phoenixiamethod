@@ -2833,6 +2833,7 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
   .aj-t, .aj-fila-n, .aj-fila-i, .filter, .label, .soc-handle,
   .about-stat .l, .proyector-n, .cc-e, .ch-d, .pm-n,
   .work-row .wi, .work-row .wm, .work-row .wd, .wd,
+  .work-vista-pie,
   .gal-cap .y, .lb-caption .y, .avanzar-destino, .pane-mas {
     font-size: 11px;
     letter-spacing: .16em;
@@ -2943,4 +2944,26 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
     font-size: 11px !important;
     letter-spacing: .14em;
   }
+}
+
+/* --- 10. El inicio en una ventana baja ------------------------------------
+   Medido en una ventana de 961x415 —un escritorio con la ventana a media
+   altura, que es un caso tan real como el teléfono acostado—: el bloque del
+   titular pedía más alto del que había y se salía por abajo, hasta quedar el
+   verso y la bajada encima de la flecha de la barra inferior.
+
+   La causa era `height: 100%`: la caja del texto se quedaba clavada al alto de
+   la pantalla pase lo que pase, así que el sobrante no empujaba a nadie, se
+   desbordaba. Con un alto mínimo en vez de un alto fijo, la caja centra el
+   texto mientras quepa —el comportamiento de siempre en pantallas normales— y
+   crece cuando no cabe, con lo que la escena ya puede desplazarse hasta el
+   final y el relleno inferior mantiene el texto sobre la barra. */
+.home-copy { height: auto; min-height: 100%; box-sizing: border-box; }
+
+/* La figura decorativa se mide en 72vh, y en una ventana baja esos 72 % se
+   comían la franja de la barra superior: el sello quedaba cruzado con el botón
+   de Ajustes. No estorba el clic —no recibe puntero— pero se ve sucio. Acá se
+   le pone como techo el espacio que queda libre entre las dos barras. */
+.home-figura {
+  max-height: calc(100% - var(--nav-h) - var(--pie-h) - 16px);
 }
