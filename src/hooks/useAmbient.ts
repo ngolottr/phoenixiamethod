@@ -44,7 +44,10 @@ function varsParaTema(): Array<[keyof Ambient, string]> {
 
 function valorParaTema(key: keyof Ambient, valor: string): string {
   if (key === 'accent' && document.documentElement.dataset.theme === 'light') {
-    return `color-mix(in srgb, ${valor} 55%, #06301D)`
+    /* Con qué se oscurece lo pone el bloque, no esta función: en Phoenix el
+       acento se apaga hacia el ladrillo y en ElGolott hacia el verde profundo.
+       Un valor fijo aquí teñía de marrón las fotos del bloque personal. */
+    return `color-mix(in srgb, ${valor} 55%, var(--mezcla-claro))`
   }
   return valor
 }

@@ -58,7 +58,7 @@ function tituloDia(d: Dia) {
 function pintarCargando() {
   raiz.innerHTML = `
     <main class="ag">
-      <p class="eyebrow">ELGOLOTT</p>
+      <p class="eyebrow">PHOENIX IA METHOD</p>
       <h1 class="display h-md ag-title">Buscando horas
 libres…</h1>
       <div class="ag-skeleton"></div>

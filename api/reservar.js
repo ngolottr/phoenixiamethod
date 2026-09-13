@@ -49,7 +49,7 @@ function enPalabras(inicio) {
 /** Confirma al cliente y avisa a Nicolás. */
 async function avisar({ nombre, email, tema, cuando, enlaceReunion, revision }) {
   const agregar = enlaceAgregarACalendario({
-    titulo: 'Reunión con Nicolás Golott — NeuraIA',
+    titulo: 'Reunión con Nicolás Golott — Phoenix IA Method',
     inicio: revision.inicio,
     fin: revision.termino,
     detalle: `Reunión de ${DURACION_MIN} minutos.${enlaceReunion ? `\nEnlace: ${enlaceReunion}` : ''}`,
@@ -70,21 +70,21 @@ Si necesitas moverla o no puedes llegar, responde este correo.
 Nos vemos,
 
 Nicolás Golott
-NeuraIA`
+Phoenix IA Method`
 
-  const html = `<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#040D0A;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#040D0A;padding:32px 16px;"><tr><td align="center">
+  const html = `<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#120B07;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#120B07;padding:32px 16px;"><tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#071711;border:1px solid rgba(239,231,213,.14);">
-  <tr><td style="padding:30px 32px 0;"><p style="margin:0;font:400 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.42em;color:#2BE58F;text-transform:uppercase;">Reunión confirmada</p></td></tr>
-  <tr><td style="padding:20px 32px 0;"><p style="margin:0;font:400 26px/1.25 Georgia,serif;color:#EFE7D5;">Nos vemos el<br>${escapar(cuando)}.</p></td></tr>
-  <tr><td style="padding:18px 32px 0;"><p style="margin:0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#B9C9C0;">Son 30 minutos por videollamada, hora de Chile.</p></td></tr>
+  <tr><td style="padding:30px 32px 0;"><p style="margin:0;font:400 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.42em;color:#F26522;text-transform:uppercase;">Reunión confirmada</p></td></tr>
+  <tr><td style="padding:20px 32px 0;"><p style="margin:0;font:400 26px/1.25 Georgia,serif;color:#F8F4F1;">Nos vemos el<br>${escapar(cuando)}.</p></td></tr>
+  <tr><td style="padding:18px 32px 0;"><p style="margin:0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#D8C7BC;">Son 30 minutos por videollamada, hora de Chile.</p></td></tr>
   ${
     enlaceReunion
-      ? `<tr><td style="padding:22px 32px 0;"><a href="${escapar(enlaceReunion)}" style="display:inline-block;background:#2BE58F;color:#040D0A;text-decoration:none;padding:16px 30px;font:400 12px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;">Entrar a la reunión</a></td></tr>`
-      : `<tr><td style="padding:22px 32px 0;"><p style="margin:0;font:400 14px/1.6 Helvetica,Arial,sans-serif;color:#8FA79B;">Te hago llegar el enlace de la videollamada antes de la reunión.</p></td></tr>`
+      ? `<tr><td style="padding:22px 32px 0;"><a href="${escapar(enlaceReunion)}" style="display:inline-block;background:#F26522;color:#120B07;text-decoration:none;padding:16px 30px;font:400 12px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;">Entrar a la reunión</a></td></tr>`
+      : `<tr><td style="padding:22px 32px 0;"><p style="margin:0;font:400 14px/1.6 Helvetica,Arial,sans-serif;color:#B39C90;">Te hago llegar el enlace de la videollamada antes de la reunión.</p></td></tr>`
   }
-  <tr><td style="padding:18px 32px 0;"><a href="${escapar(agregar)}" style="font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#2BE58F;">Agregar a mi calendario →</a></td></tr>
-  <tr><td style="padding:26px 32px 32px;"><p style="margin:0;padding-top:20px;border-top:1px solid rgba(239,231,213,.12);font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#8FA79B;">¿Necesitas moverla? Responde este correo.<br><br>Nicolás Golott<br><span style="color:#C8A05A;">NeuraIA</span></p></td></tr>
+  <tr><td style="padding:18px 32px 0;"><a href="${escapar(agregar)}" style="font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#F26522;">Agregar a mi calendario →</a></td></tr>
+  <tr><td style="padding:26px 32px 32px;"><p style="margin:0;padding-top:20px;border-top:1px solid rgba(248,244,241,.12);font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#B39C90;">¿Necesitas moverla? Responde este correo.<br><br>Nicolás Golott<br><span style="color:#FFC46B;">Phoenix IA Method</span></p></td></tr>
 </table></td></tr></table></body></html>`
 
   await enviarCorreo({
@@ -105,7 +105,7 @@ Cuándo:   ${cuando}
 Quién:    ${nombre}
 Correo:   ${email}
 ${tema ? `\nQué quiere resolver:\n${tema}\n` : ''}
-Ya está en tu calendario NeuraIA · Clientes.${enlaceReunion ? `\nEnlace: ${enlaceReunion}` : '\n\nOJO: el evento no tiene enlace de videollamada. Agrégalo antes de la reunión.'}`
+Ya está en tu calendario de clientes.${enlaceReunion ? `\nEnlace: ${enlaceReunion}` : '\n\nOJO: el evento no tiene enlace de videollamada. Agrégalo antes de la reunión.'}`
 
   await enviarCorreo({
     para: CORREO_NICOLAS,
@@ -186,9 +186,9 @@ export default async function handler(req, res) {
     if (!revision.ok) return res.status(409).json({ ok: false, error: revision.motivo })
 
     const evento = await crearEvento({
-      resumen: `NeuraIA · ${nombre}`,
+      resumen: `Phoenix · ${nombre}`,
       descripcion: [
-        `Reunión de ${DURACION_MIN} minutos agendada desde elgolott.vercel.app`,
+        `Reunión de ${DURACION_MIN} minutos agendada desde phoenixiamethod.vercel.app`,
         '',
         `Contacto: ${email}`,
         tema ? `\nQué quiere resolver:\n${tema}` : '',

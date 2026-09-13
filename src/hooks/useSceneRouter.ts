@@ -11,13 +11,16 @@ export type SceneId =
   | 'redes'
 
 /**
- * El sitio va en dos tiempos.
+ * El sitio va en dos tiempos, y cada uno tiene su propia marca.
  *
- * `negocio` es lo que un cliente viene a buscar: qué hago, cómo contratarme y
- * bajo qué criterio trabajo. `marca` es quién está detrás, y solo tiene sentido
- * después de lo anterior — a nadie le importa tu biografía antes de saber si le
- * sirves. Por eso el orden no es decorativo: el recorrido vende primero y se
- * presenta después.
+ * `negocio` es PHOENIX IA METHOD: lo que un cliente viene a buscar —qué
+ * problema se le resuelve, con qué método y cómo empezar—. Es el frente del
+ * sitio y manda en la portada, en la barra y en la paleta.
+ *
+ * `marca` es MARKETING: Nicolás Golott y su marca personal ElGolott. Quién
+ * está detrás, qué publica y dónde encontrarlo. Va después a propósito — a
+ * nadie le importa tu biografía antes de saber si le sirves— y cambia de piel
+ * al entrar, porque es una marca distinta, no una sección más.
  */
 export type Bloque = 'negocio' | 'marca'
 
@@ -30,18 +33,30 @@ export type SceneDef = {
 
 export const SCENES: SceneDef[] = [
   { id: 'inicio', label: 'Inicio', num: '01', bloque: 'negocio' },
-  { id: 'trabajo', label: 'Trabajo', num: '02', bloque: 'negocio' },
+  { id: 'trabajo', label: 'Soluciones', num: '02', bloque: 'negocio' },
   { id: 'contacto', label: 'Contacto', num: '03', bloque: 'negocio' },
-  { id: 'manifiesto', label: 'Manifiesto', num: '04', bloque: 'negocio' },
+  { id: 'manifiesto', label: 'Método', num: '04', bloque: 'negocio' },
   { id: 'sobre-mi', label: 'Sobre mí', num: '05', bloque: 'marca' },
   { id: 'redes', label: 'Redes', num: '06', bloque: 'marca' },
   { id: 'galeria', label: 'Galería', num: '07', bloque: 'marca' },
   { id: 'destacados', label: 'Destacados', num: '08', bloque: 'marca' },
 ]
 
-export const BLOQUES: Record<Bloque, { titulo: string; pie: string }> = {
-  negocio: { titulo: 'Negocio', pie: 'Qué hago y cómo contratarme' },
-  marca: { titulo: 'Quién soy', pie: 'Con quién estás trabajando' },
+/* Los identificadores de escena NO cambian aunque cambien las etiquetas: son
+   lo que va en la URL y lo que ya está compartido por ahí. Un enlace a
+   #trabajo tiene que seguir abriendo la escena de soluciones. */
+
+export const BLOQUES: Record<Bloque, { titulo: string; marca: string; pie: string }> = {
+  negocio: {
+    titulo: 'Phoenix IA Method',
+    marca: 'Phoenix IA Method',
+    pie: 'Qué problema resuelvo y cómo empezamos',
+  },
+  marca: {
+    titulo: 'Marketing',
+    marca: 'ElGolott',
+    pie: 'Quién está detrás: Nicolás Golott',
+  },
 }
 
 /** Primera escena de cada bloque: a dónde salta "Entrar" y el paso entre bloques. */
@@ -116,7 +131,15 @@ export function useSceneRouter(reduced: boolean) {
     if (window.location.hash.replace('#', '') !== id) {
       window.history.replaceState(null, '', `#${id}`)
     }
-    document.title = index === 0 ? 'ELGOLOTT — Dirección creativa' : `${SCENES[index].label} · ELGOLOTT`
+    /* El título sigue al bloque: en la parte comercial la pestaña dice
+       Phoenix, y en la personal dice ElGolott. Quien deje diez pestañas
+       abiertas tiene que poder distinguir de cuál de las dos marcas es cada
+       una sin abrirlas. */
+    const s = SCENES[index]
+    document.title =
+      index === 0
+        ? 'Phoenix IA Method — IA y automatización aplicadas'
+        : `${s.label} · ${BLOQUES[s.bloque].marca}`
   }, [index])
 
   useEffect(() => {

@@ -1,7 +1,8 @@
 import { MagneticButton } from './MagneticButton'
 import { Ajustes } from './Ajustes'
+import { Isotipo } from './Isotipo'
 import { BLOQUES, SCENES, type SceneDef } from '../hooks/useSceneRouter'
-import { brand } from '../data/site'
+import { persona, phoenix } from '../data/site'
 import type { Theme } from '../hooks/usePreferences'
 
 type Props = {
@@ -52,12 +53,31 @@ export function Nav({
   const anterior = isFirst ? null : SCENES[index - 1]
   /** El paso siguiente cambia de bloque: conviene avisarlo antes de darlo. */
   const cambiaBloque = siguiente ? siguiente.bloque !== scene.bloque : false
+  /** En la parte comercial la firma es Phoenix; en la personal, ElGolott. */
+  const enNegocio = scene.bloque === 'negocio'
 
   return (
     <>
       <header className={`topnav${hidden ? ' is-away' : ''}`} aria-hidden={hidden || undefined}>
-        <button className="wordmark" onClick={() => onGo(0)} aria-label="Volver al inicio">
-          EL<b>GOLOTT</b>
+        {/* La firma de la esquina no es decorativa: dice bajo qué marca está
+            leyendo el visitante. Cambia con el bloque porque el sitio aloja
+            dos marcas, y una barra que dijera siempre lo mismo estaría
+            mintiendo en la mitad del recorrido. */}
+        <button
+          className={`wordmark${enNegocio ? ' es-phoenix' : ''}`}
+          onClick={() => onGo(0)}
+          aria-label={`${enNegocio ? phoenix.name : persona.name}. Volver al inicio`}
+        >
+          {enNegocio ? (
+            <>
+              <Isotipo className="wordmark-marca" />
+              PHOENIX<b>IA METHOD</b>
+            </>
+          ) : (
+            <>
+              EL<b>GOLOTT</b>
+            </>
+          )}
         </button>
 
         {/* El menú de escenas se retiró a propósito: el recorrido es la
@@ -164,7 +184,7 @@ export function Nav({
       </div>
 
       <span className="sr-only" aria-live="polite">
-        Escena {scene.num} de {SCENES.length}: {scene.label}. {brand.name}.
+        Escena {scene.num} de {SCENES.length}: {scene.label}. {BLOQUES[scene.bloque].marca}.
       </span>
     </>
   )

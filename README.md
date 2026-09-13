@@ -1,7 +1,32 @@
-# ELGOLOTT — Portfolio "La Cámara"
+# PHOENIX IA METHOD — sitio
 
-Portfolio de marca personal en React + Vite + TypeScript. Sin scroll: siete
-escenas a pantalla completa que se recorren con botones, flechas y teclado.
+Sitio del negocio en React + Vite + TypeScript. Sin scroll: ocho escenas a
+pantalla completa que se recorren con flechas y teclado.
+
+**Dominio:** `phoenixiamethod.vercel.app` (antes `elgolott.vercel.app`).
+
+---
+
+## Las dos marcas
+
+Esto no es un portafolio con una sección comercial pegada: son dos marcas en un
+mismo recorrido, y casi todas las decisiones del proyecto salen de ahí.
+
+| | Bloque **negocio** | Bloque **marketing** |
+|---|---|---|
+| Marca | **Phoenix IA Method** | **ElGolott** |
+| Qué es | El negocio: IA y automatización aplicadas | La marca personal de Nicolás |
+| Escenas | Inicio · Soluciones · Contacto · Método | Sobre mí · Redes · Galería · Destacados |
+| Paleta | Brasa y fuego, del isotipo de la identidad | Esmeralda "La Cámara", extraída de una foto |
+| Dónde se edita | Primera mitad de `src/data/site.ts` | Segunda mitad del mismo archivo |
+
+Phoenix va primero **a propósito**: es lo primero que ve cualquiera que llegue.
+La persona detrás se presenta después, cuando ya se sabe qué se ofrece.
+
+El cambio de piel entre bloques se hace con **un solo atributo**: `App.tsx`
+escribe `data-bloque` en `<html>` y `global.css` redefine los valores de los
+mismos tokens. Ni un componente sabe en qué bloque está — por eso agregar una
+escena a cualquiera de los dos lados no obliga a tocar nada más.
 
 ---
 
@@ -26,9 +51,19 @@ Otros comandos:
 
 ## Qué editar
 
-**Todo el contenido vive en un solo archivo: `src/data/site.ts`.** Nombre, rol,
-frase, email, redes, proyectos, versos del manifiesto y rutas de imágenes. No
-hay que tocar componentes para cambiar textos.
+**Todo el contenido vive en un solo archivo: `src/data/site.ts`,** partido en
+dos mitades bien marcadas. Arriba Phoenix —nombre, propósito, método, contacto—
+y abajo ElGolott —quién está detrás, galería, historias, redes—. No hay que
+tocar componentes para cambiar textos.
+
+**Los casos van aparte, en `src/data/proyectos.ts`.** Regla de la marca: ahí solo
+entra lo que ya se construyó y se puede comprobar. Un servicio que suena bien
+pero todavía no se ha hecho no es un caso, es una promesa.
+
+**El isotipo está en `src/components/Isotipo.tsx`,** con los trazados copiados
+tal cual del archivo de identidad
+(`02_Fenix_IA_Method/Identidad/creacion de marca/isotipo.svg`). Si la marca
+cambia, se cambia allá y se copia acá, nunca al revés.
 
 **Las fotos van en `public/images/`** con los nombres que indica
 `public/images/LEEME.md`. Mientras falte una, esa ranura dibuja por CSS la
@@ -37,65 +72,92 @@ espera — así el sitio nunca se ve roto.
 
 ---
 
-## El concepto: LA CÁMARA
+## El concepto
 
-La fotografía de referencia manda: una figura sola, de pie, dentro de un pasillo
-de piedra atravesado por luz esmeralda que viene de atrás. Contraluz duro,
-sombras negras absolutas, azul medianoche en el cuerpo, latón en los bordes.
+Hay dos, uno por bloque.
 
-El sitio no se comporta como una página, sino como ese pasillo. Cada sección es
-una sala en la que se entra, no un bloque por el que se pasa scrolleando. De ahí
-salen las tres decisiones estructurales:
+**Phoenix — LA BRASA.** El emblema de la identidad manda: una llama de tres
+lenguas sobre un fondo de brasa apagada. Naranjo que sube desde el ladrillo
+hasta el ámbar, y ni un solo color frío salvo el mínimo que sostiene el naranjo.
+Es la piel del negocio: la portada, las soluciones, el método y el contacto.
+
+**ElGolott — LA CÁMARA.** La fotografía de referencia manda: una figura sola, de
+pie, dentro de un pasillo de piedra atravesado por luz esmeralda que viene de
+atrás. Contraluz duro, sombras negras absolutas, azul medianoche en el cuerpo,
+latón en los bordes.
+
+Lo que sigue —el sin scroll, la cortina, la atmósfera, la gota— es común a los
+dos: es la puesta en escena del sitio, no de una de las marcas.
+
+El sitio no se comporta como una página, sino como una sucesión de salas. En
+cada sección se entra; no es un bloque por el que se pasa scrolleando. De ahí
+salen las cuatro decisiones estructurales:
 
 - **Sin scroll.** Se avanza, no se desliza. La navegación por escenas obliga a
   componer cada pantalla como un plano cerrado, con un solo foco.
-- **Cortina de luz.** Entre escena y escena barre lateralmente una cortina
-  verde en cuatro franjas desfasadas: el corte queda escondido detrás del
-  barrido, como en un montaje de cine.
-- **Atmósfera constante.** Grano analógico, viñeta profunda y un halo esmeralda
-  que respira detrás del contenido, siempre presentes. Es la iluminación de la
+- **Cortina de luz.** Entre escena y escena barre lateralmente una cortina en
+  cuatro franjas desfasadas, del color del acento en curso: el corte queda
+  escondido detrás del barrido, como en un montaje de cine. Es también donde se
+  esconde el cambio de piel al pasar de una marca a la otra.
+- **Atmósfera constante.** Grano analógico, viñeta profunda y un halo que
+  respira detrás del contenido, siempre presentes. Es la iluminación de la
   sala, no un efecto decorativo.
 - **La gota.** Cada pulsación deja ondas: tres anillos concéntricos que nacen
   del punto exacto del clic con retardo creciente, más un destello que marca el
   impacto. Se dibujan por debajo del grano para que la textura los cubra y
   parezcan parte de la escena, no un elemento pegado encima.
 
-## La paleta
+## Las paletas
 
-Seis colores muestreados directamente de la fotografía:
+**Ambas usan los mismos nombres de token.** Lo que cambia son los valores, y los
+cambia `data-bloque`. Por eso ningún componente lleva un color escrito a mano:
+si lo llevara, se quedaría clavado en una de las dos marcas.
 
-| HEX | Nombre | De dónde sale | Para qué |
+Phoenix — sale del degradado del isotipo, no de una foto:
+
+| Token | Phoenix | De dónde sale | Para qué |
 |---|---|---|---|
-| `#040D0A` | Negro Cripta | sombras del piso y las paredes | fondo, sombra absoluta |
-| `#0C2B1F` | Verde Sepulcro | piedra en medios tonos | superficies, profundidad |
-| `#2BE58F` | Verde Veneno | la luz esmeralda del fondo | acento primario, foco, hover |
-| `#1A2035` | Azul Medianoche | la camisa | paneles y superficies frías |
-| `#C8A05A` | Latón Antorcha | los mangos dorados de las antorchas | detalle fino, cifras, numeración |
-| `#EFE7D5` | Hueso | el beige de las zapatillas | tipografía y apoyos |
+| `--brasa` | `#120B07` | brasa apagada | fondo y sombras |
+| `--brasa-2` | `#1D120C` | un paso arriba | superficies |
+| `--rescoldo` | `#3A1B0B` | el rescoldo con calor | medios tonos |
+| `--fuego` | `#F26522` | el naranjo del isotipo | acento primario, foco, hover |
+| `--noche` | `#241726` | el único frío del sistema | paneles fríos |
+| `--ambar` | `#FFC46B` | la punta clara de la llama | detalle fino, cifras |
+| `--arena` | `#F8F4F1` | el papel de la marca | tipografía |
 
-La regla de uso: el verde veneno **nunca** rellena áreas grandes, solo marca lo
-vivo (un hover, un foco, una palabra del manifiesto). El latón aparece en dosis
-mínimas. Todo lo demás es negro y hueso.
+ElGolott — los seis colores muestreados sobre la fotografía, punto por punto
+(la medición está publicada en el caso 04 del sitio):
+
+| Token | ElGolott | De dónde sale |
+|---|---|---|
+| `--brasa` | `#040D0A` | sombras del piso y las paredes |
+| `--rescoldo` | `#0C2B1F` | piedra en medios tonos |
+| `--fuego` | `#2BE58F` | la luz esmeralda del fondo |
+| `--noche` | `#1A2035` | la camisa |
+| `--ambar` | `#C8A05A` | los mangos dorados de las antorchas |
+| `--arena` | `#EFE7D5` | el beige de las zapatillas |
+
+La regla de uso es la misma en las dos: el acento **nunca** rellena áreas
+grandes, solo marca lo vivo (un hover, un foco, una palabra del método). El
+ámbar aparece en dosis mínimas. Todo lo demás es fondo y arena.
+
+En modo claro no se dan vuelta los colores: el acento se apaga hasta contrastar
+sobre papel (`#C2410C` en Phoenix, `#0B7346` en ElGolott) y la tipografía pasa
+al ink de cada marca. Son cuatro combinaciones y las cuatro están definidas.
 
 ## La tipografía
 
-- **Titulares — serif de alto contraste.** Didot / Bodoni MT / Playfair Display,
-  con Georgia como respaldo. Es la voz que grita: tamaño grande, interlineado
+- **Titulares — Cambria,** la serif de la identidad de Phoenix, con Bodoni MT y
+  Georgia como respaldo. Es la voz que grita: tamaño grande, interlineado
   cerrado (0.84), tracking negativo. La cursiva se reserva para la palabra
-  acentuada, siempre en verde veneno.
-- **Interfaz — sans neo-grotesca.** Neue Haas Grotesk / Inter / Helvetica, con
-  la pila del sistema como respaldo. Es la voz que instruye: siempre en
-  mayúsculas, cuerpo pequeño y tracking muy abierto (0.3em).
+  acentuada, siempre en el color del acento.
+- **Interfaz — Calibri,** la sans de la identidad, con Segoe UI y la pila del
+  sistema como respaldo. Es la voz que instruye: siempre en mayúsculas, cuerpo
+  pequeño y tracking muy abierto (0.3em).
 
-Las dos nunca se mezclan en la misma línea. No se descarga ninguna fuente de un
-servidor externo. Si quieres las tipografías exactas en vez de las del sistema:
-
-```bash
-npm i @fontsource/playfair-display @fontsource/inter
-```
-
-e impórtalas en `src/main.tsx`, añadiéndolas al principio de `--serif` y
-`--sans` en `src/styles/global.css`.
+Las dos nunca se mezclan en la misma línea. **No se descarga ninguna fuente de
+un servidor externo:** Cambria y Calibri vienen con Windows y con Office en Mac,
+y quien no las tenga cae en el respaldo sin que el sitio se descomponga.
 
 ---
 
@@ -123,21 +185,28 @@ e impórtalas en `src/main.tsx`, añadiéndolas al principio de `--serif` y
     ├── components/
     │   ├── Atmosphere.tsx      ← grano, viñeta, halo y cortina de transición
     │   ├── Cursor.tsx          ← cursor personalizado
-    │   ├── Intro.tsx           ← telón de apertura
+    │   ├── Intro.tsx           ← telón de apertura, con el isotipo
+    │   ├── Isotipo.tsx         ← el emblema de Phoenix, copiado de la identidad
     │   ├── Lightbox.tsx        ← visor de galería (portal, foco atrapado)
     │   ├── MagneticButton.tsx  ← botón que responde al cursor
-    │   ├── Nav.tsx             ← menú, flechas e indicador de escena
+    │   ├── Nav.tsx             ← firma, flechas e indicador de escena
     │   ├── Ripples.tsx         ← ondas de agua al pulsar
     │   └── SmartImage.tsx      ← imagen con respaldo procedural
     └── scenes/
-        ├── Home.tsx        01 · Inicio
-        ├── About.tsx       02 · Sobre mí
-        ├── Gallery.tsx     03 · Galería
-        ├── Work.tsx        04 · Proyectos y servicios
-        ├── Manifesto.tsx   05 · Manifiesto
-        ├── Contact.tsx     06 · Contacto
-        └── Social.tsx      07 · Redes
+        ├── Home.tsx        01 · Inicio        ┐
+        ├── Work.tsx        02 · Soluciones    │ PHOENIX IA METHOD
+        ├── Contact.tsx     03 · Contacto      │ (bloque negocio)
+        ├── Manifesto.tsx   04 · Método        ┘
+        ├── About.tsx       05 · Sobre mí      ┐
+        ├── Social.tsx      06 · Redes         │ ELGOLOTT
+        ├── Gallery.tsx     07 · Galería       │ (bloque marketing)
+        └── Highlights.tsx  08 · Destacados    ┘
 ```
+
+El orden de las escenas y a qué bloque pertenece cada una se decide en un solo
+sitio: la lista `SCENES` de `src/hooks/useSceneRouter.ts`. Los identificadores
+(`#trabajo`, `#manifiesto`…) **no cambian** aunque cambien las etiquetas: son lo
+que va en la URL y lo que ya está compartido por ahí.
 
 ---
 
@@ -146,8 +215,8 @@ e impórtalas en `src/main.tsx`, añadiéndolas al principio de `--serif` y
 | Acción | Cómo |
 |---|---|
 | Cambiar de escena | Botones del menú, flechas ← → de la barra inferior, teclas ← → |
-| Ir a una escena directa | Teclas `1` a `7` |
-| Volver al inicio | Tecla `Esc` o el logotipo |
+| Ir a una escena directa | Teclas `1` a `8` |
+| Volver al inicio | Tecla `Esc` o la firma de la esquina |
 | Primera / última escena | `Inicio` / `Fin` |
 | Abrir una foto | Clic, o `Tab` + `Enter` |
 | Dentro del visor | ← → cambian de foto, `Esc` cierra |
@@ -175,8 +244,11 @@ compartir un enlace directo a una sección y el botón atrás del navegador func
 - **Sin dependencias más allá de React.** Ninguna librería de animación ni de
   rutas: las transiciones son CSS y la navegación es estado.
 - **Sin llamadas externas.** Ni fuentes, ni APIs, ni analíticas, ni claves.
-- **Formulario local.** Valida en el navegador y, al confirmar, arma un `mailto:`
-  con los datos. No hay backend ni se envía nada a ningún servidor.
+- **Formulario conectado de verdad.** Valida en el navegador y envía a las
+  funciones de `api/`: sale un correo por Brevo, llega la copia interna y la
+  reserva escribe en Google Calendar. El `mailto:` quedó solo como salida de
+  emergencia si la función no responde. (Esta línea decía lo contrario y llevaba
+  tiempo mintiendo: el backend existe desde que se agregó `api/`.)
 - **Peso:** ~55 kB de JavaScript y ~6 kB de CSS comprimidos.
 - **`base: './'`** en `vite.config.ts`: el `dist/` funciona tal cual en Netlify,
   Vercel, GitHub Pages o abierto desde una carpeta.
@@ -212,7 +284,7 @@ así que frenan el abuso corriente —un bot repitiendo el formulario— pero no
 alguien decidido repartiendo la carga entre muchas IP. Para eso está el firewall
 de Vercel, que es una casilla en el panel:
 
-- [x] **Hecho el 2026-09-07.** Vercel → proyecto `elgolott` → **Firewall** →
+- [x] **Hecho el 2026-09-07.** Vercel → proyecto `phoenixiamethod` (entonces `elgolott`) → **Firewall** →
       **Reglas** → regla `Límite de la API`: si la ruta empieza con `/api`,
       ventana fija de 60 segundos, 20 solicitudes por dirección IP, y responde
       *Demasiadas peticiones (429)*. Comprobada en producción: las 20 primeras
@@ -288,7 +360,7 @@ mejor que desde un subdominio compartido.
 Para disparar la publicación a mano:
 
 ```bash
-curl -X POST -H "Authorization: Bearer TU_CRON_SECRET" https://elgolott.vercel.app/api/publicar
+curl -X POST -H "Authorization: Bearer TU_CRON_SECRET" https://phoenixiamethod.vercel.app/api/publicar
 ```
 
 ## Un aviso sobre OneDrive

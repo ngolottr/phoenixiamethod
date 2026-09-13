@@ -32,11 +32,11 @@ export function Work({
   return (
     <section className="scene" aria-labelledby="work-title">
       <div className="rise" data-d="1">
-        <p className="eyebrow">Proyectos y servicios</p>
+        <p className="eyebrow">Soluciones · Casos reales</p>
         <h2 id="work-title" className="display h-md" style={{ marginTop: 12 }}>
-          Lo que hago
+          Lo que ya
           {'\n'}
-          <em>cuando nadie mira.</em>
+          <em>está funcionando.</em>
         </h2>
       </div>
 
@@ -101,9 +101,9 @@ export function Work({
       {/* --- La llamada: es el único elemento de la página que insiste --- */}
       <div className="cta rise" data-d="4">
         <div className="cta-copy">
-          <p className="cta-kicker">¿Tienes algo entre manos?</p>
+          <p className="cta-kicker">¿Hay algo que te esté costando tiempo?</p>
           <p className="cta-line">
-            Cuéntame qué quieres construir y te digo en un correo si puedo ayudarte.
+            Cuéntame el problema —no la herramienta— y te digo en un correo si puedo ayudarte.
           </p>
         </div>
 

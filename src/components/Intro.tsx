@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { brand } from '../data/site'
+import { Isotipo } from './Isotipo'
+import { phoenix } from '../data/site'
 
 /** Telón de apertura: 2,5 segundos y desaparece. No se muestra si se redujo el movimiento. */
 export function Intro({ reduced }: { reduced: boolean }) {
@@ -16,9 +17,12 @@ export function Intro({ reduced }: { reduced: boolean }) {
   return (
     <div className="intro" aria-hidden="true">
       <div>
+        {/* Lo primero de lo primero es la marca del negocio, entera: el
+            emblema y el nombre. Dos segundos y medio es todo lo que hay para
+            que alguien sepa a dónde llegó. */}
+        <Isotipo className="intro-isotipo" />
         <div className="intro-mark">
-          {brand.nameLine1}
-          <em>{brand.nameLine2}</em>
+          {phoenix.nameLine1} <em>{phoenix.nameLine2}</em>
         </div>
         <div className="intro-bar" />
       </div>

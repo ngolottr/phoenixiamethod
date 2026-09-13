@@ -1,13 +1,29 @@
 import { useCallback, useEffect, useState } from 'react'
 
-const MOTION_KEY = 'elgolott:motion'
-const CURSOR_KEY = 'elgolott:cursor'
-const DRAG_KEY = 'elgolott:drag'
-const THEME_KEY = 'elgolott:theme'
-const MUSICA_KEY = 'elgolott:musica'
-const SONIDO_KEY = 'elgolott:sonido'
+const MOTION_KEY = 'phoenix:motion'
+const CURSOR_KEY = 'phoenix:cursor'
+const DRAG_KEY = 'phoenix:drag'
+const THEME_KEY = 'phoenix:theme'
+const MUSICA_KEY = 'phoenix:musica'
+const SONIDO_KEY = 'phoenix:sonido'
 
 export type Theme = 'dark' | 'light'
+
+/**
+ * Pinta la barra del navegador del teléfono con el fondo que el sitio tenga
+ * puesto en ese momento.
+ *
+ * No lleva ninguna lista de colores: lee el token `--brasa` ya resuelto, así
+ * que acierta con las cuatro combinaciones —Phoenix y ElGolott, en claro y en
+ * oscuro— sin que haya que acordarse de actualizarla cada vez que cambie una
+ * paleta. Por eso la llaman tanto el cambio de tema como el cambio de bloque.
+ */
+export function pintarBarraDelNavegador() {
+  const meta = document.querySelector('meta[name="theme-color"]')
+  if (!meta) return
+  const fondo = getComputedStyle(document.documentElement).getPropertyValue('--brasa').trim()
+  if (fondo) meta.setAttribute('content', fondo)
+}
 
 function readStored(key: string): string | null {
   try {
@@ -91,9 +107,7 @@ export function usePreferences() {
   useEffect(() => {
     document.documentElement.dataset.theme = theme
     store(THEME_KEY, theme)
-    // La barra del navegador en el teléfono se pinta con esto.
-    const meta = document.querySelector('meta[name="theme-color"]')
-    if (meta) meta.setAttribute('content', theme === 'light' ? '#F1F5F1' : '#040D0A')
+    pintarBarraDelNavegador()
   }, [theme])
 
   useEffect(() => {

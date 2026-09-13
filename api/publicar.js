@@ -116,7 +116,7 @@ export default async function handler(req, res) {
 
      Para dispararla a mano:
        curl -X POST -H "Authorization: Bearer TU_CRON_SECRET" \
-            https://elgolott.vercel.app/api/publicar                         */
+            https://phoenixiamethod.vercel.app/api/publicar                         */
   const secreto = process.env.CRON_SECRET
   const auth = String(req.headers.authorization || '')
   const presentada = auth.startsWith('Bearer ') ? auth.slice(7).trim() : ''

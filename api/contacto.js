@@ -60,7 +60,7 @@ const REMITENTE = {
   name: 'Nicolás Golott',
   email: process.env.REMITENTE_EMAIL || 'contacto.nicolaspk@12068809.brevosend.com',
 }
-const SITIO = process.env.SITIO_URL || 'https://elgolott.vercel.app'
+const SITIO = process.env.SITIO_URL || 'https://phoenixiamethod.vercel.app'
 const HORARIO =
   'lunes a viernes desde las 20:30, sábados desde las 16:00 y domingos todo el día (hora de Chile)'
 
@@ -108,47 +108,47 @@ Atiendo ${HORARIO}.
 Nos vemos,
 
 Nicolás Golott
-NeuraIA`
+Phoenix IA Method`
 
   const html = `<!doctype html>
-<html lang="es"><body style="margin:0;padding:0;background:#040D0A;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#040D0A;padding:32px 16px;">
+<html lang="es"><body style="margin:0;padding:0;background:#120B07;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#120B07;padding:32px 16px;">
 <tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#071711;border:1px solid rgba(239,231,213,.14);">
   <tr><td style="padding:30px 32px 0;">
-    <p style="margin:0;font:400 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.42em;color:#2BE58F;text-transform:uppercase;">ELGOLOTT</p>
+    <p style="margin:0;font:400 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.42em;color:#F26522;text-transform:uppercase;">PHOENIX IA METHOD</p>
   </td></tr>
   <tr><td style="padding:22px 32px 0;">
-    <p style="margin:0;font:400 26px/1.2 Georgia,'Times New Roman',serif;color:#EFE7D5;">Hola, ${escapar(nom)}.</p>
+    <p style="margin:0;font:400 26px/1.2 Georgia,'Times New Roman',serif;color:#F8F4F1;">Hola, ${escapar(nom)}.</p>
   </td></tr>
   <tr><td style="padding:18px 32px 0;">
-    <p style="margin:0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#B9C9C0;">Gracias por escribir. Leí tu solicitud y esto fue lo que me llegó:</p>
+    <p style="margin:0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#D8C7BC;">Gracias por escribir. Leí tu solicitud y esto fue lo que me llegó:</p>
   </td></tr>
   <tr><td style="padding:16px 32px 0;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-      <td style="border-left:2px solid #2BE58F;padding:4px 0 4px 16px;">
-        <p style="margin:0;font:italic 400 15px/1.6 Georgia,serif;color:#EFE7D5;">${escapar(mensaje).replace(/\n/g, '<br>')}</p>
+      <td style="border-left:2px solid #F26522;padding:4px 0 4px 16px;">
+        <p style="margin:0;font:italic 400 15px/1.6 Georgia,serif;color:#F8F4F1;">${escapar(mensaje).replace(/\n/g, '<br>')}</p>
       </td></tr></table>
   </td></tr>
   <tr><td style="padding:20px 32px 0;">
-    <p style="margin:0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#B9C9C0;">Para dimensionarlo bien necesito conversarlo contigo en vivo: por correo se pierde justo lo que importa, que es entender cómo funciona hoy tu operación antes de proponer nada.</p>
-    <p style="margin:14px 0 0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#B9C9C0;">El siguiente paso es una reunión de <strong style="color:#EFE7D5;">30 minutos por videollamada</strong>.</p>
+    <p style="margin:0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#D8C7BC;">Para dimensionarlo bien necesito conversarlo contigo en vivo: por correo se pierde justo lo que importa, que es entender cómo funciona hoy tu operación antes de proponer nada.</p>
+    <p style="margin:14px 0 0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#D8C7BC;">El siguiente paso es una reunión de <strong style="color:#F8F4F1;">30 minutos por videollamada</strong>.</p>
   </td></tr>
   <tr><td style="padding:24px 32px 0;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #2BE58F;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #F26522;">
       <tr><td style="padding:20px 22px;">
-        <p style="margin:0;font:400 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;color:#2BE58F;text-transform:uppercase;">Cómo seguimos</p>
-        <p style="margin:12px 0 0;font:400 16px/1.55 Helvetica,Arial,sans-serif;color:#EFE7D5;">Elige tú mismo la hora que te acomode. Verás solo los horarios que tengo <strong>realmente libres</strong>.</p>
+        <p style="margin:0;font:400 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;color:#F26522;text-transform:uppercase;">Cómo seguimos</p>
+        <p style="margin:12px 0 0;font:400 16px/1.55 Helvetica,Arial,sans-serif;color:#F8F4F1;">Elige tú mismo la hora que te acomode. Verás solo los horarios que tengo <strong>realmente libres</strong>.</p>
         <p style="margin:20px 0 6px;">
-          <a href="${escapar(agenda)}" style="display:inline-block;background:#2BE58F;color:#040D0A;text-decoration:none;padding:16px 30px;font:400 12px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;">Elegir mi horario</a>
+          <a href="${escapar(agenda)}" style="display:inline-block;background:#F26522;color:#120B07;text-decoration:none;padding:16px 30px;font:400 12px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;">Elegir mi horario</a>
         </p>
-        <p style="margin:14px 0 0;font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#8FA79B;">Atiendo ${HORARIO}.</p>
+        <p style="margin:14px 0 0;font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#B39C90;">Atiendo ${HORARIO}.</p>
       </td></tr>
     </table>
   </td></tr>
   <tr><td style="padding:26px 32px 32px;">
-    <p style="margin:0;padding-top:20px;border-top:1px solid rgba(239,231,213,.12);font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#8FA79B;">
-      Nicolás Golott<br><span style="color:#C8A05A;">NeuraIA</span>
+    <p style="margin:0;padding-top:20px;border-top:1px solid rgba(248,244,241,.12);font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#B39C90;">
+      Nicolás Golott<br><span style="color:#FFC46B;">Phoenix IA Method</span>
     </p>
   </td></tr>
 </table>
@@ -173,9 +173,9 @@ desde este mensaje.
   const siguiente = marcada
     ? 'No se le envió el enlace para agendar.'
     : `Ya se le envió el enlace para que elija su horario.
-Cuando reserve, el evento aparece solo en tu calendario NeuraIA · Clientes.`
+Cuando reserve, el evento aparece solo en tu calendario de clientes.`
 
-  const texto = `${encabezado}Nueva solicitud desde elgolott.vercel.app
+  const texto = `${encabezado}Nueva solicitud desde phoenixiamethod.vercel.app
 
 Nombre:       ${nombre}
 Correo:       ${email}

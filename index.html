@@ -3,22 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#040D0A" />
-    <meta name="description" content="ELGOLOTT — Dirección creativa, contenido e inteligencia artificial aplicada. Portfolio personal." />
-    <meta property="og:title" content="ELGOLOTT" />
-    <meta property="og:description" content="Dirección creativa, contenido e inteligencia artificial aplicada." />
+    <!-- El color de la barra del navegador lo reescribe usePreferences con el
+         fondo que tenga puesto el sitio: cambia con el tema y con el bloque.
+         Este valor es solo el de arranque, la brasa de Phoenix. -->
+    <meta name="theme-color" content="#120B07" />
+    <meta name="description" content="Phoenix IA Method — Inteligencia artificial y automatización aplicadas al trabajo que ya haces. Primero el problema, después la tecnología. Nicolás Golott, Santiago de Chile." />
+    <meta property="og:title" content="Phoenix IA Method" />
+    <meta property="og:description" content="IA y automatización aplicadas a problemas reales. Primero el problema, después la tecnología." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="./images/hero.jpg" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23040D0A'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' fill='%232BE58F' text-anchor='middle'%3EG%3C/text%3E%3C/svg%3E" />
-    <!-- Precarga del hero: es lo primero que se ve. Apunta a la figura
-         recortada, que es la que se muestra de verdad; antes precargaba
-         hero.jpg —171 KB que ya nadie usaba— y el navegador avisaba. -->
-    <link rel="preload" as="image" href="./images/hero-figura.png" fetchpriority="high" />
-    <title>ELGOLOTT — Dirección creativa</title>
+    <meta property="og:locale" content="es_CL" />
+    <meta property="og:image" content="./images/marca/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- El isotipo de la marca, dibujado en el propio atributo: no cuesta una
+         petición y se ve nítido en cualquier pantalla. Los trazados son los
+         mismos del archivo de identidad. -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23120B07'/%3E%3Cpath d='M48 94 C 32 74 19 48 17 14 C 33 33 44 58 48 79 Z' fill='%23C2410C'/%3E%3Cpath d='M52 94 C 68 74 81 48 83 14 C 67 33 56 58 52 79 Z' fill='%23F26522'/%3E%3Cpath d='M50 26 C 60 46 63 58 59 70 C 55 80 51 86 50 98 C 49 86 45 80 41 70 C 37 58 40 46 50 26 Z' fill='%23FF8A2B'/%3E%3C/svg%3E" />
+    <!-- Ya no hay nada que precargar en la primera pantalla: el emblema de
+         Phoenix va dibujado dentro del propio JavaScript, así que llega con la
+         página. Antes se precargaba la fotografía del hero, que pesaba y que
+         ahora vive en el bloque de marketing. -->
+    <title>Phoenix IA Method — IA y automatización aplicadas</title>
   </head>
   <body>
     <div id="root"></div>
-    <noscript>Este portfolio necesita JavaScript activado para funcionar.</noscript>
+    <noscript>Este sitio necesita JavaScript activado para funcionar.</noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

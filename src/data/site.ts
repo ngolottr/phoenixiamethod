@@ -2,6 +2,20 @@
    ÚNICO ARCHIVO QUE NECESITAS EDITAR PARA CAMBIAR TODO EL CONTENIDO DEL SITIO.
    Textos, fotos, enlaces, proyectos, versos y las historias destacadas.
 
+   El sitio lleva DOS marcas y este archivo está partido en dos por eso:
+
+   · PHOENIX IA METHOD — el negocio. Es lo primero que ve cualquiera que
+     llegue: portada, soluciones, método y contacto. Todo lo suyo vive en la
+     primera mitad del archivo, empezando por `phoenix`.
+
+   · ELGOLOTT — la marca personal de Nicolás, en el bloque de marketing:
+     quién está detrás, la galería, las historias y las redes. Empieza en
+     `persona` y sigue hasta el final.
+
+   Si vas a tocar el discurso comercial, tócalo arriba. Si vas a subir una foto
+   o cambiar una red, es abajo. Mezclar los dos lados es exactamente lo que
+   este archivo trata de evitar.
+
    Las fotos salen de public/images/ (publicaciones) y de
    public/images/highlights/<coleccion>/ (historias destacadas de Instagram).
    El color de fondo NO se define aquí: el sitio lo extrae de cada imagen.
@@ -39,32 +53,134 @@ export type Shot = {
   year: string
 }
 
-export const brand = {
+/* ===========================================================================
+   ▓▓▓ PHOENIX IA METHOD — EL NEGOCIO ▓▓▓
+   Todo lo que sigue hasta el aviso de ELGOLOTT es la parte comercial.
+   =========================================================================== */
+
+/**
+ * La marca del negocio.
+ *
+ * El nombre va partido en dos líneas porque en la portada se compone así:
+ * PHOENIX arriba, IA METHOD debajo y en cursiva. `short` es para cuando solo
+ * cabe una palabra (la barra en pantallas chicas, el pie de los correos).
+ */
+export const phoenix = {
+  name: 'PHOENIX IA METHOD',
+  nameLine1: 'PHOENIX',
+  nameLine2: 'IA METHOD',
+  short: 'Phoenix',
+  legalName: 'Nicolás Golott',
+  role: 'IA aplicada · Automatización · Sistemas',
+  location: 'Santiago, Chile',
+  /* La frase de la marca es también su regla de trabajo, y aparece tal cual en
+     el método: primero el problema de la persona, después la solución, y recién
+     entonces la herramienta. Prometer "transformación" sin haber escuchado el
+     problema es justo lo que Phoenix no hace. */
+  tagline: 'Primero el problema.\nDespués la tecnología.',
+  proposito:
+    'Ayudo a personas y equipos a meter inteligencia artificial y automatización en el trabajo que ya hacen: para ganar tiempo, ordenar procesos y resolver lo que hoy se resuelve a mano.',
+  email: 'contacto.nicolaspk@gmail.com',
+  dominio: 'phoenixiamethod.vercel.app',
+  year: '2026',
+}
+
+export const hero = {
+  eyebrow: 'IA aplicada y automatización',
+  cta: 'Entrar',
+  /** las tres palabras del ciclo de la marca, bajo el nombre */
+  ciclo: ['Problema', 'Método', 'Sistema'],
+}
+
+/**
+ * EL MÉTODO — los cinco principios, uno por pantalla.
+ *
+ * No son eslóganes: son las reglas con las que Phoenix decide qué acepta y qué
+ * no, copiadas del contexto maestro de Neurona. Están escritos en primera
+ * persona y en negativo a propósito —lo que NO se hace es más informativo que
+ * una promesa— y cada uno se puede contrastar con los casos de la escena de
+ * soluciones. Un método que no se puede desmentir no es un método.
+ *
+ * El asterisco marca la palabra que se resalta con el color de la marca.
+ */
+export const manifesto = {
+  eyebrow: 'El método',
+  verses: [
+    {
+      line: 'PRIMERO\nEL\n*PROBLEMA*',
+      note: 'No parto preguntando qué herramienta de IA vender. Parto preguntando qué te está costando tiempo hoy. La tecnología viene tercera, siempre.',
+    },
+    {
+      line: 'PRUEBO\nANTES\nDE\n*VENDER*',
+      note: 'Cada cosa que ofrezco la usé yo primero para resolver un problema mío. Soy el primer caso de estudio de Phoenix, y por eso hay algo que mostrar.',
+    },
+    {
+      line: 'NO\n*INVENTO*\nAUTORIDAD',
+      note: 'Lo que no he construido, no lo ofrezco. Prefiero enseñar el tablero con los números incómodos que un folleto con los cómodos.',
+    },
+    {
+      line: 'SIMPLE\nANTES\nQUE\n*PERFECTO*',
+      note: 'Simple, funcional, medible, mejorable, automatizado. En ese orden, y cada paso funcionando de verdad antes de empezar el siguiente.',
+    },
+    {
+      line: 'LA IA\n*AMPLIFICA*\nNO\nREEMPLAZA',
+      note: 'La máquina acelera; el criterio sigue siendo tuyo. Si al final del proyecto no entiendes tu propio proceso, el trabajo se hizo mal.',
+    },
+  ],
+}
+
+export const contact = {
+  eyebrow: 'Contacto',
+  title: 'Cuéntame\ntu problema.',
+  intro:
+    'No hace falta que sepas qué herramienta usar ni que tengas el proyecto definido. Con que sepas qué te está costando tiempo, alcanza para la primera conversación.',
+  copyLabel: 'Copiar email',
+  copiedLabel: 'Copiado',
+  formNote: 'Te llega un correo con el siguiente paso: agendar 30 minutos por videollamada.',
+}
+
+/** Opciones del desplegable de presupuesto. La primera es el marcador vacío. */
+export const presupuestos = [
+  'Prefiero conversarlo',
+  'Menos de $300.000',
+  'Entre $300.000 y $1.000.000',
+  'Más de $1.000.000',
+]
+
+/** Franjas en que Nicolás atiende reuniones, en hora de Chile. */
+export const disponibilidad = {
+  resumen: 'Lunes a viernes desde las 20:30 · Sábados desde las 16:00 · Domingos todo el día',
+}
+
+/* ===========================================================================
+   ▓▓▓ ELGOLOTT — MARKETING Y MARCA PERSONAL ▓▓▓
+   Desde aquí hacia abajo es el segundo bloque: la persona detrás de Phoenix.
+   =========================================================================== */
+
+/**
+ * La marca personal. Es la de Nicolás, no la del negocio: aquí se documenta
+ * el proceso de aprender, y por eso puede permitirse memes y errores donde
+ * Phoenix tiene que ser preciso.
+ */
+export const persona = {
   name: 'ELGOLOTT',
   nameLine1: 'EL',
   nameLine2: 'GOLOTT',
   legalName: 'Nicolás Golott',
-  role: 'Dirección creativa · Contenido · IA aplicada',
+  handle: '@elgolott',
+  role: 'Contenido · Aprendizaje en público · IA',
   location: 'Santiago, Chile',
   tagline: 'No pido permiso para ocupar el cuadro.',
   email: 'contacto.nicolaspk@gmail.com',
   year: '2026',
 }
 
-export const hero = {
-  /** figura recortada sobre fondo transparente: deja el texto libre */
-  image: 'images/hero-figura.png',
-  alt: 'Nicolás de pie, ajustándose los lentes, recortado sobre el fondo.',
-  eyebrow: 'Portfolio · MMXXVI',
-  cta: 'Entrar',
-}
-
 export const about = {
-  eyebrow: 'Sobre mí',
-  title: 'Construyo\nen público.',
+  eyebrow: 'Quién está detrás',
+  title: 'Aprendo\nen público.',
   paragraphs: [
-    'Soy Nicolás. Trabajo en la intersección entre dirección creativa, contenido e inteligencia artificial aplicada: diseño sistemas que producen, miden y mejoran solos.',
-    'No vendo humo ni resultados prestados. Todo lo que muestro acá lo construí, lo rompí y lo volví a armar delante de cámara. La autoridad se gana documentando, no posando.',
+    'Soy Nicolás Golott, fundador de Phoenix IA Method. Trabajo como jefe de tienda mientras construyo esto: el método no salió de un curso, sale de resolver con IA problemas que tengo de verdad, en un trabajo de verdad.',
+    'ElGolott es la otra mitad. Ahí publico el proceso completo —lo que funciona, lo que falla y lo que todavía no entiendo—, porque la autoridad se gana documentando, no posando. Lo que aprendo grabando termina siendo método; el método es lo que ofrece Phoenix.',
     'Y sí, entre medio hay memes. La seriedad permanente es otra forma de posar.',
   ],
   stats: [
@@ -463,57 +579,6 @@ export const highlightsScene = {
   title: 'Lo que\nno se borra.',
   intro:
     'Tres colecciones rescatadas de Instagram. Pulsa una y los videos corren solos, mientras el sitio se tiñe con el color de lo que estás mirando.',
-}
-
-/* ------------------------------------------------------------------------- */
-
-export type Work = {
-  index: string
-  title: string
-  category: string
-  description: string
-  meta: string
-  image: string
-  url?: string
-}
-
-/* Los proyectos NO viven aquí: viven en data/proyectos.ts, que es lo que la
-   escena de Trabajo lee de verdad. Había una copia en este archivo que ya no
-   usaba nadie y que además seguía anunciando un caso que ya no existe. Dos
-   listas del mismo contenido siempre terminan contando cosas distintas. */
-
-export const manifesto = {
-  eyebrow: 'Manifiesto',
-  verses: [
-    { line: 'NO\n*ESPERO*\nTURNO', note: 'La oportunidad no toca la puerta. Se construye la puerta.' },
-    { line: 'HAGO\n*RUIDO*\nCON\nCRITERIO', note: 'Presencia no es gritar. Es que se note cuando entras.' },
-    { line: 'LO\n*FEO*\nNO\nCONVIERTE', note: 'La estética es una decisión de negocio, no un adorno.' },
-    { line: 'ME\n*RÍO*\nDE MÍ\nPRIMERO', note: 'El que no se ríe de sí mismo se lo toma todo demasiado en serio.' },
-    { line: 'DOCUMENTO\nTODO\n*INCLUSO*\nEL ERROR', note: 'La autoridad se gana mostrando el proceso, no el trofeo.' },
-  ],
-}
-
-export const contact = {
-  eyebrow: 'Contacto',
-  title: 'Hablemos\nen serio.',
-  intro:
-    'Colaboraciones, dirección creativa, consultoría de IA o simplemente una idea que no te deja dormir.',
-  copyLabel: 'Copiar email',
-  copiedLabel: 'Copiado',
-  formNote: 'Te llega un correo con el siguiente paso: agendar 30 minutos por Zoom.',
-}
-
-/** Opciones del desplegable de presupuesto. La primera es el marcador vacío. */
-export const presupuestos = [
-  'Prefiero conversarlo',
-  'Menos de $300.000',
-  'Entre $300.000 y $1.000.000',
-  'Más de $1.000.000',
-]
-
-/** Franjas en que Nicolás atiende reuniones, en hora de Chile. */
-export const disponibilidad = {
-  resumen: 'Lunes a viernes desde las 20:30 · Sábados desde las 16:00 · Domingos todo el día',
 }
 
 /** Enlaces reales, tomados de elgolottlinks.carrd.co */

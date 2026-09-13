@@ -5,7 +5,7 @@
    =========================================================================== */
 
 html, body, #agenda { height: auto; overflow: auto; }
-body { background: var(--cripta); min-height: 100%; }
+body { background: var(--brasa); min-height: 100%; }
 
 .ag {
   max-width: 780px;
@@ -21,7 +21,7 @@ body { background: var(--cripta); min-height: 100%; }
 /* Marcador mientras llegan los horarios */
 .ag-skeleton {
   margin-top: 34px; height: 180px;
-  background: linear-gradient(110deg, var(--sepulcro) 0%, rgba(255,255,255,.05) 42%, var(--sepulcro) 78%);
+  background: linear-gradient(110deg, var(--rescoldo) 0%, rgba(255,255,255,.05) 42%, var(--rescoldo) 78%);
   background-size: 300% 100%;
   animation: cargando 1.7s linear infinite;
 }
@@ -43,13 +43,13 @@ body { background: var(--cripta); min-height: 100%; }
   transition: border-color .35s var(--ease), background .35s var(--ease);
 }
 .ag-dia-n { font-size: 9px; letter-spacing: .26em; text-transform: uppercase; color: var(--humo); }
-.ag-dia-f { font-family: var(--serif); font-size: 20px; color: var(--hueso); }
-.ag-dia-c { font-size: 9px; letter-spacing: .2em; color: var(--laton); }
+.ag-dia-f { font-family: var(--serif); font-size: 20px; color: var(--arena); }
+.ag-dia-c { font-size: 9px; letter-spacing: .2em; color: var(--ambar); }
 .ag-dia:hover { border-color: var(--linea-fuerte); }
 .ag-dia[aria-selected='true'] {
-  border-color: var(--veneno); background: rgba(43, 229, 143, .07);
+  border-color: var(--fuego); background: var(--fuego-soft);
 }
-.ag-dia[aria-selected='true'] .ag-dia-f { color: var(--veneno); }
+.ag-dia[aria-selected='true'] .ag-dia-f { color: var(--fuego); }
 
 /* --- Horas --- */
 
@@ -59,12 +59,12 @@ body { background: var(--cripta); min-height: 100%; }
 }
 .ag-hora {
   padding: 15px 8px; border: 1px solid var(--linea-fuerte);
-  font-family: var(--sans); font-size: 13px; letter-spacing: .16em; color: var(--hueso);
+  font-family: var(--sans); font-size: 13px; letter-spacing: .16em; color: var(--arena);
   transition: all .3s var(--ease);
 }
-.ag-hora:hover { border-color: var(--veneno); color: var(--veneno); }
+.ag-hora:hover { border-color: var(--fuego); color: var(--fuego); }
 .ag-hora.on {
-  background: var(--veneno); border-color: var(--veneno); color: var(--cripta);
+  background: var(--fuego); border-color: var(--fuego); color: var(--brasa);
 }
 
 /* --- Formulario --- */
@@ -79,11 +79,11 @@ body { background: var(--cripta); min-height: 100%; }
   font-family: var(--serif); font-size: clamp(17px, 2vw, 22px);
   color: var(--humo); margin-bottom: 6px;
 }
-.ag-elegida strong { color: var(--veneno); font-weight: 400; }
+.ag-elegida strong { color: var(--fuego); font-weight: 400; }
 .ag-opt { color: var(--humo); letter-spacing: .1em; }
 
 .ag-cta { margin-top: 26px; }
-.ag-link { color: var(--veneno); text-decoration: underline; text-underline-offset: 3px; }
+.ag-link { color: var(--fuego); text-decoration: underline; text-underline-offset: 3px; }
 
 @media (max-width: 520px) {
   .ag-horas { grid-template-columns: repeat(3, 1fr); }

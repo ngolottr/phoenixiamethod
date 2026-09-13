@@ -1,11 +1,16 @@
 /* ============================================================================
-   LOS CASOS
+   LOS CASOS DE PHOENIX IA METHOD
    ----------------------------------------------------------------------------
    Todo lo que hay acá salió del vault de Obsidian de Nicolás (Neurona). Las
-   cifras son las reales, incluidas las que no favorecen: 24 me gusta por cada
-   seguidor es un número incómodo, y justamente por eso convence. Un cliente
+   cifras son las reales, incluidas las que no favorecen: "11,8 % del objetivo"
+   es un número incómodo de publicar, y justamente por eso convence. Un cliente
    distingue enseguida entre alguien que muestra su tablero y alguien que
    muestra un folleto.
+
+   Regla de la marca, y no es un adorno: aquí solo entra lo que ya se construyó.
+   Un servicio que suena bien pero todavía no se ha hecho no es un caso, es una
+   promesa — y Phoenix se posiciona justamente al revés: la autoridad viene de
+   experimentar, documentar y recién entonces ofrecer.
 
    Si cambian los datos en Obsidian, hay que actualizarlos acá.
 
@@ -89,10 +94,10 @@ export const casos: Caso[] = [
     meta: 'En curso · 2026',
     image: 'images/setup-gaming.jpg',
     description:
-      'Documentar en público el intento de llegar a 100.000 seguidores usando IA como sistema de trabajo.',
+      'El laboratorio de Phoenix: llegar a 100.000 seguidores usando IA como sistema de trabajo, documentando todo.',
     estado: 'En curso',
     resumen:
-      'No es un proyecto sobre inteligencia artificial. Es un experimento sobre construir audiencia a propósito, con la IA como herramienta y con todo el proceso a la vista: lo que funciona, lo que falla y lo que todavía no se entiende. El número no es el contenido; el camino hacia el número es el contenido.',
+      'Phoenix no empezó con un cliente: empezó conmigo. Este es el experimento donde se prueba el método antes de ofrecérselo a nadie —construir audiencia a propósito, con la IA como sistema de trabajo y con el proceso entero a la vista: lo que funciona, lo que falla y lo que todavía no entiendo. El número no es el contenido; el camino hacia el número es el contenido.',
     cifras: [
       { valor: '11.800', etiqueta: 'Punto de partida', nota: 'TikTok 6.688 · Instagram 4.690 · YouTube 422' },
       { valor: '11,8 %', etiqueta: 'Del objetivo', nota: 'Faltan 88.200' },
@@ -129,18 +134,21 @@ export const casos: Caso[] = [
         'Todo se etiqueta como dato, hipótesis o recomendación. Nunca se mezclan',
       ],
     },
+    notas: [
+      'Este caso es la prueba del principio de Phoenix: primero lo resuelvo para mí, después lo documento, y solo entonces se puede ofrecer. Al revés no sirve.',
+    ],
   },
   {
     index: '02',
-    title: 'Agentes & Automatización',
-    category: 'Sistemas · n8n',
+    title: 'Agentes y automatización',
+    category: 'Automatización · n8n',
     meta: 'En diseño',
     image: 'images/minecraft-render.jpg',
     description:
-      'Una cadena de agentes que decide qué grabar con datos, publica solo y cierra el ciclo con métricas.',
+      'Cadenas de agentes que hacen el trabajo repetitivo: deciden con datos, publican solas y devuelven métricas.',
     estado: 'En diseño',
     resumen:
-      'La primera versión automatizaba la edición del video. Al probarla quedó claro que el cuello de botella no era editar, sino decidir qué grabar. El sistema se reordenó: la edición volvió a ser manual y la automatización se movió a la capa de estrategia y distribución.',
+      'La primera versión automatizaba la edición del video. Al probarla quedó claro que el cuello de botella no era editar, sino decidir qué grabar. El sistema se reordenó: la edición volvió a ser manual y la automatización se movió a la capa de estrategia y distribución. Ese reordenamiento —automatizar el cuello de botella real y no el que se ve más— es exactamente lo que se hace en un proyecto de cliente.',
     cifras: [
       { valor: '5', etiqueta: 'Agentes en el roster', nota: 'Ordenados por dependencia técnica' },
       { valor: '1', etiqueta: 'Se construye a la vez', nota: 'Ocho a la vez no es automatizar' },
@@ -158,9 +166,9 @@ export const casos: Caso[] = [
         proporcion: '1280 / 328',
       },
     ],
-    /* Este caso no lleva ni "por qué está hecho así" ni notas al pie: el flujo
-       de arriba ya enseña en qué consiste el sistema, y en una automatización
-       el diagrama explica mejor que cualquier párrafo. */
+    /* Este caso no lleva "por qué está hecho así": el flujo de arriba ya enseña
+       en qué consiste el sistema, y en una automatización el diagrama explica
+       mejor que cualquier párrafo. */
     metodo: {
       titulo: 'Los agentes',
       pasos: [
@@ -174,48 +182,59 @@ export const casos: Caso[] = [
   },
   {
     index: '03',
-    title: 'Dirección de arte',
-    category: 'Marca · Web',
-    meta: 'Este sitio',
-    image: 'images/camara-verde.jpg',
+    title: 'Neurona',
+    category: 'Conocimiento · IA',
+    meta: 'En uso diario',
+    image: 'images/herramientas/obsidian.jpg',
     description:
-      'Identidad visual y puesta en escena para marcas personales que no quieren parecerse a nadie.',
-    estado: 'Entregado',
+      'El sistema de conocimiento que hace que la IA sepa de qué le estás hablando: contexto que no se pierde entre conversaciones.',
+    estado: 'En uso diario',
     resumen:
-      'El caso lo estás mirando. Este sitio no parte de una plantilla: la paleta completa se extrajo de una sola fotografía —el pasillo de piedra con luz verde— y el sistema se construyó alrededor de esa atmósfera.',
+      'El problema que casi nadie nombra al usar IA: cada conversación empieza de cero. Explicas tu negocio, tu proceso y tus decisiones una y otra vez, y el resultado siempre es genérico porque la máquina no sabe nada de ti. Neurona es la respuesta a eso —una bóveda donde quedan escritos el contexto, las decisiones, los experimentos y los aprendizajes, conectados entre sí y legibles tanto por una persona como por un modelo. No es tomar notas: es construir la memoria que el sistema no trae.',
     cifras: [
-      { valor: '113', etiqueta: 'Fotos propias', nota: 'Publicaciones e historias rescatadas' },
-      { valor: '8', etiqueta: 'Escenas sin scroll', nota: 'Se navega, no se desliza' },
-      { valor: '62 kB', etiqueta: 'Pesa la página', nota: 'Comprimida, con todo adentro' },
+      { valor: '2', etiqueta: 'Marcas dentro', nota: 'Phoenix IA Method y ElGolott, separadas a propósito' },
+      { valor: '1', etiqueta: 'Contexto maestro', nota: 'El documento que se lee antes de cualquier cambio grande' },
+      { valor: '0', etiqueta: 'Veces que se explica de nuevo', nota: 'Ese es todo el punto' },
     ],
-    /* Los colores no están elegidos a ojo: cada uno se midió sobre la foto,
-       promediando un cuadrado de píxeles en el punto que se señala. Se muestran
-       los dos —el medido y el que quedó en el CSS— para que la afirmación se
-       pueda comprobar en vez de tener que creerla. */
-    paleta: {
-      image: 'images/camara-verde.jpg',
-      alt: 'El pasillo de piedra con luz verde del que salió toda la paleta.',
-      marcas: [
-        { x: 74, y: 11, muestra: '#0FA462', final: '#2BE58F', nombre: 'Luz', izquierda: true },
-        { x: 8, y: 47, muestra: '#1A4C31', final: '#0C2B1F', nombre: 'Piedra' },
-        { x: 50, y: 38, muestra: '#2B2530', final: '#1A2035', nombre: 'Camisa' },
-        { x: 46, y: 68, muestra: '#151110', final: '#040D0A', nombre: 'Sombra' },
-        { x: 55, y: 90, muestra: '#FCF1D2', final: '#EFE7D5', nombre: 'Hueso', izquierda: true },
-        { x: 7, y: 5, muestra: '#2F4528', final: '#C8A05A', nombre: 'Latón' },
+    tituloHerramientas: 'Las dos piezas',
+    herramientas: [
+      {
+        nombre: 'Obsidian',
+        rol: 'Dónde vive el conocimiento',
+        para: 'Archivos de texto en tu propio disco, enlazados entre sí. Sin servicio del que depender y sin formato que se muera: dentro de diez años se siguen abriendo.',
+        image: 'images/herramientas/obsidian.jpg',
+      },
+      {
+        nombre: 'Claude',
+        rol: 'Quién lo lee y lo mantiene',
+        para: 'Trabaja dentro de la bóveda: la ordena, la relaciona y la usa como contexto. La diferencia entre pedirle algo a una IA que no te conoce y a una que leyó todo lo tuyo se nota en la primera respuesta.',
+        image: 'images/herramientas/claude.jpg',
+      },
+    ],
+    metodo: {
+      titulo: 'Por qué esto va primero',
+      pasos: [
+        'Sin contexto no hay automatización útil: un agente sin memoria repite trabajo en vez de ahorrarlo',
+        'Cada decisión queda escrita con su porqué, para no volver a discutirla dentro de tres meses',
+        'Lo que se aprende se documenta; lo documentado se estandariza; lo estandarizado se puede automatizar',
+        'El conocimiento es tuyo y vive en tu disco. Ninguna herramienta se lo queda de rehén',
       ],
     },
+    notas: [
+      'Este sitio salió de ahí. Los casos, las cifras y el método que estás leyendo estaban escritos en la bóveda antes de existir como página.',
+    ],
   },
   {
     index: '04',
-    title: 'Diseño web',
-    category: 'Marca personal · Producto',
-    meta: 'Disponible',
+    title: 'Sitios y sistemas a medida',
+    category: 'Producto digital',
+    meta: 'Este sitio',
     image: 'images/espejo-amarillo.jpg',
     description:
-      'Sitios de marca personal construidos a medida: sin plantilla, sin dependencias y hechos para que la visita termine en un contacto.',
+      'Cuando la solución es un producto digital: construido pieza por pieza, sin plantilla y hecho para terminar en una conversación.',
     estado: 'Disponible',
     resumen:
-      'Esto que estás usando es el producto. No es una demostración ni una maqueta: es un sitio real, en producción, con formulario y agenda conectados a un calendario de verdad. Lo que ves acá es lo que se entrega — construido pieza por pieza, no elegido de un catálogo de plantillas.',
+      'Automatizar no siempre alcanza: a veces el problema pide algo que todavía no existe. Esto que estás usando es ese caso. No es una demostración ni una maqueta: es un sitio real, en producción, con formulario y agenda conectados a un calendario de verdad. Lo que ves acá es lo que se entrega.',
     /* Todas estas cifras se midieron sobre el sitio en producción, no son
        estimaciones de folleto. Un cliente puede abrir las herramientas de su
        propio navegador y comprobarlas mientras lee esto. */
@@ -230,15 +249,36 @@ export const casos: Caso[] = [
         nombre: 'Un sistema de diseño propio',
         rol: 'Lo que se entrega debajo del sitio',
         para:
-          'Escala tipográfica, tokens de color y reglas que no se rompen. Por eso una página nueva se agrega en minutos y sigue pareciendo del mismo sitio: no hay que volver a decidir nada que ya se decidió una vez.',
+          'Escala tipográfica, tokens de color y reglas que no se rompen. Por eso este sitio puede llevar dos marcas con dos paletas distintas cambiando un solo atributo, y por eso una página nueva se agrega en minutos sin volver a decidir nada que ya se decidió una vez.',
         image: 'images/herramientas/sistema-diseno.jpg',
         proporcion: '1400 / 760',
       },
     ],
+    /* Los colores no están elegidos a ojo: cada uno se midió sobre la foto,
+       promediando un cuadrado de píxeles en el punto que se señala. Se muestran
+       los dos —el medido y el que quedó en el CSS— para que la afirmación se
+       pueda comprobar en vez de tener que creerla.
+
+       Ojo con lo que afirma este bloque: es la paleta del bloque de MARKETING,
+       el de ElGolott. La de Phoenix no sale de una foto, sale del isotipo de la
+       identidad. Si algún día se cambia una de las dos, hay que corregir aquí
+       también: una prueba que dejó de ser cierta es peor que no tener prueba. */
+    paleta: {
+      image: 'images/camara-verde.jpg',
+      alt: 'El pasillo de piedra con luz verde del que salió la paleta de ElGolott.',
+      marcas: [
+        { x: 74, y: 11, muestra: '#0FA462', final: '#2BE58F', nombre: 'Luz', izquierda: true },
+        { x: 8, y: 47, muestra: '#1A4C31', final: '#0C2B1F', nombre: 'Piedra' },
+        { x: 50, y: 38, muestra: '#2B2530', final: '#1A2035', nombre: 'Camisa' },
+        { x: 46, y: 68, muestra: '#151110', final: '#040D0A', nombre: 'Sombra' },
+        { x: 55, y: 90, muestra: '#FCF1D2', final: '#EFE7D5', nombre: 'Hueso', izquierda: true },
+        { x: 7, y: 5, muestra: '#2F4528', final: '#C8A05A', nombre: 'Latón' },
+      ],
+    },
     metodo: {
-      titulo: 'Por qué éste vende y una plantilla no',
+      titulo: 'Por qué éste convierte y una plantilla no',
       pasos: [
-        'La identidad sale de tus fotos, no de un tema comprado: nadie más puede tener este sitio',
+        'La identidad sale de tu marca o de tus fotos, no de un tema comprado: nadie más puede tener este sitio',
         'Sin librerías de interfaz ni servicios de terceros: no se rompe cuando uno de ellos cambia o cae',
         'La agenda y el formulario van conectados de verdad — la visita termina en una reunión, no en un "gracias por escribir"',
         'Funciona igual en un teléfono de gama baja: los efectos vienen apagados y los enciende quien quiera',
@@ -246,7 +286,7 @@ export const casos: Caso[] = [
     },
     notas: [
       'Lo que estás mirando es también la prueba: si el sitio te pareció rápido y distinto, eso es exactamente lo que se entrega.',
-      'Trabajo un proyecto a la vez y parto entendiendo el negocio antes de abrir el editor. Si quieres ver cómo se aplicaría al tuyo, conversémoslo.',
+      'Trabajo un proyecto a la vez y parto entendiendo el problema antes de abrir el editor. Si quieres ver cómo se aplicaría al tuyo, conversémoslo.',
     ],
   },
 ]

@@ -1,23 +1,28 @@
-import { SmartImage } from '../components/SmartImage'
 import { MagneticButton } from '../components/MagneticButton'
+import { Isotipo } from '../components/Isotipo'
 import { Sello } from '../components/Sello'
-import { brand, hero } from '../data/site'
+import { hero, phoenix } from '../data/site'
 
 /**
- * La escena de entrada.
+ * La escena de entrada — PHOENIX IA METHOD.
  *
- * La figura viene recortada sobre fondo transparente, así que ya no hace falta
- * pelear con degradados para que el texto se lea: la fotografía no cubre nada.
- * El fondo lo pone la propia atmósfera del sitio —negro verdoso y el halo que
- * respira—, y bajo los pies se dibuja un resplandor para que la figura apoye en
- * algo en vez de flotar recortada en el vacío.
+ * Antes esta pantalla la ocupaba una fotografía de Nicolás recortada, porque
+ * el sitio era un portafolio personal. Ya no lo es: lo primero que ve quien
+ * llega es el negocio, así que el lugar de honor lo ocupa el isotipo de la
+ * marca y la persona pasa al bloque de marketing, que es donde se la busca.
+ *
+ * El cambio además arregla algo que la foto arrastraba: el emblema es un
+ * dibujo, no una imagen que pueda tardar o fallar, se ve nítido en cualquier
+ * pantalla y se apaga solo en modo claro. La composición no cambia —el
+ * resplandor sigue detrás y la sombra al pie— para que la llama apoye en algo
+ * en vez de flotar recortada en el vacío.
  */
 export function Home({
   onEnter,
   onContacto,
   arrastrable,
 }: {
-  /** entra al recorrido por el bloque de negocio: lo primero es el trabajo */
+  /** entra al recorrido por el bloque de negocio: lo primero son las soluciones */
   onEnter: () => void
   onContacto: () => void
   /** el visitante encendió el arrastre: el sello se puede mover */
@@ -30,38 +35,53 @@ export function Home({
         <span className="home-aura" />
       </div>
 
-      <div className="home-figura">
-        <SmartImage src={hero.image} alt={hero.alt} priority />
+      <div className="home-figura" aria-hidden="true">
+        <Isotipo className="home-isotipo" />
       </div>
 
       <div className="home-copy">
         <p className="eyebrow rise" data-d="1">
-          {hero.eyebrow} — {brand.location}
+          {hero.eyebrow} — {phoenix.location}
         </p>
 
         <h1 id="home-title" className="display h-xl home-name rise" data-d="2">
-          {brand.nameLine1}
+          {phoenix.nameLine1}
           {'\n'}
-          <em>{brand.nameLine2}</em>
+          <em>{phoenix.nameLine2}</em>
         </h1>
 
         <div className="home-line rise" data-d="3">
-          <p className="home-tag">{brand.tagline}</p>
+          <p className="home-tag">{phoenix.tagline}</p>
         </div>
 
-        {/* Una sola puerta. Antes había dos botones que llevaban casi al mismo
-            sitio y obligaban a elegir antes de saber nada; ahora "Entrar" abre
-            el recorrido por el trabajo, y el sello —que gira en su esquina— es
-            el atajo para quien ya se decidió. */}
+        {/* Una sola puerta. "Entrar" abre el recorrido por las soluciones, y el
+            sello —que gira en su esquina— es el atajo para quien ya se decidió
+            y solo quiere escribir. */}
         <div className="home-cta rise" data-d="4">
           <MagneticButton className="btn solid" onClick={onEnter}>
             {hero.cta} <span className="arrow">→</span>
           </MagneticButton>
         </div>
 
-        <p className="home-meta rise" data-d="5">
-          <span>{brand.role}</span>
-          <span className="home-anio">{brand.year}</span>
+        {/* El ciclo de la marca, dicho en tres palabras: de dónde se parte y a
+            dónde se llega. Es la versión corta del método que se explica
+            entero cuatro escenas más adelante. */}
+        <p className="home-ciclo rise" data-d="5">
+          {hero.ciclo.map((paso, i) => (
+            <span key={paso}>
+              {i > 0 && (
+                <b aria-hidden="true" className="home-ciclo-flecha">
+                  →
+                </b>
+              )}
+              {paso}
+            </span>
+          ))}
+        </p>
+
+        <p className="home-meta rise" data-d="6">
+          <span>{phoenix.role}</span>
+          <span className="home-anio">{phoenix.year}</span>
         </p>
       </div>
 

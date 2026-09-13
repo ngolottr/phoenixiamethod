@@ -86,7 +86,7 @@ export function pasaLosCupos(reglas) {
  */
 function anfitrionesPermitidos() {
   const desdeEntorno = [
-    process.env.SITIO_URL || 'https://elgolott.vercel.app',
+    process.env.SITIO_URL || 'https://phoenixiamethod.vercel.app',
     process.env.VERCEL_URL,                       // este despliegue
     process.env.VERCEL_BRANCH_URL,                // el de la rama
     process.env.VERCEL_PROJECT_PRODUCTION_URL,    // el de producción

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-const CLAVE = 'elgolott:sello'
+const CLAVE = 'phoenix:sello'
 /** Cuánto puede moverse el dedo antes de que deje de ser un clic. */
 const TOLERANCIA = 6
 

@@ -45,7 +45,7 @@ export function Panal({ interactivo }: { interactivo: boolean }) {
     let mx = -9999
     let my = -9999
     let raf = 0
-    let color = '43, 229, 143'
+    let color = '242, 101, 34' /* semilla: el fuego de Phoenix, hasta que leerColor() diga otra cosa */
 
     /** Segmentos de la malla: cada uno es [x1, y1, x2, y2]. */
     let lineas: Float64Array = new Float64Array(0)
@@ -199,7 +199,7 @@ export function Panal({ interactivo }: { interactivo: boolean }) {
     const ojo = new MutationObserver(leerColor)
     ojo.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['style', 'data-theme', 'data-ambient'],
+      attributeFilter: ['style', 'data-theme', 'data-ambient', 'data-bloque'],
     })
 
     /* El tamaño se recalcula al soltar, no en cada píxel del arrastre: rehacer

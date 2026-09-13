@@ -2,7 +2,7 @@ import { MagneticButton } from '../components/MagneticButton'
 import { ContactForm } from '../components/ContactForm'
 import { PanelScroll } from '../components/PanelScroll'
 import { useCopy } from '../hooks/useCopy'
-import { brand, contact } from '../data/site'
+import { contact, phoenix } from '../data/site'
 
 export function Contact() {
   const { copied, copy } = useCopy()
@@ -25,13 +25,13 @@ export function Contact() {
             </p>
 
             <div className="mail-line rise" data-d="4">
-              <a className="mail-value" href={`mailto:${brand.email}`}>
-                {brand.email}
+              <a className="mail-value" href={`mailto:${phoenix.email}`}>
+                {phoenix.email}
               </a>
               <MagneticButton
                 className="btn ghost"
-                onClick={() => copy(brand.email)}
-                aria-label={`Copiar la dirección ${brand.email} al portapapeles`}
+                onClick={() => copy(phoenix.email)}
+                aria-label={`Copiar la dirección ${phoenix.email} al portapapeles`}
               >
                 {copied ? contact.copiedLabel : contact.copyLabel} ⧉
               </MagneticButton>

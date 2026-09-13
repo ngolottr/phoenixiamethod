@@ -2,7 +2,7 @@ import { SmartImage } from '../components/SmartImage'
 import { MagneticButton } from '../components/MagneticButton'
 import { PanelScroll } from '../components/PanelScroll'
 import { useAmbientApi } from '../hooks/useAmbient'
-import { brand, linkHub, socialScene, socials } from '../data/site'
+import { linkHub, persona, socialScene, socials } from '../data/site'
 
 /**
  * La escena que más convierte: acá la gente decide si te sigue.
@@ -71,7 +71,7 @@ export function Social({ onHome }: { onHome: () => void }) {
             ↺ Volver al inicio
           </MagneticButton>
           <span className="label">
-            © {brand.year} {brand.legalName} · {brand.location}
+            © {persona.year} {persona.legalName} · {persona.location}
           </span>
         </div>
       </PanelScroll>

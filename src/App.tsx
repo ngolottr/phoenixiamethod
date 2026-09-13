@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 
 import { Atmosphere, Curtain } from './components/Atmosphere'
 import { Cursor } from './components/Cursor'
@@ -6,7 +6,7 @@ import { Ripples } from './components/Ripples'
 import { Intro } from './components/Intro'
 import { Nav } from './components/Nav'
 
-import { usePreferences, useViewportHeight } from './hooks/usePreferences'
+import { pintarBarraDelNavegador, usePreferences, useViewportHeight } from './hooks/usePreferences'
 import { useMusica } from './hooks/useAudio'
 import { INICIO_DE_BLOQUE, SCENES, useSceneRouter } from './hooks/useSceneRouter'
 import { AmbientContext, useAmbientProvider } from './hooks/useAmbient'
@@ -83,6 +83,18 @@ export default function App() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [navLocked, next, prev, home, go])
+
+  /* La piel del sitio la decide el bloque, no la escena.
+     En el bloque de negocio manda Phoenix IA Method —brasa y fuego—; al pasar
+     al de marketing el sitio vuelve al esmeralda de ElGolott. Todo eso son
+     valores de token, así que basta con anunciar en <html> dónde estamos y el
+     CSS reescribe la paleta entera. Va en un efecto de disposición para que un
+     enlace directo a una escena personal no muestre primero un destello
+     naranjo antes de corregirse. */
+  useLayoutEffect(() => {
+    document.documentElement.dataset.bloque = scene.bloque
+    pintarBarraDelNavegador()
+  }, [scene.bloque])
 
   // Al cambiar de escena el color vuelve al de la marca: el tono de una
   // fotografía no debe quedarse pegado en la escena siguiente.

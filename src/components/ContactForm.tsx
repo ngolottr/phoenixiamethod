@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { MagneticButton } from './MagneticButton'
-import { brand, contact, presupuestos } from '../data/site'
+import { contact, phoenix, presupuestos } from '../data/site'
 
 type Values = { name: string; email: string; budget: string; message: string }
 type Errors = Partial<Record<keyof Values, string>>
@@ -77,11 +77,11 @@ export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
   }
 
   const mailto = () => {
-    const subject = encodeURIComponent(`Contacto desde el portfolio — ${values.name}`)
+    const subject = encodeURIComponent(`Contacto desde phoenixiamethod — ${values.name}`)
     const body = encodeURIComponent(
       `${values.message}\n\nPresupuesto: ${values.budget || 'No indicado'}\n\n—\n${values.name}\n${values.email}`,
     )
-    window.location.href = `mailto:${brand.email}?subject=${subject}&body=${body}`
+    window.location.href = `mailto:${phoenix.email}?subject=${subject}&body=${body}`
   }
 
   const err = (k: keyof Values) => (touched[k] ? errors[k] : undefined)
