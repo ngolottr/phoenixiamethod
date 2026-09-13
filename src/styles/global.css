@@ -2958,7 +2958,33 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
    texto mientras quepa —el comportamiento de siempre en pantallas normales— y
    crece cuando no cabe, con lo que la escena ya puede desplazarse hasta el
    final y el relleno inferior mantiene el texto sobre la barra. */
-.home-copy { height: auto; min-height: 100%; box-sizing: border-box; }
+.home-copy {
+  height: auto; min-height: 100%; box-sizing: border-box;
+  /* La escena es una columna flexible, y en una columna flexible un bloque que
+     no cabe se APLASTA en vez de empujar: la caja se quedaba en los 247 px
+     disponibles mientras su contenido seguía hasta los 401 y se derramaba por
+     debajo, encima de la barra. Sin encogimiento, la caja mide lo que mide su
+     contenido y el sobrante pasa a ser desplazamiento, que sí se puede
+     alcanzar. */
+  flex-shrink: 0;
+}
+
+/* --- 11. El sello, siempre en la franja libre -----------------------------
+   El sello que se puede arrastrar va en posición fija y se colocaba con un
+   porcentaje de la pantalla: en una ventana baja ese 22 % lo dejaba pisando el
+   botón de Ajustes. Acá se calcula desde el hueco real que queda entre las dos
+   barras, y se le da un techo de tamaño para que quepa dentro de ese hueco.
+   Solo en pantallas bajas: donde hay altura de sobra, el diseño no cambia. */
+@media (max-height: 620px) {
+  .sello:not(.is-suelto) {
+    top: calc(var(--nav-h) + (var(--vh) - var(--nav-h) - var(--pie-h)) / 2);
+    transform: translateY(-50%);
+  }
+  .sello {
+    width: min(clamp(96px, 13vw, 168px),
+               calc((var(--vh) - var(--nav-h) - var(--pie-h)) * .66));
+  }
+}
 
 /* La figura decorativa se mide en 72vh, y en una ventana baja esos 72 % se
    comían la franja de la barra superior: el sello quedaba cruzado con el botón
