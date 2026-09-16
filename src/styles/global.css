@@ -1577,6 +1577,82 @@ html[data-motion='reduced'] .work-vista-foto { animation: none; }
 }
 .work-row:hover .wt-mas, .work-row:focus-visible .wt-mas { opacity: 1; transform: translateX(0); }
 
+/* --- Servicios: la grilla de todo lo que se hace ---------------------------
+   Once tarjetas y el cierre del método. Se desplaza dentro de su propio panel
+   para que la llamada a la acción siga a la vista debajo. */
+.srv-cuerpo {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  margin-top: clamp(14px, 2.4vh, 28px);
+}
+.srv-panel { justify-content: flex-start !important; padding-right: 4px; }
+.srv-grilla {
+  list-style: none; margin: 0; padding: 0 0 8px;
+  display: grid; gap: clamp(10px, 1.2vw, 16px);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+}
+.srv-card {
+  position: relative;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: clamp(16px, 1.6vw, 22px);
+  border: 1px solid color-mix(in srgb, var(--amb-accent) 38%, transparent);
+  border-radius: 14px;
+  background:
+    radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--amb-accent) 10%, transparent), transparent 60%),
+    color-mix(in srgb, var(--amb-bg) 90%, var(--arena));
+  transition: border-color .4s var(--ease), transform .5s var(--ease), box-shadow .5s var(--ease);
+}
+.srv-card:hover {
+  border-color: var(--amb-accent);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px -18px var(--amb-glow), 0 0 0 1px color-mix(in srgb, var(--amb-accent) 30%, transparent);
+}
+html[data-motion='reduced'] .srv-card:hover { transform: none; }
+
+.srv-cabeza { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 12px; align-items: start; }
+.srv-icono {
+  width: 34px; height: 34px; flex: none;
+  fill: none; stroke: var(--amb-accent);
+  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+}
+.srv-titulo {
+  margin: 2px 0 6px;
+  font-family: var(--sans); font-weight: 700;
+  font-size: 12px; letter-spacing: .12em; text-transform: uppercase; line-height: 1.35;
+  color: var(--arena);
+}
+.srv-bajada { margin: 0; font-size: 13px; line-height: 1.5; color: var(--humo); }
+.srv-items {
+  list-style: none; margin: 0; padding: 12px 0 0;
+  border-top: 1px solid var(--linea);
+  display: grid; gap: 6px;
+}
+.srv-items li {
+  position: relative; padding-left: 14px;
+  font-size: 13px; line-height: 1.45; color: var(--arena);
+}
+.srv-items li::before {
+  content: ''; position: absolute; left: 0; top: .6em;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--amb-accent);
+}
+
+/* El cierre: no lista nada, explica qué une a las once */
+.srv-metodo { justify-content: center; }
+.srv-metodo .srv-icono { width: 42px; height: 42px; }
+.srv-metodo-t {
+  margin: 0; white-space: pre-line;
+  font-family: var(--serif); font-style: italic;
+  font-size: clamp(20px, 1.7vw, 26px); line-height: 1.15; color: var(--arena);
+}
+.srv-metodo-t em { color: var(--amb-accent); text-transform: uppercase; font-style: normal; }
+.srv-metodo-link {
+  align-self: flex-start; display: inline-flex; gap: 10px; align-items: center;
+  padding-top: 4px;
+  font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--amb-accent);
+}
+.srv-metodo-link span { transition: transform .4s var(--ease); }
+.srv-metodo-link:hover span, .srv-metodo-link:focus-visible span { transform: translateX(6px); }
+
 /* ===========================================================================
    EL EXPEDIENTE — datos reales del proyecto, sacados del vault
    =========================================================================== */

@@ -3,7 +3,10 @@ import { SmartImage } from '../components/SmartImage'
 import { CerebroEngranaje } from '../components/CerebroEngranaje'
 import { Vortex } from '../components/Vortex'
 import { CasoPanel } from '../components/CasoPanel'
+import { PanelScroll } from '../components/PanelScroll'
+import { ServicioIcono } from '../components/ServicioIcono'
 import { casos, type Caso } from '../data/proyectos'
+import { servicios, cierreMetodo } from '../data/servicios'
 
 const TONES = ['emerald', 'midnight', 'brass'] as const
 
@@ -25,26 +28,86 @@ export function Work({
   const [active, setActive] = useState<string | null>(null)
   const [abierto, setAbierto] = useState<Caso | null>(null)
   const [entrando, setEntrando] = useState(false)
+  /* Parte en los servicios: quien llega primero necesita saber si su problema
+     cae dentro de lo que se hace; los casos son la prueba, un clic después. */
+  const [vista, setVista] = useState<'servicios' | 'casos'>('servicios')
 
   /** El proyecto que se está señalando, para la vista previa de al lado. */
   const activo = casos.find((c) => c.index === active) ?? null
 
   return (
     <section className="scene" aria-labelledby="work-title">
-      <div className="rise" data-d="1">
-        <p className="eyebrow">Soluciones · Casos reales</p>
-        <h2 id="work-title" className="display h-md" style={{ marginTop: 12 }}>
-          Lo que ya
-          {'\n'}
-          <em>está funcionando.</em>
-        </h2>
+      <div className="gal-head rise" data-d="1">
+        <div>
+          <p className="eyebrow">
+            {vista === 'servicios' ? 'Soluciones · Lo que hacemos' : 'Soluciones · Casos reales'}
+          </p>
+          <h2 id="work-title" className="display h-md" style={{ marginTop: 12 }}>
+            {vista === 'servicios' ? 'Todo lo que' : 'Lo que ya'}
+            {'\n'}
+            <em>{vista === 'servicios' ? 'sabemos construir.' : 'está funcionando.'}</em>
+          </h2>
+        </div>
+
+        <div className="filters" role="group" aria-label="Cambiar vista">
+          <button
+            className="filter"
+            aria-pressed={vista === 'servicios'}
+            onClick={() => setVista('servicios')}
+          >
+            Servicios <span className="filter-n">{servicios.length}</span>
+          </button>
+          <button
+            className="filter"
+            aria-pressed={vista === 'casos'}
+            onClick={() => setVista('casos')}
+          >
+            Casos reales <span className="filter-n">{casos.length}</span>
+          </button>
+        </div>
       </div>
 
-      {/* La lista y su vista previa. Antes la fotografía era un fantasma que se
+      {vista === 'servicios' ? (
+        <div className="srv-cuerpo rise" data-d="2" key="servicios">
+          <PanelScroll className="srv-panel">
+            <ul className="srv-grilla">
+              {servicios.map((s) => (
+                <li className="srv-card" key={s.titulo}>
+                  <div className="srv-cabeza">
+                    <ServicioIcono nombre={s.icono} />
+                    <div>
+                      <h3 className="srv-titulo">{s.titulo}</h3>
+                      <p className="srv-bajada">{s.bajada}</p>
+                    </div>
+                  </div>
+                  <ul className="srv-items">
+                    {s.items.map((it) => (
+                      <li key={it}>{it}</li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+              <li className="srv-card srv-metodo">
+                <ServicioIcono nombre={cierreMetodo.icono} />
+                <p className="srv-metodo-t">
+                  {cierreMetodo.titulo}
+                  {'\n'}
+                  <em>{cierreMetodo.enfasis}</em>
+                </p>
+                <p className="srv-bajada">{cierreMetodo.texto}</p>
+                <button className="srv-metodo-link" onClick={() => setVista('casos')}>
+                  Ver casos reales <span aria-hidden="true">→</span>
+                </button>
+              </li>
+            </ul>
+          </PanelScroll>
+        </div>
+      ) : (
+      /* La lista y su vista previa. Antes la fotografía era un fantasma que se
           dibujaba DENTRO de la fila, encima de la descripción y de la categoría:
           ni se leía el texto ni se veía la foto. Ahora tiene columna propia, se
-          muestra entera y no pisa nada. */}
-      <div className="work-cuerpo rise" data-d="2">
+          muestra entera y no pisa nada. */
+      <div className="work-cuerpo rise" data-d="2" key="casos">
         <div className="work-list">
           {casos.map((c) => (
             <button
@@ -97,6 +160,7 @@ export function Work({
           </span>
         </aside>
       </div>
+      )}
 
       {/* --- La llamada: es el único elemento de la página que insiste --- */}
       <div className="cta rise" data-d="4">

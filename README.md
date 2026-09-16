@@ -60,6 +60,11 @@ tocar componentes para cambiar textos.
 entra lo que ya se construyó y se puede comprobar. Un servicio que suena bien
 pero todavía no se ha hecho no es un caso, es una promesa.
 
+**Los servicios van en `src/data/servicios.ts`.** Son el mapa de lo que se sabe
+hacer (sacado de la lámina "¿Qué es el Método Fénix con IA?") y se muestran en la
+misma escena de Soluciones, en una vista aparte de los casos: botón *Servicios* /
+*Casos reales*. Los íconos están dibujados a trazo en `components/ServicioIcono.tsx`.
+
 **El isotipo está en `src/components/Isotipo.tsx`,** con los trazados copiados
 tal cual del archivo de identidad
 (`02_Fenix_IA_Method/Identidad/creacion de marca/isotipo.svg`). Si la marca
