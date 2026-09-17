@@ -176,6 +176,13 @@ function memoria([cmd, clave, ...args]) {
       const z = mem.get(clave) || new Map()
       return [...z.values()].filter((p) => p >= Number(args[0]) && p <= Number(args[1])).length
     }
+    case 'INCR': {
+      const v = (Number(mem.get(clave)) || 0) + 1
+      mem.set(clave, v)
+      return v
+    }
+    case 'GET':
+      return mem.has(clave) ? String(mem.get(clave)) : null
     case 'EXPIRE':
       return 1
     default:
@@ -272,8 +279,10 @@ export function sistemaDe(ua) {
 
 /** Nombre legible de la fuente, a partir del host que trajo al visitante. */
 export function fuenteDe(host, utm) {
-  const u = String(utm || '').toLowerCase().trim()
-  if (u) return u.slice(0, 40)
+  // Solo letras, números y separadores: es un texto que escribe el visitante
+  // en la dirección, así que no se guarda tal cual.
+  const u = String(utm || '').toLowerCase().trim().replace(/[^a-z0-9._-]/g, '').slice(0, 30)
+  if (u) return u
   const h = String(host || '').toLowerCase().replace(/^www\./, '').replace(/^m\./, '').replace(/^l\./, '').replace(/^lm\./, '')
   if (!h) return 'directo'
   const conocidas = [

@@ -10,7 +10,9 @@
    código. Cinco intentos fallidos por IP cada quince minutos y se cierra.
    ========================================================================== */
 
+import crypto from 'node:crypto'
 import {
+  redis,
   claveCorrecta,
   emitirPase,
   enVercel,
@@ -39,12 +41,32 @@ export default async function handler(req, res) {
       return fallo(res, 400, 'No pude leer la contraseña.')
     }
     const ip = ipDe(req)
-    // El cupo se gasta solo con los intentos: primero se mira sin sumar.
-    if (!dentroDelCupo(`panel:ip:${ip}`, 6, 15 * 60000)) {
+    const bloqueo = () => {
       res.setHeader('Retry-After', '900')
       return fallo(res, 429, 'Demasiados intentos. Espera 15 minutos.')
     }
+    // Primera barrera, en la memoria de esta instancia.
+    if (!dentroDelCupo(`panel:ip:${ip}`, 6, 15 * 60000)) return bloqueo()
+
+    /* Segunda barrera, en la base: vale para todas las instancias a la vez.
+       Diez fallos por IP cada 15 minutos. No hay un bloqueo global a
+       propósito: bastaría con fallar desde cualquier lado para dejar a Nicolás
+       sin poder entrar. Contra muchas IP protege el largo de la contraseña
+       (12 caracteres al azar: probarlas todas tomaría millones de años). */
+    const kIp = `st:login:ip:${crypto.createHash('sha256').update(ip).digest('hex').slice(0, 24)}`
+    try {
+      const [fallosIp] = await redis([['GET', kIp]])
+      if (Number(fallosIp) >= 10) return bloqueo()
+    } catch {
+      /* sin base igual queda la primera barrera */
+    }
+
     if (!claveCorrecta(String(b.clave || '').slice(0, 200))) {
+      try {
+        await redis([['INCR', kIp], ['EXPIRE', kIp, 900]])
+      } catch {
+        /* idem */
+      }
       await new Promise((r) => setTimeout(r, 600))
       return fallo(res, 401, 'Contraseña incorrecta.')
     }

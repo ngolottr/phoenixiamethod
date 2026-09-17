@@ -18,13 +18,37 @@ import {
   huella,
   lugar,
   navegadorDe,
+  redis,
   registrar,
   sistemaDe,
 } from './_estadisticas.js'
 import { cuerpoDemasiadoGrande, ipDe, pasaLosCupos, sinCache, vieneDeLaWeb } from './_seguridad.js'
 
-const RE_NOMBRE = /^[a-z0-9_:.\-]{1,60}$/
 const RE_SESION = /^[A-Za-z0-9_-]{8,40}$/
+
+/* --- Qué nombres se aceptan ------------------------------------------------
+   Lista cerrada, no un patrón abierto. Con un patrón, cualquiera con una línea
+   de comandos podía inventar mil nombres distintos y llenar el panel de basura.
+   Y lo más importante: "contacto_enviado" y "reserva_hecha" NO están acá. Esas
+   las cuenta solo el servidor cuando el correo salió o el evento se creó; si
+   el navegador pudiera mandarlas, se podrían fabricar conversiones falsas. */
+const ESCENAS = new Set([
+  'inicio', 'trabajo', 'contacto', 'manifiesto', 'sobre-mi', 'redes', 'galeria', 'destacados', 'agendar',
+])
+const EVENTOS = new Set(['llamar', 'whatsapp', 'correo', 'copiar_email', 'abrir_agenda', 'cta_trabajemos', 'ver_casos'])
+const nombreValido = (tipo, n) =>
+  tipo === 'vista'
+    ? ESCENAS.has(n)
+    : EVENTOS.has(n) || /^abrir_caso:\d{2}$/.test(n) || (/^enlace:[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(n) && n.length <= 70)
+
+/* --- Techo diario ------------------------------------------------------------
+   El plan gratis de la base tiene 500.000 comandos al mes y cada golpe usa unos
+   diez. Los cupos por IP de _seguridad.js viven en la memoria de cada instancia:
+   alguien con muchas IP los esquiva. Este techo vive en la base, así que vale
+   para todas las instancias: pasado el límite del día se deja de anotar (el
+   sitio sigue funcionando igual) y el cupo del mes no se agota por un ataque.
+   Un día normal del sitio está muy por debajo. */
+const TECHO_DIARIO = 3000
 
 export default async function handler(req, res) {
   sinCache(res)
@@ -45,12 +69,20 @@ export default async function handler(req, res) {
   }
 
   const tipo = ['vista', 'evento', 'salida'].includes(b.tipo) ? b.tipo : null
-  const nombre = String(b.nombre || '').toLowerCase()
-  if (!tipo || (tipo !== 'salida' && !RE_NOMBRE.test(nombre))) return listo()
+  const nombre = String(b.nombre || '').toLowerCase().slice(0, 80)
+  if (!tipo || (tipo !== 'salida' && !nombreValido(tipo, nombre))) return listo()
 
   const ip = ipDe(req)
   // Una persona real no genera más de esto; un bucle sí.
-  if (!pasaLosCupos([[`evento:ip:${ip}`, 120, 10 * 60000], ['evento:total', 6000, 60000]])) return listo()
+  if (!pasaLosCupos([[`evento:ip:${ip}`, 120, 10 * 60000], ['evento:total', 300, 60000]])) return listo()
+
+  try {
+    const clave = `st:cupo:${diaDe()}`
+    const [usados] = await redis([['INCR', clave], ['EXPIRE', clave, 172800]])
+    if (Number(usados) > TECHO_DIARIO) return listo()
+  } catch {
+    return listo()
+  }
 
   const sesion = RE_SESION.test(String(b.sesion || '')) ? String(b.sesion) : ''
   let hostRef = ''

@@ -1,4 +1,4 @@
-# PHOENIX IA METHOD — sitio
+﻿# PHOENIX IA METHOD — sitio
 
 Sitio del negocio en React + Vite + TypeScript. Sin scroll: ocho escenas a
 pantalla completa que se recorren con flechas y teclado.
@@ -75,7 +75,7 @@ tal cual del archivo de identidad
 cambia, se cambia allá y se copia acá, nunca al revés.
 
 **Las fotos van en `public/images/`** con los nombres que indica
-`public/images/LEEME.md`. Mientras falte una, esa ranura dibuja por CSS la
+`docs/LEEME-imagenes.md`. Mientras falte una, esa ranura dibuja por CSS la
 atmósfera de la foto original y muestra en pequeño el nombre del archivo que
 espera — así el sitio nunca se ve roto.
 
@@ -179,7 +179,7 @@ y quien no las tenga cae en el respaldo sin que el sitio se descomponga.
 ├── vite.config.ts
 ├── tsconfig.json
 ├── public/
-│   └── images/            ← tus fotos van aquí (ver LEEME.md)
+│   └── images/            ← tus fotos van aquí (ver docs/LEEME-imagenes.md)
 ├── mockup/
 │   └── index.html         ← storyboard de dirección de arte (abrir en el navegador)
 └── src/
