@@ -189,7 +189,7 @@ export default async function handler(req, res) {
     const evento = await crearEvento({
       resumen: `Phoenix · ${nombre}`,
       descripcion: [
-        `Reunión de ${DURACION_MIN} minutos agendada desde phoenixiamethod.vercel.app`,
+        `Reunión de ${DURACION_MIN} minutos agendada desde phoenixiamethod.cl`,
         '',
         `Contacto: ${email}`,
         tema ? `\nQué quiere resolver:\n${tema}` : '',

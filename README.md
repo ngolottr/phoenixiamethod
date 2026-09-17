@@ -3,7 +3,11 @@
 Sitio del negocio en React + Vite + TypeScript. Sin scroll: ocho escenas a
 pantalla completa que se recorren con flechas y teclado.
 
-**Dominio:** `phoenixiamethod.vercel.app` (antes `elgolott.vercel.app`).
+**Dominio:** `phoenixiamethod.cl` desde el 16/09/2026, con los nameservers de
+Vercel (`ns1/ns2.vercel-dns.com`). `www.phoenixiamethod.cl` y
+`phoenixiamethod.vercel.app` redirigen ahí (ver `redirects` en `vercel.json`);
+las rutas `/api/` del `.vercel.app` NO se redirigen, para no romper llamadas
+automáticas que todavía usen esa dirección. Antes: `elgolott.vercel.app`.
 
 ---
 

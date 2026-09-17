@@ -86,7 +86,13 @@ export function pasaLosCupos(reglas) {
  */
 function anfitrionesPermitidos() {
   const desdeEntorno = [
-    process.env.SITIO_URL || 'https://phoenixiamethod.vercel.app',
+    (process.env.SITIO_URL || 'https://phoenixiamethod.cl').trim(),
+    // El dominio propio y sus dos alias. Las visitas a www y a .vercel.app se
+    // redirigen al .cl, pero una pestaña que quedó abierta antes del cambio
+    // sigue enviando desde el host viejo y no hay por qué rechazarla.
+    'https://phoenixiamethod.cl',
+    'https://www.phoenixiamethod.cl',
+    'https://phoenixiamethod.vercel.app',
     process.env.VERCEL_URL,                       // este despliegue
     process.env.VERCEL_BRANCH_URL,                // el de la rama
     process.env.VERCEL_PROJECT_PRODUCTION_URL,    // el de producción

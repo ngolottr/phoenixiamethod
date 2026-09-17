@@ -61,7 +61,8 @@ const REMITENTE = {
   name: 'Nicolás Golott',
   email: process.env.REMITENTE_EMAIL || 'contacto.nicolaspk@12068809.brevosend.com',
 }
-const SITIO = process.env.SITIO_URL || 'https://phoenixiamethod.vercel.app'
+// trim: al cargar la variable desde una terminal se puede colar un salto de línea
+const SITIO = (process.env.SITIO_URL || 'https://phoenixiamethod.cl').trim().replace(/\/$/, '')
 const HORARIO =
   'lunes a viernes desde las 20:30, sábados desde las 16:00 y domingos todo el día (hora de Chile)'
 
@@ -176,7 +177,7 @@ desde este mensaje.
     : `Ya se le envió el enlace para que elija su horario.
 Cuando reserve, el evento aparece solo en tu calendario de clientes.`
 
-  const texto = `${encabezado}Nueva solicitud desde phoenixiamethod.vercel.app
+  const texto = `${encabezado}Nueva solicitud desde phoenixiamethod.cl
 
 Nombre:       ${nombre}
 Correo:       ${email}
