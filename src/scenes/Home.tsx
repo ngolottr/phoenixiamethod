@@ -40,7 +40,14 @@ export function Home({
       </div>
 
       <div className="home-copy">
-        <p className="eyebrow rise" data-d="1">
+        {/* Solo en el teléfono vertical: la llama entra al flujo, arriba, en
+            una franja que mide lo que sobra de pantalla después del texto. Así
+            nunca queda detrás del titular y tampoco deja un hueco al pie. */}
+        <div className="home-llama-movil" aria-hidden="true">
+          <Isotipo className="home-isotipo" />
+        </div>
+
+        <p className="eyebrow rise home-eyebrow" data-d="1">
           {hero.eyebrow} — {phoenix.location}
         </p>
 

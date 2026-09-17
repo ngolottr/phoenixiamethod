@@ -3106,3 +3106,105 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
 .home-figura {
   max-height: calc(100% - var(--nav-h) - var(--pie-h) - 16px);
 }
+
+/* --- 12. El inicio en el teléfono vertical ---------------------------------
+   Reportado el 17/09 desde el navegador de Instagram: la bajada "Santiago,
+   Chile" tocaba el titular, el sello y la llama se montaban sobre las letras, y
+   abajo quedaba un hueco grande. La causa era que las tres piezas se ubicaban
+   cada una por su lado, con porcentajes fijos de la pantalla.
+
+   Ahora se reparten el alto REAL que queda entre las dos barras:
+     1. Arriba, la franja de la llama con el sello a su lado. Su alto (--zona)
+        es lo que sobra después de reservar el texto, con piso y techo: en un
+        teléfono alto la llama crece y llena; en uno bajo se achica.
+     2. Debajo, el texto, repartido en lo que queda sin tocar la llama.
+   Ninguna pieza se superpone a otra en ningún alto de pantalla. */
+@media (max-width: 760px) and (orientation: portrait) {
+  .home {
+    --libre: calc(var(--vh) - var(--nav-h) - var(--pie-h));
+    /* ~350 px es lo que mide el bloque de texto en un teléfono común */
+    --zona: clamp(92px, calc(var(--libre) - 350px), 300px);
+    --sello-t: clamp(72px, calc(var(--zona) * .78), 104px);
+  }
+
+  /* El espacio de las barras lo reserva el bloque de texto, no la escena:
+     con los dos a la vez se reservaba doble y el texto se salía por abajo. */
+  .home.scene { padding: 0; }
+
+  /* La figura de escritorio y su suelo se retiran: la llama va en el flujo */
+  .home-figura { display: none; }
+  .home-escena::after { display: none; }
+
+  .home-copy {
+    display: flex; flex-direction: column;
+    justify-content: flex-start;
+    min-height: 100%;
+    padding: calc(var(--nav-h) + var(--respiro)) var(--edge)
+             calc(var(--pie-h) + var(--respiro) + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Franja de la llama. Deja libre a la derecha el ancho del sello. */
+  .home-llama-movil {
+    display: flex; justify-content: center; align-items: center;
+    height: var(--zona); flex: 0 0 auto;
+    padding-right: calc(var(--sello-t) + 8px);
+    animation: figuraEntra 1.5s var(--ease) backwards;
+  }
+  .home-llama-movil .home-isotipo {
+    height: 100%; width: auto; max-width: 100%;
+    filter: drop-shadow(0 14px 44px rgba(242, 101, 34, .34));
+  }
+
+  /* El resplandor, detrás de la llama y no a media pantalla */
+  .home-aura {
+    right: auto; bottom: auto;
+    left: 50%; top: calc(var(--nav-h) + var(--respiro) + var(--zona) / 2);
+    width: min(80vw, calc(var(--zona) * 2.2));
+    transform: translate(calc(-50% - var(--sello-t) / 2), -50%);
+    animation: none;
+  }
+
+  /* El sello, a la derecha de la llama y centrado en su franja */
+  .sello:not(.is-suelto) {
+    right: var(--edge);
+    top: calc(var(--nav-h) + var(--respiro) + var(--zona) / 2);
+    transform: translateY(-50%);
+  }
+  .sello { width: var(--sello-t); }
+
+  /* El texto ocupa lo que queda y se reparte parejo: sin hueco al pie */
+  .home-eyebrow {
+    max-width: none !important;
+    margin-top: auto;
+    line-height: 1.7;
+  }
+  .home-name {
+    /* La serif lleva interlineado .84: sin este margen las mayúsculas suben
+       por encima de su caja y tocan la bajada. */
+    margin-top: .28em;
+    font-size: clamp(40px, min(14.5vw, calc(var(--libre) * .11)), 72px) !important;
+  }
+  .home-line { margin-top: clamp(14px, 2.6vh, 26px); }
+  .home-tag { font-size: clamp(16px, 4.6vw, 20px); padding-left: 16px; }
+  .home-cta { margin-top: clamp(16px, 3vh, 30px); }
+  .home-cta .btn { width: 100%; justify-content: center; padding-block: 15px; }
+  .home-ciclo {
+    margin-top: clamp(14px, 2.6vh, 24px); margin-bottom: auto;
+    gap: 10px;
+    font-size: 11px; letter-spacing: .2em;
+  }
+  .home-ciclo > span { gap: 10px; }
+}
+
+/* Teléfonos muy bajos (o el navegador de Instagram con sus dos barras): el
+   ciclo de tres palabras es lo primero que se va, antes que achicar la llama
+   por debajo de lo reconocible. */
+@media (max-width: 760px) and (orientation: portrait) and (max-height: 620px) {
+  .home { --zona: clamp(84px, calc(var(--libre) - 300px), 300px); }
+  .home-ciclo { display: none; }
+}
+
+/* Fuera del teléfono vertical la llama del flujo no existe */
+@media not all and (max-width: 760px) and (orientation: portrait) {
+  .home-llama-movil { display: none; }
+}
