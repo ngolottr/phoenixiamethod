@@ -189,6 +189,12 @@ export function Ajustes({
             Todo viene apagado para que el sitio abra liviano en cualquier equipo: mientras un
             efecto está apagado no se descarga su audio. Tu elección queda guardada.
           </p>
+
+          {/* La entrada al panel privado. Discreta a propósito: pide contraseña,
+              así que un visitante que la abra solo ve la puerta cerrada. */}
+          <a className="aj-panel-privado" href="./panel.html">
+            <span aria-hidden="true">▦</span> Estadísticas <em>· acceso privado</em>
+          </a>
         </div>
       )}
     </div>

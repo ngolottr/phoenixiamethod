@@ -10,6 +10,10 @@
 
 import '../styles/global.css'
 import './agendar.css'
+import { contarVista, iniciarAnalitica } from '../lib/analitica'
+
+iniciarAnalitica()
+contarVista('agendar')
 
 type Hora = { inicio: string; fin: string; etiqueta: string }
 type Dia = { fecha: string; diaSemana: number; horas: Hora[] }

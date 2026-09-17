@@ -8,6 +8,7 @@
    ========================================================================== */
 
 import { tramosOcupados, crearEvento } from './_google.js'
+import { contarDesdeServidor } from './_estadisticas.js'
 import { esHuecoValido, DURACION_MIN, partesEnChile } from './_agenda.js'
 import { CORREO_NICOLAS, enviarCorreo, escapar, enlaceAgregarACalendario } from './_correo.js'
 import {
@@ -206,6 +207,7 @@ export default async function handler(req, res) {
     // El evento ya está en la agenda. Los correos son deseables, pero si Brevo
     // falla la reserva sigue siendo válida: no se le dice que no a la persona.
     await avisar({ nombre, email, tema, cuando, enlaceReunion, revision }).catch(() => {})
+    await contarDesdeServidor(req, 'reserva_hecha')
 
     return res.status(200).json({ ok: true, cuando, enlace: enlaceReunion })
   } catch (e) {

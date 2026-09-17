@@ -368,6 +368,42 @@ Para disparar la publicación a mano:
 curl -X POST -H "Authorization: Bearer TU_CRON_SECRET" https://phoenixiamethod.vercel.app/api/publicar
 ```
 
+## Estadísticas propias y botón de llamada
+
+**Botón "Llamar ahora"** en la barra superior, en todas las escenas: enlace
+`tel:+56920596120`. El número está en `src/data/site.ts` (`phoenix.telefono`).
+
+**Estadísticas** sin Google Analytics ni cookies. Tres piezas:
+
+| Pieza | Qué hace |
+|---|---|
+| `src/lib/analitica.ts` | En el navegador: manda cada escena vista, los clics que importan (llamar, WhatsApp, correo, agenda, redes, y cualquier botón con `data-evento="…"`) y el tiempo en el sitio al salir |
+| `api/evento.js` | Recibe eso, descarta robots y guarda contadores por día en Upstash Redis |
+| `api/estadisticas.js` + `panel.html` | El panel privado con contraseña |
+
+`api/contacto.js` y `api/reservar.js` cuentan por su cuenta el formulario
+enviado y la reunión reservada, porque son ellas las que saben que de verdad pasó.
+
+**Entrar al panel:** en el sitio, Ajustes (⚙) → *Estadísticas · acceso privado*,
+o directo en `/panel.html`. La contraseña es la variable `ESTADISTICAS_CLAVE` de
+Vercel (una copia está en `CLAVE-ESTADISTICAS.txt`, que no se sube a git). Al
+entrar se puede marcar "no contar mis visitas" para ese dispositivo.
+
+**Privacidad:** no se guarda la IP. Cada visitante es una huella anónima que
+cambia cada día; sirve para contar personas distintas, no para seguir a nadie.
+Los contadores se borran solos a los ~13 meses.
+
+**Base de datos:** Upstash Redis, plan gratis, conectado desde Vercel → Storage.
+Sin conectar, el sitio funciona igual, no registra nada y el panel lo avisa.
+El plan gratis tiene cupo mensual de comandos: por eso el panel refresca lo
+"en vivo" cada 20 s y el periodo completo solo cada 5 min o al pedirlo.
+
+**Probar en local con las funciones:** dos servidores a la vez (están en
+`.claude/launch.json` de Neurona): `phoenix-con-api` (`vercel dev` en el 3000)
+y `phoenix-local-completo` (Vite en el 5173 con `--mode conapi`, que le pasa
+`/api` al 3000). En local la base es un archivo temporal, la contraseña es
+`local`, y el contador no manda nada salvo que la dirección lleve `?contar=1`.
+
 ## Un aviso sobre OneDrive
 
 Esta carpeta está dentro de OneDrive. `node_modules` tiene miles de archivos

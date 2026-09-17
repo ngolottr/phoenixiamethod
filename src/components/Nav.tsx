@@ -91,6 +91,22 @@ export function Nav({
         {/* Un atajo directo al tema, que es lo que más se toca, y el resto
             dentro del panel. Así la barra no crece con cada opción nueva. */}
         <div className="utils">
+          {/* Llamada inmediata, para quien necesita hablar ya. En el teléfono
+              abre el marcador; en el computador, la app de llamadas que haya.
+              Va en todas las escenas porque una urgencia no espera al final
+              del recorrido. */}
+          <a
+            className="util util-llamar"
+            href={`tel:${phoenix.telefono.tel}`}
+            title={`Llamar ahora: ${phoenix.telefono.visible}`}
+          >
+            <svg className="util-llamar-icono" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6.6 3.5h2.6l1.4 4.2-2 1.5a12 12 0 0 0 6.2 6.2l1.5-2 4.2 1.4v2.6A2.1 2.1 0 0 1 18.4 20 15.9 15.9 0 0 1 4 5.6a2.1 2.1 0 0 1 2.6-2.1z" />
+            </svg>
+            <span className="util-long">Llamar ahora</span>
+            <span className="sr-only">Llamar ahora a Nicolás: {phoenix.telefono.visible}</span>
+          </a>
+
           <button
             className="util util-tema"
             onClick={onToggleTheme}

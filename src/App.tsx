@@ -10,6 +10,7 @@ import { pintarBarraDelNavegador, usePreferences, useViewportHeight } from './ho
 import { useMusica } from './hooks/useAudio'
 import { INICIO_DE_BLOQUE, SCENES, useSceneRouter } from './hooks/useSceneRouter'
 import { AmbientContext, useAmbientProvider } from './hooks/useAmbient'
+import { contarVista, iniciarAnalitica } from './lib/analitica'
 
 import { Home } from './scenes/Home'
 import { About } from './scenes/About'
@@ -95,6 +96,15 @@ export default function App() {
     document.documentElement.dataset.bloque = scene.bloque
     pintarBarraDelNavegador()
   }, [scene.bloque])
+
+  // Estadísticas propias: el contador arranca una vez y cada escena cuenta
+  // como vista. Ver src/lib/analitica.ts.
+  useEffect(() => {
+    iniciarAnalitica()
+  }, [])
+  useEffect(() => {
+    contarVista(scene.id)
+  }, [scene.id])
 
   // Al cambiar de escena el color vuelve al de la marca: el tono de una
   // fotografía no debe quedarse pegado en la escena siguiente.

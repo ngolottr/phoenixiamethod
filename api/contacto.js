@@ -22,6 +22,7 @@
                        acepta el envío y después lo marca "Bloqueado".
    ========================================================================== */
 
+import { contarDesdeServidor } from './_estadisticas.js'
 import {
   MAX_ENLACES,
   RE_EMAIL,
@@ -425,5 +426,6 @@ export default async function handler(req, res) {
     console.error('[contacto] no llegó la copia interna →', e.message)
   }
 
+  await contarDesdeServidor(req, 'contacto_enviado')
   return res.status(200).json({ ok: true })
 }

@@ -60,6 +60,7 @@ export function Work({
           <button
             className="filter"
             aria-pressed={vista === 'casos'}
+            data-evento="ver_casos"
             onClick={() => setVista('casos')}
           >
             Casos reales <span className="filter-n">{casos.length}</span>
@@ -114,6 +115,7 @@ export function Work({
               key={c.index}
               className="work-row"
               data-open={active === c.index}
+              data-evento={`abrir_caso:${c.index}`}
               onClick={() => {
                 setAbierto(c)
                 onLockNav(true)
@@ -171,7 +173,7 @@ export function Work({
           </p>
         </div>
 
-        <button className="cta-btn" onClick={() => setEntrando(true)}>
+        <button className="cta-btn" data-evento="cta_trabajemos" onClick={() => setEntrando(true)}>
           <span className="cta-btn-bg" aria-hidden="true" />
           <span className="cta-btn-txt">Trabajemos juntos</span>
           <span className="cta-btn-arrow" aria-hidden="true">

@@ -81,6 +81,9 @@ export const phoenix = {
   proposito:
     'Ayudo a personas y equipos a meter inteligencia artificial y automatización en el trabajo que ya hacen: para ganar tiempo, ordenar procesos y resolver lo que hoy se resuelve a mano.',
   email: 'contacto.nicolaspk@gmail.com',
+  /* Para urgencias: el botón "Llamar" de la barra superior marca directo.
+     `tel` va en formato internacional para que funcione desde cualquier país. */
+  telefono: { tel: '+56920596120', visible: '+56 9 2059 6120' },
   dominio: 'phoenixiamethod.vercel.app',
   year: '2026',
 }

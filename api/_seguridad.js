@@ -90,6 +90,10 @@ function anfitrionesPermitidos() {
     process.env.VERCEL_URL,                       // este despliegue
     process.env.VERCEL_BRANCH_URL,                // el de la rama
     process.env.VERCEL_PROJECT_PRODUCTION_URL,    // el de producción
+    // Solo en el computador de trabajo (`vercel dev`): el sitio corre en Vite
+    // y le pasa las llamadas a las funciones. En Vercel, VERCEL vale "1"
+    // siempre, así que en internet no abre nada.
+    ...(process.env.VERCEL !== '1' ? ['http://localhost:5173', 'http://localhost:3000'] : []),
   ]
   return desdeEntorno
     .filter(Boolean)

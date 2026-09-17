@@ -240,7 +240,7 @@ export const casos: Caso[] = [
        propio navegador y comprobarlas mientras lee esto. */
     cifras: [
       { valor: '204 ms', etiqueta: 'Hasta quedar listo', nota: 'Medido en producción, no en el portátil del que lo hizo' },
-      { valor: '0', etiqueta: 'Dominios externos', nota: 'Ni un rastreador, ni una fuente de Google' },
+      { valor: '0', etiqueta: 'Dominios externos', nota: 'Ni rastreadores de terceros ni fuentes de Google: las visitas se cuentan en el propio sitio, sin cookies' },
       { valor: '2', etiqueta: 'Dependencias', nota: 'React y nada más' },
     ],
     tituloHerramientas: 'El sistema, no la plantilla',

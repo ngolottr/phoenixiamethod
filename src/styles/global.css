@@ -744,6 +744,43 @@ html[data-motion='reduced'] .pane-mas b { animation: none; }
 .util-tema:hover { color: var(--amb-accent); }
 .aj-boton[aria-expanded='true'] { color: var(--amb-accent); border-color: var(--amb-accent); }
 
+/* --- Llamar ahora ----------------------------------------------------------
+   El único control de la barra que va lleno: es para una urgencia y tiene que
+   encontrarse sin buscarlo. Un pulso lento lo señala sin volverlo alarma. */
+.util-llamar {
+  position: relative;
+  color: var(--brasa); background: var(--amb-accent); border-color: var(--amb-accent);
+  font-weight: 700; text-decoration: none;
+}
+.util-llamar:hover, .util-llamar:focus-visible {
+  color: var(--brasa); background: color-mix(in srgb, var(--amb-accent) 82%, white);
+  border-color: var(--amb-accent);
+}
+.util-llamar::after {
+  content: ''; position: absolute; inset: -1px; border-radius: inherit;
+  border: 1px solid var(--amb-accent);
+  animation: llamarPulso 2.6s var(--ease) infinite; pointer-events: none;
+}
+@keyframes llamarPulso {
+  0% { opacity: .7; transform: scale(1); }
+  70%, 100% { opacity: 0; transform: scale(1.35); }
+}
+html[data-motion='reduced'] .util-llamar::after { animation: none; opacity: 0; }
+.util-llamar-icono {
+  width: 13px; height: 13px; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round;
+}
+
+/* La puerta al panel de estadísticas, al pie de los ajustes */
+.aj-panel-privado {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--linea);
+  font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--humo); text-decoration: none;
+}
+.aj-panel-privado em { font-style: normal; letter-spacing: .08em; text-transform: none; opacity: .7; }
+.aj-panel-privado:hover, .aj-panel-privado:focus-visible { color: var(--amb-accent); }
+
 /* --- El panel de ajustes ------------------------------------------------- */
 
 .ajustes { position: relative; }
