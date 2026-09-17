@@ -369,7 +369,7 @@ mejor que desde un subdominio compartido.
 Para disparar la publicación a mano:
 
 ```bash
-curl -X POST -H "Authorization: Bearer TU_CRON_SECRET" https://phoenixiamethod.vercel.app/api/publicar
+curl -X POST -H "Authorization: Bearer TU_CRON_SECRET" https://phoenixiamethod.cl/api/publicar
 ```
 
 ## Estadísticas propias y botón de llamada
