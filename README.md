@@ -302,6 +302,26 @@ de Vercel, que es una casilla en el panel:
 - [ ] Vercel → **Firewall** → activar **Attack Challenge Mode** si alguna vez ves
       tráfico raro en los registros. Es un interruptor, no hay que configurarlo.
 
+### Auditoría del 17/09/2026 (dominio .cl y estadísticas)
+
+Revisado desde afuera y probado con ataques reales, sin dañar nada:
+
+| Qué | Estado |
+|---|---|
+| HTTPS | TLS 1.3, certificado Let's Encrypt; TLS 1.0 y 1.1 rechazados; http → https con 308 |
+| Cabeceras | CSP estricta, HSTS 2 años con subdominios, sin iframes ajenos, nosniff, permisos del navegador cerrados |
+| Archivos | `.env`, `.git`, código de `api/`, `package.json`, mapas de código: todo 404. Las notas `LEEME.md` salieron de `public/` a `docs/` |
+| Despliegues viejos | Las URL `phoenixiamethod-xxxx-ngolottr.vercel.app` piden login de Vercel |
+| DNS | Nameservers de Vercel; CAA solo Let's Encrypt, Google y Sectigo; subdominios inventados dan 404 de Vercel y no se pueden reclamar desde otra cuenta sin verificar el dominio |
+| Correo falso con @phoenixiamethod.cl | Bloqueado: SPF `-all`, DMARC `p=reject`, MX nulo y DKIM vacío. **Si algún día se usa correo con el dominio (Brevo, Google Workspace), hay que reemplazar estos cuatro registros** |
+| Estadísticas | Solo escenas y acciones de una lista cerrada; formulario y reserva solo los cuenta el servidor; techo de 3.000 golpes diarios en la base; `utm` saneado; todo lo que muestra el panel pasa por escape |
+| Panel | Contraseña al azar de 12 caracteres, 10 fallos por IP cada 15 min guardados en la base, pase firmado de 30 días, `noindex` y `no-store` |
+
+Lo que no se puede cerrar desde el código: **DNSSEC** (el DNS de Vercel no lo
+ofrece) y que alguien con la línea de comandos mande visitas falsas que parezcan
+reales. Eso último pasa con cualquier contador, incluido Google Analytics; los
+techos de arriba lo limitan.
+
 ## El correo: por dónde sale y qué mirar cuando no llega
 
 Todo el correo del sitio —la respuesta al formulario, la copia interna y la
