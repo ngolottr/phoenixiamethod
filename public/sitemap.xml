@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  El sitio es una sola pagina: las escenas (#trabajo, #manifiesto, #contacto)
+  viven dentro de la misma direccion, asi que Google indexa una sola URL y no
+  corresponde listarlas como paginas aparte.
+  Si algun dia hay paginas de verdad (un caso por URL, un blog), se agregan aca.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://phoenixiamethod.cl/</loc>
+    <lastmod>2026-09-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

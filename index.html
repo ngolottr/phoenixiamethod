@@ -8,11 +8,20 @@
          Este valor es solo el de arranque, la brasa de Phoenix. -->
     <meta name="theme-color" content="#120B07" />
     <meta name="description" content="Phoenix IA Method — Inteligencia artificial y automatización aplicadas al trabajo que ya haces. Primero el problema, después la tecnología. Nicolás Golott, Santiago de Chile." />
+    <!-- La direccion oficial y unica del sitio. Sin esto, Google puede tratar
+         phoenixiamethod.vercel.app, el www y el .cl como tres paginas distintas
+         que compiten entre si, aunque redirijan. -->
+    <link rel="canonical" href="https://phoenixiamethod.cl/" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
     <meta property="og:title" content="Phoenix IA Method" />
     <meta property="og:description" content="IA y automatización aplicadas a problemas reales. Primero el problema, después la tecnología." />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_CL" />
-    <meta property="og:image" content="./images/marca/og.png" />
+    <meta property="og:site_name" content="Phoenix IA Method" />
+    <meta property="og:url" content="https://phoenixiamethod.cl/" />
+    <!-- Absoluta a proposito: WhatsApp, Instagram y LinkedIn no resuelven una
+         ruta relativa cuando leen la vista previa del enlace. -->
+    <meta property="og:image" content="https://phoenixiamethod.cl/images/marca/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -24,11 +33,76 @@
          Phoenix va dibujado dentro del propio JavaScript, así que llega con la
          página. Antes se precargaba la fotografía del hero, que pesaba y que
          ahora vive en el bloque de marketing. -->
-    <title>Phoenix IA Method — IA y automatización aplicadas</title>
+    <title>Phoenix IA Method — IA y automatización aplicadas | Santiago, Chile</title>
+    <!--
+      Ficha del negocio para los buscadores. Google lee esto directo del HTML,
+      sin tener que ejecutar el sitio: es lo que le permite entender QUE es
+      Phoenix, DONDE trabaja y COMO contactarlo aunque el contenido se dibuje
+      despues con JavaScript.
+      Todo lo que dice aca es real y esta tambien en la pagina: no se inventan
+      clientes, cifras ni premios.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": "Phoenix IA Method",
+        "alternateName": "Phoenix",
+        "url": "https://phoenixiamethod.cl/",
+        "image": "https://phoenixiamethod.cl/images/marca/og.png",
+        "description": "Inteligencia artificial y automatización aplicadas al trabajo que ya haces: ganar tiempo, ordenar procesos y resolver lo que hoy se hace a mano. Primero el problema, después la tecnología.",
+        "slogan": "Primero el problema. Después la tecnología.",
+        "founder": { "@type": "Person", "name": "Nicolás Golott" },
+        "email": "contacto.nicolaspk@gmail.com",
+        "telephone": "+56920596120",
+        "inLanguage": "es-CL",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Santiago",
+          "addressCountry": "CL"
+        },
+        "areaServed": { "@type": "Country", "name": "Chile" },
+        "knowsAbout": [
+          "Inteligencia artificial aplicada",
+          "Automatización de procesos",
+          "Agentes de IA",
+          "Desarrollo web",
+          "Integraciones y flujos de trabajo"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <noscript>Este sitio necesita JavaScript activado para funcionar.</noscript>
+    <!--
+      Lo que ve un buscador (o una persona) si el JavaScript no corre. No es
+      decoracion: es el unico texto del sitio que existe antes de que React
+      dibuje nada, y le da a Google algo que leer en la primera pasada.
+    -->
+    <noscript>
+      <h1>Phoenix IA Method</h1>
+      <p>
+        Inteligencia artificial y automatización aplicadas al trabajo que ya haces.
+        Primero el problema, después la tecnología.
+      </p>
+      <p>
+        Ayudo a personas y equipos de Chile a meter IA y automatización en sus
+        procesos: para ganar tiempo, ordenar el trabajo y resolver lo que hoy se
+        hace a mano.
+      </p>
+      <ul>
+        <li>Inteligencia artificial aplicada y agentes</li>
+        <li>Automatización e integraciones entre herramientas</li>
+        <li>Desarrollo web y aplicaciones</li>
+        <li>Consultoría e implementación</li>
+      </ul>
+      <p>
+        Nicolás Golott — Santiago, Chile ·
+        <a href="mailto:contacto.nicolaspk@gmail.com">contacto.nicolaspk@gmail.com</a> ·
+        <a href="tel:+56920596120">+56 9 2059 6120</a>
+      </p>
+      <p>Este sitio necesita JavaScript activado para funcionar completo.</p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

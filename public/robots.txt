@@ -1,0 +1,14 @@
+# phoenixiamethod.cl
+# Lo que Google puede recorrer. El panel de estadisticas, la pagina de agenda y
+# las funciones de la API quedan fuera: no son contenido publico y ya responden
+# con X-Robots-Tag noindex desde vercel.json.
+
+User-agent: *
+Allow: /
+Disallow: /panel
+Disallow: /panel.html
+Disallow: /agendar
+Disallow: /agendar.html
+Disallow: /api/
+
+Sitemap: https://phoenixiamethod.cl/sitemap.xml
