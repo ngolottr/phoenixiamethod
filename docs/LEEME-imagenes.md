@@ -10,7 +10,13 @@ atmósfera de la foto original y el nombre del archivo que espera.
 | `about-1.jpg` | Escena 02 — retrato grande | vertical 3:4 |
 | `about-2.jpg` | Escena 02 — retrato pequeño superpuesto | cuadrado 1:1 |
 | `gallery-01.jpg` … `gallery-06.jpg` | Escena 03 — galería y visor | vertical 3:4 |
-| `work-01.jpg` … `work-04.jpg` | Escena 04 — imagen fantasma tras cada fila | vertical 4:5 |
+
+**Los casos ya no llevan foto.** El marco de la escena de Soluciones se dibuja
+solo: son láminas en SVG (`src/components/GraficoCaso.tsx`) que muestran el
+trabajo —la curva de seguidores, el flujo de n8n, la tienda— en vez de una
+fotografía que no decía nada de él. La única excepción es Neurona, que usa la
+captura de Obsidian que ya está en `images/herramientas/`. No hay que preparar
+ningún archivo para esa escena.
 
 ## Recomendaciones
 

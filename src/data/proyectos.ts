@@ -63,12 +63,25 @@ export type Paleta = {
   marcas: MarcaColor[]
 }
 
+/**
+ * Las láminas dibujadas que ilustran un caso, en `components/GraficoCaso`.
+ *
+ * Tres de los cuatro casos llevaban una fotografía del vault —un escritorio,
+ * un render, un espejo— que no decía nada del trabajo que estaba ilustrando.
+ * Un caso de automatización se enseña con su flujo, no con un retrato. Neurona
+ * es la excepción y mantiene su captura: ahí la herramienta ES la prueba.
+ */
+export type GraficoNombre = 'redes' | 'agentes' | 'sitios'
+
 export type Caso = {
   index: string
   title: string
   category: string
   meta: string
+  /** La fotografía del caso. Se ignora cuando hay `grafico`. */
   image: string
+  /** La lámina dibujada, cuando el caso se explica mejor con un esquema. */
+  grafico?: GraficoNombre
   /** una línea, la que se lee en el índice */
   description: string
   estado: string
@@ -93,6 +106,7 @@ export const casos: Caso[] = [
     category: 'Contenido · Sistema',
     meta: 'En curso · 2026',
     image: 'images/setup-gaming.jpg',
+    grafico: 'redes',
     description:
       'El laboratorio de Phoenix: llegar a 100.000 seguidores usando IA como sistema de trabajo, documentando todo.',
     estado: 'En curso',
@@ -144,6 +158,7 @@ export const casos: Caso[] = [
     category: 'Automatización · n8n',
     meta: 'En diseño',
     image: 'images/minecraft-render.jpg',
+    grafico: 'agentes',
     description:
       'Cadenas de agentes que hacen el trabajo repetitivo: deciden con datos, publican solas y devuelven métricas.',
     estado: 'En diseño',
@@ -230,6 +245,7 @@ export const casos: Caso[] = [
     category: 'Producto digital',
     meta: 'Este sitio',
     image: 'images/espejo-amarillo.jpg',
+    grafico: 'sitios',
     description:
       'Cuando la solución es un producto digital: construido pieza por pieza, sin plantilla y hecho para terminar en una conversación.',
     estado: 'Disponible',

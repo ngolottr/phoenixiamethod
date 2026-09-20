@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { SmartImage } from '../components/SmartImage'
+import { GraficoCaso } from '../components/GraficoCaso'
 import { CerebroEngranaje } from '../components/CerebroEngranaje'
 import { Vortex } from '../components/Vortex'
 import { CasoPanel } from '../components/CasoPanel'
@@ -150,10 +151,18 @@ export function Work({
             <CerebroEngranaje />
           </span>
 
+          {/* Casi todos los casos se explican mejor dibujados que fotografiados:
+              un flujo de agentes o una tienda se entienden de un vistazo, y una
+              foto del escritorio no dice nada. El que conserva captura es
+              Neurona, donde la herramienta misma es la prueba. */}
           {casos.map((c, i) =>
             active === c.index ? (
               <span className="work-vista-foto" key={c.index}>
-                <SmartImage src={c.image} alt="" tone={TONES[i % TONES.length]} />
+                {c.grafico ? (
+                  <GraficoCaso nombre={c.grafico} />
+                ) : (
+                  <SmartImage src={c.image} alt="" tone={TONES[i % TONES.length]} />
+                )}
               </span>
             ) : null,
           )}

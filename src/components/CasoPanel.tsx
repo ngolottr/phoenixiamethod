@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { SmartImage } from './SmartImage'
+import { GraficoCaso } from './GraficoCaso'
 import { MagneticButton } from './MagneticButton'
 import type { Caso } from '../data/proyectos'
 
@@ -179,8 +180,11 @@ export function CasoPanel({ caso, onClose }: { caso: Caso; onClose: () => void }
           </div>
         </div>
 
-        <div className="caso-foto" aria-hidden="true">
-          <SmartImage src={caso.image} alt="" />
+        {/* El telón del fondo: la misma lámina del marco, muy atrás. Va un poco
+            menos apagada que una fotografía porque es trazo fino y al 10 % no
+            se vería nada. */}
+        <div className={`caso-foto${caso.grafico ? ' es-grafico' : ''}`} aria-hidden="true">
+          {caso.grafico ? <GraficoCaso nombre={caso.grafico} /> : <SmartImage src={caso.image} alt="" />}
         </div>
       </div>
     </div>,

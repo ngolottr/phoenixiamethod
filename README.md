@@ -64,6 +64,22 @@ tocar componentes para cambiar textos.
 entra lo que ya se construyó y se puede comprobar. Un servicio que suena bien
 pero todavía no se ha hecho no es un caso, es una promesa.
 
+**Cada caso se ilustra con una lámina dibujada, no con una fotografía.** Están en
+`components/GraficoCaso.tsx` y se eligen con el campo `grafico` del caso
+(`redes`, `agentes` o `sitios`); sin ese campo se usa la foto de `image`. El
+cambio se hizo porque el marco llevaba fotos del vault —un escritorio, un
+render, un espejo— que no decían nada del trabajo que estaban ilustrando: quien
+señala "Agentes y automatización" quiere ver un flujo, no un retrato. La
+excepción es **Neurona**, que mantiene su captura de Obsidian porque ahí la
+herramienta misma es la prueba.
+
+Las láminas van en SVG por lo mismo que el isotipo: pesan un par de kilobytes,
+no se pixelan y se tiñen solas con el tema claro/oscuro y con las dos marcas, en
+vez de obligar a mantener cuatro imágenes por caso. Las cifras que aparecen
+dentro (6.688 · 4.690 · 422, el 11,8 %) son las mismas del expediente: **si
+cambian en `proyectos.ts`, hay que cambiarlas también en la lámina**, porque una
+prueba que dejó de ser cierta es peor que no tener prueba.
+
 **Los servicios van en `src/data/servicios.ts`.** Son el mapa de lo que se sabe
 hacer (sacado de la lámina "¿Qué es el Método Fénix con IA?") y se muestran en la
 misma escena de Soluciones, en una vista aparte de los casos: botón *Servicios* /
@@ -194,6 +210,7 @@ y quien no las tenga cae en el respaldo sin que el sitio se descomponga.
     ├── components/
     │   ├── Atmosphere.tsx      ← grano, viñeta, halo y cortina de transición
     │   ├── Cursor.tsx          ← cursor personalizado
+    │   ├── GraficoCaso.tsx     ← las láminas dibujadas de los casos (SVG)
     │   ├── Intro.tsx           ← telón de apertura, con el isotipo
     │   ├── Isotipo.tsx         ← el emblema de Phoenix, copiado de la identidad
     │   ├── Lightbox.tsx        ← visor de galería (portal, foco atrapado)
