@@ -80,6 +80,23 @@ dentro (6.688 · 4.690 · 422, el 11,8 %) son las mismas del expediente: **si
 cambian en `proyectos.ts`, hay que cambiarlas también en la lámina**, porque una
 prueba que dejó de ser cierta es peor que no tener prueba.
 
+**Los precios van en dos archivos, y hay que saber cuál toca cada cosa.** Los
+montos viven en **`api/_precios.js`** —y solo ahí— porque los necesitan los dos
+lados: el sitio para mostrarlos y la función de cobro para cobrarlos. El texto
+de cada paquete (qué incluye, qué advertencia lleva el botón) está en
+`src/data/precios.ts`, que importa las cifras de allá. Dos listas de precios en
+dos archivos se desincronizan, y el día que pasa, la web muestra un número y
+Flow cobra otro.
+
+Para **subir un precio** se cambia `total` en `api/_precios.js` y nada más: el
+dólar se recalcula solo y el anticipo también. Si se mueve el dólar, se cambia
+`CAMBIO` en `src/data/precios.ts`, que lleva la fecha anotada a propósito.
+
+Regla de seguridad que no se negocia: **el monto que se cobra sale siempre del
+servidor, nunca del navegador.** La página manda el identificador del paquete;
+el precio lo pone `api/pagar.js`. Un formulario que envía el precio es un
+formulario donde el precio lo decide el cliente.
+
 **Los servicios van en `src/data/servicios.ts`.** Son el mapa de lo que se sabe
 hacer (sacado de la lámina "¿Qué es el Método Fénix con IA?") y se muestran en la
 misma escena de Soluciones, en una vista aparte de los casos: botón *Servicios* /
@@ -278,6 +295,60 @@ compartir un enlace directo a una sección y el botón atrás del navegador func
 - **Peso:** ~55 kB de JavaScript y ~6 kB de CSS comprimidos.
 - **`base: './'`** en `vite.config.ts`: el `dist/` funciona tal cual en Netlify,
   Vercel, GitHub Pages o abierto desde una carpeta.
+
+## Cobrar en línea (Flow)
+
+Se eligió **Flow** sobre Webpay y Mercado Pago por dos razones medibles: cobra
+**2,89 % + IVA**, la comisión más baja de las tres, y **no tiene costo fijo
+mensual** — los meses sin ventas no cuestan nada. Stripe no era opción: no opera
+en Chile.
+
+**Qué se puede pagar y qué no.** El *Diagnóstico* ($90.000) y el
+*Acompañamiento* ($290.000/mes) se pagan completos. Los proyectos grandes cobran
+un **anticipo del 30 %** que reserva el cupo, y el resto se acuerda en la
+reunión — vender un proyecto de $690.000 con un clic y sin hablar antes termina
+en devoluciones. *Proyecto especial* no tiene precio y va a conversación: por eso
+no está en `PRECIOS` y la función lo rechaza si alguien lo intenta.
+
+**Las piezas**
+
+| Archivo | Qué hace |
+|---|---|
+| `api/_precios.js` | Los montos. Única fuente, la leen el sitio y el servidor |
+| `api/_flow.js` | Firma HMAC-SHA256, crear orden y consultar estado |
+| `api/pagar.js` | Abre la orden y devuelve a dónde mandar al comprador |
+| `api/pago-confirmado.js` | El aviso de Flow. **Esto, y solo esto, da una venta por buena** |
+| `api/pago-listo.js` | La pantalla que ve el comprador al volver. No registra nada |
+
+**Por qué hay dos vueltas y no una.** El aviso de Flow y el regreso del
+comprador llegan los dos por internet abierto y los dos se pueden falsificar con
+un `curl`. Por eso ninguno se cree: de ellos se usa solo el token, y el estado
+se va a buscar a Flow firmando con la clave secreta. Si el sistema confiara en
+lo que trae el aviso, cualquiera podría anunciar ventas que nunca ocurrieron.
+
+**Variables de entorno** (Vercel → Settings → Environment Variables):
+
+| Variable | Qué es |
+|---|---|
+| `FLOW_API_KEY` | La llave pública del comercio (Flow → Configuración → API) |
+| `FLOW_SECRET_KEY` | La secreta. **Nunca en el repositorio ni en un chat** |
+| `FLOW_API` | `https://sandbox.flow.cl/api` para probar, `https://www.flow.cl/api` para cobrar de verdad |
+
+**`FLOW_API` viene en modo pruebas por omisión, y es a propósito.** Si el valor
+por defecto fuera producción, cualquier despliegue mal configurado —una rama, un
+olvido— empezaría a cobrarle de verdad a gente de verdad. Para cobrar en serio
+hay que decirlo explícitamente.
+
+En el panel de Flow hay que dejar puestas las dos direcciones de retorno:
+
+- Confirmación: `https://phoenixiamethod.cl/api/pago-confirmado`
+- Retorno: `https://phoenixiamethod.cl/api/pago-listo`
+
+**Qué NO guarda este sitio:** ningún dato de tarjeta. Eso ocurre entero dentro
+de Flow, en su propia página. Acá solo pasan el nombre, el correo y qué paquete
+se compró.
+
+---
 
 ## Seguridad
 

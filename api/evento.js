@@ -35,11 +35,22 @@ const RE_SESION = /^[A-Za-z0-9_-]{8,40}$/
 const ESCENAS = new Set([
   'inicio', 'trabajo', 'contacto', 'manifiesto', 'sobre-mi', 'redes', 'galeria', 'destacados', 'agendar',
 ])
-const EVENTOS = new Set(['llamar', 'whatsapp', 'correo', 'copiar_email', 'abrir_agenda', 'cta_trabajemos', 'ver_casos'])
+const EVENTOS = new Set([
+  'llamar', 'whatsapp', 'correo', 'copiar_email', 'abrir_agenda', 'cta_trabajemos', 'ver_casos',
+  // Precios. "comprar:X" es solo que abrió la ventanita de compra: la VENTA no
+  // se cuenta acá nunca, la cuenta el servidor en pago-confirmado.js cuando
+  // Flow confirma. Si el navegador pudiera declarar ventas, cualquiera podría
+  // fabricar ingresos falsos en el panel con una línea de consola.
+  'ver_precios', 'precio_conversar',
+])
+const RE_PAQUETE = /^(comprar|hablar):[a-z]{4,20}$/
 const nombreValido = (tipo, n) =>
   tipo === 'vista'
     ? ESCENAS.has(n)
-    : EVENTOS.has(n) || /^abrir_caso:\d{2}$/.test(n) || (/^enlace:[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(n) && n.length <= 70)
+    : EVENTOS.has(n) ||
+      /^abrir_caso:\d{2}$/.test(n) ||
+      RE_PAQUETE.test(n) ||
+      (/^enlace:[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(n) && n.length <= 70)
 
 /* --- Techo diario ------------------------------------------------------------
    El plan gratis de la base tiene 500.000 comandos al mes y cada golpe usa unos

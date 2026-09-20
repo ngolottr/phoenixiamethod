@@ -6,8 +6,10 @@ import { Vortex } from '../components/Vortex'
 import { CasoPanel } from '../components/CasoPanel'
 import { PanelScroll } from '../components/PanelScroll'
 import { ServicioIcono } from '../components/ServicioIcono'
+import { Precios } from '../components/Precios'
 import { casos, type Caso } from '../data/proyectos'
 import { servicios, cierreMetodo } from '../data/servicios'
+import { paquetes } from '../data/precios'
 
 const TONES = ['emerald', 'midnight', 'brass'] as const
 
@@ -30,8 +32,10 @@ export function Work({
   const [abierto, setAbierto] = useState<Caso | null>(null)
   const [entrando, setEntrando] = useState(false)
   /* Parte en los servicios: quien llega primero necesita saber si su problema
-     cae dentro de lo que se hace; los casos son la prueba, un clic después. */
-  const [vista, setVista] = useState<'servicios' | 'casos'>('servicios')
+     cae dentro de lo que se hace; los casos son la prueba, un clic después, y
+     los precios el tercer paso —cuánto cuesta importa recién cuando ya sabes
+     que esto es para ti y que funciona. Ese es el orden de la conversación. */
+  const [vista, setVista] = useState<'servicios' | 'casos' | 'precios'>('servicios')
 
   /** El proyecto que se está señalando, para la vista previa de al lado. */
   const activo = casos.find((c) => c.index === active) ?? null
@@ -41,12 +45,22 @@ export function Work({
       <div className="gal-head rise" data-d="1">
         <div>
           <p className="eyebrow">
-            {vista === 'servicios' ? 'Soluciones · Lo que hacemos' : 'Soluciones · Casos reales'}
+            {vista === 'servicios'
+              ? 'Soluciones · Lo que hacemos'
+              : vista === 'casos'
+                ? 'Soluciones · Casos reales'
+                : 'Soluciones · Precios'}
           </p>
           <h2 id="work-title" className="display h-md" style={{ marginTop: 12 }}>
-            {vista === 'servicios' ? 'Todo lo que' : 'Lo que ya'}
+            {vista === 'servicios' ? 'Todo lo que' : vista === 'casos' ? 'Lo que ya' : 'Cuánto cuesta,'}
             {'\n'}
-            <em>{vista === 'servicios' ? 'sabemos construir.' : 'está funcionando.'}</em>
+            <em>
+              {vista === 'servicios'
+                ? 'sabemos construir.'
+                : vista === 'casos'
+                  ? 'está funcionando.'
+                  : 'dicho de frente.'}
+            </em>
           </h2>
         </div>
 
@@ -66,10 +80,24 @@ export function Work({
           >
             Casos reales <span className="filter-n">{casos.length}</span>
           </button>
+          <button
+            className="filter"
+            aria-pressed={vista === 'precios'}
+            data-evento="ver_precios"
+            onClick={() => setVista('precios')}
+          >
+            Precios <span className="filter-n">{paquetes.length}</span>
+          </button>
         </div>
       </div>
 
-      {vista === 'servicios' ? (
+      {vista === 'precios' ? (
+        <div className="srv-cuerpo rise" data-d="2" key="precios">
+          <PanelScroll className="srv-panel">
+            <Precios onContacto={() => setEntrando(true)} />
+          </PanelScroll>
+        </div>
+      ) : vista === 'servicios' ? (
         <div className="srv-cuerpo rise" data-d="2" key="servicios">
           <PanelScroll className="srv-panel">
             <ul className="srv-grilla">

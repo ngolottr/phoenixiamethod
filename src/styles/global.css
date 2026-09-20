@@ -1576,6 +1576,175 @@ html[data-motion='reduced'] .cerebro-engranaje { animation: none; }
 @keyframes vistaEntra { from { opacity: 0; } }
 html[data-motion='reduced'] .work-vista-foto { animation: none; }
 
+/* ===========================================================================
+   LOS PRECIOS
+   ---------------------------------------------------------------------------
+   Tercera vista de Soluciones, después de los servicios y los casos. Ese orden
+   es la conversación: qué se hace, que funciona, cuánto cuesta.
+
+   La cifra manda en cada tarjeta y el resto se le subordina: el peso grande y
+   en serif, el dólar debajo, chico y apagado, porque es referencia y no precio.
+   La letra chica va VISIBLE bajo el botón —quien está a punto de pagar tiene
+   derecho a saber si eso es el total o un anticipo antes de hacer clic, no
+   después.
+   =========================================================================== */
+
+.pr-grilla {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: clamp(12px, 1.6vw, 20px);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.pr-card {
+  position: relative;
+  display: flex; flex-direction: column;
+  padding: clamp(18px, 2.2vw, 26px);
+  border: 1px solid var(--linea);
+  background: color-mix(in srgb, var(--amb-bg) 72%, transparent);
+  transition: border-color .45s var(--ease);
+}
+.pr-card:hover { border-color: var(--linea-fuerte); }
+
+/* El de entrada, no el más caro: es el que conviene que se compre primero */
+.pr-card.es-destacado {
+  border-color: color-mix(in srgb, var(--amb-accent) 50%, transparent);
+  background: color-mix(in srgb, var(--amb-accent) 5%, var(--amb-bg));
+}
+.pr-sello {
+  position: absolute; top: -1px; right: clamp(14px, 2vw, 22px);
+  padding: 4px 10px 5px;
+  background: var(--amb-accent); color: var(--brasa);
+  font-size: 8.5px; letter-spacing: .18em; text-transform: uppercase; font-weight: 600;
+}
+
+.pr-cabeza { margin-bottom: 18px; }
+.pr-titulo {
+  font-family: var(--serif); font-weight: 400;
+  font-size: clamp(19px, 1.5vw, 23px); line-height: 1.15;
+  margin: 0 0 8px; color: var(--arena);
+}
+.pr-bajada { font-size: 12.5px; line-height: 1.55; color: var(--humo); margin: 0; }
+
+/* --- La cifra ------------------------------------------------------------- */
+.pr-cifra {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 7px;
+  padding: 14px 0 16px; margin-bottom: 16px;
+  border-top: 1px solid var(--linea); border-bottom: 1px solid var(--linea);
+}
+.pr-desde, .pr-sufijo {
+  font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--humo);
+}
+.pr-clp {
+  font-family: var(--serif); font-size: clamp(26px, 2.4vw, 34px);
+  line-height: 1; color: var(--amb-accent); letter-spacing: -.01em;
+}
+.pr-clp.a-conversar { font-size: clamp(19px, 1.6vw, 23px); color: var(--ambar); font-style: italic; }
+/* Referencia, no precio: debajo, chico y apagado */
+.pr-usd {
+  flex-basis: 100%;
+  font-size: 10.5px; letter-spacing: .12em; color: var(--humo); opacity: .85;
+}
+
+/* Debajo del botón: lo lee quien ya se interesó por el precio */
+.pr-items {
+  list-style: none; padding: 0; flex: 1;
+  margin: 18px 0 0; padding-top: 16px;
+  border-top: 1px solid var(--linea);
+}
+.pr-items li {
+  position: relative; padding-left: 17px; margin-bottom: 8px;
+  font-size: 12.5px; line-height: 1.5; color: var(--humo);
+}
+.pr-items li::before {
+  content: ''; position: absolute; left: 0; top: .55em;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--amb-accent); opacity: .5;
+}
+
+/* --- El pie: comprar, o hablar antes -------------------------------------- */
+.pr-pie { display: flex; flex-direction: column; gap: 9px; }
+.pr-btn { width: 100%; justify-content: center; text-align: center; }
+.pr-hablar {
+  align-self: center;
+  font-size: 10.5px; letter-spacing: .1em; color: var(--humo);
+  border-bottom: 1px solid transparent; padding-bottom: 1px;
+  transition: color .3s var(--ease), border-color .3s var(--ease);
+}
+.pr-hablar:hover, .pr-hablar:focus-visible {
+  color: var(--amb-accent); border-bottom-color: color-mix(in srgb, var(--amb-accent) 50%, transparent);
+}
+/* Visible, no escondida: si dice "anticipo", se lee ANTES de hacer clic */
+.pr-chica {
+  font-size: 10px; line-height: 1.45; color: var(--humo); opacity: .75; text-align: center;
+}
+
+.pr-aviso {
+  margin: clamp(18px, 2.4vw, 28px) 0 4px;
+  font-size: 11px; line-height: 1.6; color: var(--humo); opacity: .8;
+  max-width: 78ch;
+}
+
+/* --- La ventanita de compra ----------------------------------------------- */
+.compra {
+  position: fixed; inset: 0; z-index: 90;
+  display: grid; place-items: center; padding: 20px;
+  background: var(--velo-fuerte);
+  animation: compraEntra .3s var(--ease);
+}
+@keyframes compraEntra { from { opacity: 0; } }
+html[data-motion='reduced'] .compra { animation: none; }
+
+.compra-caja {
+  width: min(430px, 100%); max-height: 92vh; overflow-y: auto;
+  padding: clamp(22px, 3vw, 32px);
+  background: var(--amb-bg); border: 1px solid var(--linea-fuerte);
+}
+.compra-titulo { margin: 10px 0 0; }
+
+.compra-monto {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 16px 0; margin: 16px 0 20px;
+  border-top: 1px solid var(--linea); border-bottom: 1px solid var(--linea);
+}
+.cm-v { font-family: var(--serif); font-size: 32px; line-height: 1; color: var(--amb-accent); }
+.cm-n { font-size: 11.5px; line-height: 1.5; color: var(--humo); }
+
+.compra-form { display: flex; flex-direction: column; gap: 14px; }
+
+/* Etiqueta arriba, campo debajo. Una etiqueta al lado del campo obliga a
+   inventar un ancho fijo para que las dos filas se alineen, y ese ancho se
+   rompe en cuanto el texto cambia de largo o alguien agranda la letra. */
+.compra-form .campo { display: flex; flex-direction: column; gap: 6px; }
+.compra-form .campo > span {
+  font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--humo);
+}
+.compra-form .campo input {
+  width: 100%; padding: 11px 13px;
+  background: color-mix(in srgb, var(--arena) 5%, transparent);
+  border: 1px solid var(--linea); border-radius: 3px;
+  color: var(--arena); font-family: var(--sans); font-size: 14px;
+  transition: border-color .3s var(--ease), background .3s var(--ease);
+}
+.compra-form .campo input:focus {
+  outline: none; border-color: var(--amb-accent);
+  background: color-mix(in srgb, var(--arena) 8%, transparent);
+}
+.compra-form .campo small { font-size: 10.5px; line-height: 1.45; color: var(--humo); opacity: .75; }
+.compra-botones { display: flex; gap: 10px; margin-top: 4px; }
+.compra-botones .btn { flex: 1; justify-content: center; text-align: center; }
+.compra-botones .btn[disabled] { opacity: .55; pointer-events: none; }
+
+.compra-nota {
+  margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--linea);
+  font-size: 10.5px; line-height: 1.55; color: var(--humo); opacity: .85;
+}
+.compra-nota strong { color: var(--arena); font-weight: 500; }
+
+@media (max-width: 560px) {
+  .pr-grilla { grid-template-columns: 1fr; }
+  .compra-botones { flex-direction: column-reverse; }
+}
+
 /* --- Las láminas de los casos --------------------------------------------
    Tres de los cuatro proyectos se ilustran con un dibujo y no con una foto:
    un flujo de agentes, una tienda o una curva de seguidores se entienden de
