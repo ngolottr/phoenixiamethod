@@ -43,6 +43,23 @@ import { PRECIOS, anticipoDe } from '../../api/_precios.js'
 export const CAMBIO = { clp: 960, fecha: '19 de septiembre de 2026' }
 
 /**
+ * ¿Está la pasarela lista para cobrar?
+ *
+ * Mientras esto sea `false`, los precios se muestran igual pero el botón lleva
+ * al formulario en vez de abrir un pago. Es a propósito: un botón que dice
+ * "Comprar" y contesta "no disponible" es peor que no tener botón —quema la
+ * única oportunidad de que esa persona haga clic, y deja la impresión de que el
+ * sitio está a medio terminar.
+ *
+ * Se pone en `true` el día que las llaves de la pasarela estén cargadas en
+ * Vercel, y no antes. Es un interruptor explícito y no una detección
+ * automática porque el navegador no puede saber si el servidor tiene las
+ * llaves sin preguntárselo, y preguntar significa una llamada de más en cada
+ * visita para responder algo que cambia una vez en la vida.
+ */
+export const COBRO_EN_LINEA = false
+
+/**
  * Cómo se paga un paquete desde el sitio.
  *
  * - `completo`: se paga entero con un clic. Solo para lo que es acotado y no

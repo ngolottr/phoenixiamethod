@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { MagneticButton } from './MagneticButton'
-import { CAMBIO, dolares, montoACobrar, paquetes, pesos, type Paquete } from '../data/precios'
+import { CAMBIO, COBRO_EN_LINEA, dolares, montoACobrar, paquetes, pesos, type Paquete } from '../data/precios'
 
 /**
  * Los precios, a la vista.
@@ -172,9 +172,15 @@ export function Precios({ onContacto }: { onContacto: () => void }) {
                   no se puede cometer. Lo que incluye el paquete se lee
                   después, por quien ya está interesado. */}
               <div className="pr-pie">
-                {p.forma === 'conversar' ? (
-                  <button className="btn ghost pr-btn" data-evento="precio_conversar" onClick={onContacto}>
-                    Cuéntame tu caso
+                {p.forma === 'conversar' || !COBRO_EN_LINEA ? (
+                  /* Sin pasarela lista, el botón manda al formulario y lo dice
+                     con todas sus letras. No promete un pago que no existe. */
+                  <button
+                    className={`btn ${p.destacado ? 'solid' : 'ghost'} pr-btn`}
+                    data-evento={p.forma === 'conversar' ? 'precio_conversar' : `hablar:${p.id}`}
+                    onClick={onContacto}
+                  >
+                    {p.forma === 'conversar' ? 'Cuéntame tu caso' : 'Contratar'}
                   </button>
                 ) : (
                   <>
@@ -192,7 +198,7 @@ export function Precios({ onContacto }: { onContacto: () => void }) {
                     </button>
                   </>
                 )}
-                {p.letraChica && <span className="pr-chica">{p.letraChica}</span>}
+                {p.letraChica && COBRO_EN_LINEA && <span className="pr-chica">{p.letraChica}</span>}
               </div>
 
               <ul className="pr-items">
@@ -205,11 +211,18 @@ export function Precios({ onContacto }: { onContacto: () => void }) {
         })}
       </ul>
 
-      {/* Dónde queda parado cada número, dicho sin letra chica escondida. */}
+      {/* Dónde queda parado cada número, dicho sin letra chica escondida.
+
+          Acá decía "con IVA incluido" y se quitó: eso depende del giro con el
+          que se formalice Phoenix, que todavía no está definido. Una afirmación
+          tributaria falsa en una página de precios no es un detalle de
+          redacción —es lo que después discute un cliente cuando le llega la
+          boleta por un monto distinto al que leyó. Cuando el giro esté
+          decidido, vuelve a escribirse, y esa vez siendo cierta. */}
       <p className="pr-aviso">
-        Precios en pesos chilenos, con IVA incluido. El valor en dólares es solo
-        referencia, calculado a ${CAMBIO.clp} por dólar ({CAMBIO.fecha}); el cobro
-        se hace siempre en pesos. Si estás fuera de Chile, escríbeme y lo coordinamos.
+        Precios en pesos chilenos. El valor en dólares es solo referencia,
+        calculado a ${CAMBIO.clp} por dólar ({CAMBIO.fecha}); el cobro se hace
+        siempre en pesos. Si estás fuera de Chile, escríbeme y lo coordinamos.
       </p>
 
       {comprando && <Comprar paquete={comprando} onClose={() => setComprando(null)} />}
