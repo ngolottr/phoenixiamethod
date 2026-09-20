@@ -213,16 +213,18 @@ export function Precios({ onContacto }: { onContacto: () => void }) {
 
       {/* Dónde queda parado cada número, dicho sin letra chica escondida.
 
-          Acá decía "con IVA incluido" y se quitó: eso depende del giro con el
-          que se formalice Phoenix, que todavía no está definido. Una afirmación
-          tributaria falsa en una página de precios no es un detalle de
-          redacción —es lo que después discute un cliente cuando le llega la
-          boleta por un monto distinto al que leyó. Cuando el giro esté
-          decidido, vuelve a escribirse, y esa vez siendo cierta. */}
+          Acá decía "con IVA incluido" y era falso: Phoenix opera en segunda
+          categoría y no está afecto a IVA (verificado en el perfil del SII el
+          20-09-2026, código 960909). Ahora dice lo que de verdad ocurre, y dice
+          también que se emite boleta de honorarios —no factura—, porque un
+          cliente empresa necesita saberlo ANTES de contratar y no cuando pida
+          su crédito fiscal y no lo tenga. Si algún día Phoenix pasa a primera
+          categoría, esta frase se cambia junto con el giro. */}
       <p className="pr-aviso">
-        Precios en pesos chilenos. El valor en dólares es solo referencia,
-        calculado a ${CAMBIO.clp} por dólar ({CAMBIO.fecha}); el cobro se hace
-        siempre en pesos. Si estás fuera de Chile, escríbeme y lo coordinamos.
+        Precios en pesos chilenos y sin IVA: los servicios se documentan con
+        boleta de honorarios. El valor en dólares es solo referencia, calculado
+        a ${CAMBIO.clp} por dólar ({CAMBIO.fecha}); el cobro se hace siempre en
+        pesos. Si estás fuera de Chile, escríbeme y lo coordinamos.
       </p>
 
       {comprando && <Comprar paquete={comprando} onClose={() => setComprando(null)} />}
