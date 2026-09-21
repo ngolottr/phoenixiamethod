@@ -32,14 +32,40 @@ function extras(datos) {
   }
 }
 
-/** El correo que le llega a Nicolás cuando alguien paga. */
+/**
+ * La retención de segunda categoría vigente.
+ *
+ * Sube por tramos según la Ley 21.133: 15,25 % durante 2026 y hasta 17 % en
+ * 2028. Va como constante y no incrustada en el texto para que el día que
+ * cambie se corrija en un solo sitio.
+ */
+const RETENCION = 0.1525
+
+/** Dónde se emite la boleta. Es el portal simplificado, que es el que usa. */
+const SII_BOLETAS = 'https://www2.sii.cl/siimple/home-diferenciado'
+
+/**
+ * El correo que le llega a Nicolás cuando alguien paga.
+ *
+ * Trae además lo que hay que hacer con esa venta: emitir la boleta de
+ * honorarios, que Flow no emite por él —Flow solo entrega el comprobante del
+ * pago—. Va con el monto ya calculado y el enlace directo, porque el momento
+ * en que uno se acuerda de una obligación es el momento en que conviene tener
+ * todo a mano; si hay que ir a buscar la cifra y la dirección, se posterga.
+ *
+ * Sobre la retención: se informa cuánto es, no quién debe enterarla. Eso
+ * depende de si el comprador es empresa o persona natural, y no es algo que
+ * este correo pueda saber ni deba decidir.
+ */
 async function avisar(pago, sueltos) {
   const paquete = PRECIOS[sueltos.paquete]?.nombre || sueltos.paquete || 'sin identificar'
-  const monto = Number(pago.amount || 0).toLocaleString('es-CL')
+  const bruto = Number(pago.amount || 0)
+  const monto = bruto.toLocaleString('es-CL')
+  const retencion = Math.round(bruto * RETENCION)
   const quien = sueltos.nombre || '(no dejó nombre)'
   const correo = pago.payer || '(sin correo)'
   const esAnticipo = sueltos.cobra === 'anticipo'
-  const resto = esAnticipo && sueltos.total ? Number(sueltos.total) - Number(pago.amount || 0) : 0
+  const resto = esAnticipo && sueltos.total ? Number(sueltos.total) - bruto : 0
 
   const lineas = [
     `Paquete: ${paquete}`,
@@ -52,6 +78,13 @@ async function avisar(pago, sueltos) {
     esAnticipo
       ? 'Reservó su cupo. Escríbele hoy para agendar la reunión de inicio.'
       : 'Pagó completo. Escríbele hoy para coordinar.',
+    '',
+    '--- Boleta de honorarios ---',
+    `Emitir por: $${monto}`,
+    `Retención ${(RETENCION * 100).toFixed(2).replace('.', ',')} %: $${retencion.toLocaleString('es-CL')}`,
+    `Líquido: $${(bruto - retencion).toLocaleString('es-CL')}`,
+    `Emitirla en: ${SII_BOLETAS}`,
+    'Flow no emite la boleta: solo entrega el comprobante del pago.',
   ]
 
   await enviarCorreo({
@@ -59,7 +92,13 @@ async function avisar(pago, sueltos) {
     nombrePara: 'Nicolás Golott',
     asunto: `💰 Venta: ${paquete} — $${monto}`,
     texto: lineas.join('\n'),
-    html: `<p>${lineas.map(escapar).join('<br />')}</p>`,
+    html: `<p>${lineas
+      .map((l) =>
+        l.startsWith('Emitirla en:')
+          ? `Emitirla en: <a href="${SII_BOLETAS}">el portal del SII</a>`
+          : escapar(l),
+      )
+      .join('<br />')}</p>`,
     responderA: { email: correo, name: quien },
   })
 }
