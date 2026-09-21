@@ -61,7 +61,38 @@ const FINALES = {
   },
 }
 
-function pagina(clave, orden) {
+/**
+ * El formulario para la boleta, solo cuando el pago está hecho.
+ *
+ * Va acá y no en el checkout por una razón medible: RUT, dirección, región y
+ * comuna son cuatro campos más justo en el momento en que la persona está
+ * decidiendo si paga, y cada campo ahí cuesta ventas. En esta pantalla ya
+ * pagó, así que si no lo llena no se pierde nada —la boleta se le pide
+ * después por correo— y si lo llena, Nicolás tiene todo sin escribirle.
+ *
+ * Sin JavaScript a propósito: la política de seguridad del sitio no permite
+ * scripts sueltos, y un formulario HTML de toda la vida hace exactamente lo
+ * mismo. Por eso la validación del RUT ocurre en el servidor.
+ */
+function formularioBoleta(token) {
+  if (!token) return ''
+  return `
+      <form class="bo" method="POST" action="/api/datos-boleta">
+        <input type="hidden" name="token" value="${escapar(token)}" />
+        <p class="bo-t">¿Necesitas boleta?</p>
+        <p class="bo-d">Déjame tus datos y te la envío por correo. Si no la necesitas, puedes cerrar esta página tranquilo: tu pago ya está hecho.</p>
+        <label>RUT<input name="rut" required placeholder="12.345.678-9" autocomplete="off" /></label>
+        <label>Nombre o razón social<input name="nombre" required maxlength="120" autocomplete="organization" /></label>
+        <label>Dirección<input name="direccion" required maxlength="160" autocomplete="street-address" /></label>
+        <div class="bo-par">
+          <label>Comuna<input name="comuna" required maxlength="80" autocomplete="address-level2" /></label>
+          <label>Región<input name="region" maxlength="80" autocomplete="address-level1" /></label>
+        </div>
+        <button type="submit">Enviar mis datos</button>
+      </form>`
+}
+
+function pagina(clave, orden, token = '') {
   const f = FINALES[clave] || FINALES.desconocido
   const url = sitio()
   return `<!doctype html>
@@ -118,6 +149,27 @@ function pagina(clave, orden) {
       a.btn:hover, a.btn:focus-visible { border-color: var(--acento); color: var(--acento); }
       a.btn.solido { background: var(--acento); border-color: var(--acento); color: var(--brasa); font-weight: 600; }
       a.btn.solido:hover, a.btn.solido:focus-visible { color: var(--brasa); opacity: .88; }
+
+      /* El formulario de la boleta */
+      .bo { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--linea); }
+      .bo-t { font-family: Georgia, serif; font-size: 20px; color: var(--arena); margin: 0 0 8px; }
+      .bo-d { font-size: 13px; margin-bottom: 20px; }
+      .bo label { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;
+                  font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--humo); }
+      .bo input { width: 100%; padding: 11px 13px; border-radius: 3px;
+                  background: rgba(248,244,241,.05); border: 1px solid var(--linea);
+                  color: var(--arena); font-family: inherit; font-size: 14px; letter-spacing: normal;
+                  text-transform: none; }
+      .bo input:focus { outline: none; border-color: var(--acento); }
+      .bo-par { display: flex; gap: 12px; }
+      .bo-par label { flex: 1; }
+      .bo button { width: 100%; margin-top: 6px; padding: 14px; cursor: pointer;
+                   background: var(--acento); color: var(--brasa); border: none; border-radius: 4px;
+                   font-family: inherit; font-size: 11px; font-weight: 600;
+                   letter-spacing: .2em; text-transform: uppercase; }
+      .bo button:hover { opacity: .88; }
+      @media (max-width: 420px) { .bo-par { flex-direction: column; gap: 0; } }
+
       @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
     </style>
   </head>
@@ -131,15 +183,16 @@ function pagina(clave, orden) {
         <a class="btn solido" href="${url}/">Volver al sitio</a>
         <a class="btn" href="${url}/#contacto">Escribirme</a>
       </div>
+      ${clave === 'pagado' ? formularioBoleta(token) : ''}
     </main>
   </body>
 </html>`
 }
 
-function responder(res, clave, orden = '') {
+function responder(res, clave, orden = '', token = '') {
   res.setHeader('Content-Type', 'text/html; charset=utf-8')
   res.setHeader('X-Robots-Tag', 'noindex, nofollow')
-  return res.status(200).send(pagina(clave, orden))
+  return res.status(200).send(pagina(clave, orden, token))
 }
 
 export default async function handler(req, res) {
@@ -156,7 +209,10 @@ export default async function handler(req, res) {
   try {
     const pago = await estadoDelPago(token)
     if (Number(pago.status) === PAGADA) {
-      return responder(res, 'pagado', String(pago.commerceOrder || ''))
+      /* El token viaja al formulario de la boleta: es lo que le permite al
+         otro endpoint volver a preguntarle a Flow si ese pago existe, en vez
+         de creerle a quien mande el formulario. */
+      return responder(res, 'pagado', String(pago.commerceOrder || ''), token)
     }
     return responder(res, Number(pago.status) === 1 ? 'pendiente' : 'rechazado')
   } catch (e) {
