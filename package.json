@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "node scripts/citas-revisar.mjs && tsc --noEmit && vite build",
+    "citas": "node scripts/citas-revisar.mjs",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview"
   },

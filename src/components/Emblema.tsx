@@ -162,7 +162,36 @@ function Registro() {
   )
 }
 
-const EMBLEMAS = [Umbral, Onda, Reticula, Espejo, Registro]
+/** 06 · LA FRASE DE HOY — un libro abierto y una chispa que sube de sus páginas. */
+function Libro() {
+  return (
+    <svg viewBox="0 0 400 400" fill="none" aria-hidden="true">
+      {/* las dos páginas, combadas hacia el lomo */}
+      <path d="M200 150 C 170 130 122 126 70 140 L70 300 C 122 286 170 290 200 312 Z" stroke={ACENTO} strokeWidth="1.4" />
+      <path d="M200 150 C 230 130 278 126 330 140 L330 300 C 278 286 230 290 200 312 Z" stroke={ACENTO} strokeWidth="1.4" />
+      {/* el lomo */}
+      <line x1="200" y1="150" x2="200" y2="312" stroke={AMBAR} strokeWidth="0.9" opacity="0.7" />
+      {/* los renglones, tenues: se sugiere el texto, no se escribe */}
+      {[172, 194, 216, 238, 260].map((y) => (
+        <g key={y}>
+          <line x1="92" y1={y} x2="182" y2={y + 8} stroke={AMBAR} strokeWidth="0.6" opacity="0.32" />
+          <line x1="218" y1={y + 8} x2="308" y2={y} stroke={AMBAR} strokeWidth="0.6" opacity="0.32" />
+        </g>
+      ))}
+      {/* la idea que sale del libro: un trazo que se dibuja hacia arriba */}
+      <path
+        className="em-trazo"
+        d="M200 150 C 194 112 210 84 200 44"
+        stroke={ACENTO}
+        strokeWidth="2"
+        strokeDasharray="460"
+      />
+      <circle cx="200" cy="44" r="5" fill={AMBAR} className="em-pulso" />
+    </svg>
+  )
+}
+
+const EMBLEMAS = [Umbral, Onda, Reticula, Espejo, Registro, Libro]
 
 export function Emblema({ indice }: { indice: number }) {
   const Dibujo = EMBLEMAS[indice % EMBLEMAS.length]

@@ -42,6 +42,8 @@ const EVENTOS = new Set([
   // Flow confirma. Si el navegador pudiera declarar ventas, cualquiera podría
   // fabricar ingresos falsos en el panel con una línea de consola.
   'ver_precios', 'precio_conversar',
+  // La cápsula de "la frase de hoy" en la escena del Método.
+  'ver_cita',
 ])
 /* Tres letras como mínimo porque hay paquetes con identificador corto —`crm`—
    y el patrón anterior, de cuatro, los dejaba fuera sin que nada lo avisara:

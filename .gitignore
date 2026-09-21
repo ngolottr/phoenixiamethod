@@ -9,3 +9,8 @@ tsconfig.tsbuildinfo
 .vercel
 .env*
 CLAVE-*.txt
+
+# Cachés de descarga de las herramientas de las frases (scripts/citas/LEEME.md)
+scripts/citas/fotos/
+scripts/citas/gutenberg/
+scripts/citas/fotos-final.json

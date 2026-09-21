@@ -47,7 +47,9 @@ Otros comandos:
 
 | Comando | Qué hace |
 |---|---|
-| `npm run build` | Revisa tipos y genera `dist/` listo para publicar |
+| `npm run build` | Revisa el banco de frases y los tipos, y genera `dist/` listo para publicar |
+| `npm run citas` | Revisa el banco de frases: duplicados, fotos, créditos, orden y cuántos días quedan |
+| `npm run citas -- --fijar` | Registra el orden actual como ya publicado (después de agregar frases nuevas) |
 | `npm run preview` | Sirve el `dist/` ya construido |
 | `npm run typecheck` | Solo la revisión de tipos |
 
@@ -96,6 +98,40 @@ Regla de seguridad que no se negocia: **el monto que se cobra sale siempre del
 servidor, nunca del navegador.** La página manda el identificador del paquete;
 el precio lo pone `api/pagar.js`. Un formulario que envía el precio es un
 formulario donde el precio lo decide el cliente.
+
+**Las frases del Método van en `src/data/citas.ts`, y se agregan siempre al final.**
+La escena del Método tiene sus cinco principios de siempre y una sexta pantalla,
+«La frase de hoy»: una cita de un libro famoso de negocios, autoayuda o IA, con su
+autor, su foto y el libro donde se escribió. Está ahí por credibilidad, y de eso
+depende todo lo demás: **una cita falsa en la sección que existe para dar confianza
+es peor que no tener sección.** Por eso ninguna está porque «suena a Drucker»: cada
+una se buscó, palabra por palabra, dentro de un libro escrito por esa misma persona
+(en `scripts/citas/LEEME.md` están los casos en que eso atajó un error: una frase de
+Frankl que es de Nietzsche, una de Kahneman que es de Herbert Simon…).
+
+Cómo funciona, porque no es obvio:
+
+- **No hay nada que «publique» la frase del día.** Sale de una cuenta: cuántos días
+  pasaron desde el lanzamiento (`LANZAMIENTO`, en hora de Chile) elige una posición
+  de la lista. Todos ven la misma frase el mismo día y no hace falta desplegar nada
+  para que cambie.
+- **La lista es una promesa de orden.** Como la cuenta recorre la lista, insertar una
+  frase en medio, reordenar o borrar una ya publicada corre todas las siguientes y
+  esa noche sale una que ya había salido. `scripts/citas-orden.json` guarda lo ya
+  publicado y `npm run citas` (que corre solo antes de cada `npm run build`) **frena
+  el build** si eso cambia.
+- **La lista se acaba.** 125 frases duran hasta el 23 de enero de 2027. Después el
+  sitio las repite y **deja de decir «sin repetirse»** solo. `npm run citas` avisa
+  cuántos días quedan.
+- **Las fotos son de Wikimedia Commons, con licencia libre**, y esa licencia exige
+  nombrar a quien la hizo: el crédito se muestra en pantalla. Las traducciones al
+  castellano son propias y el original va siempre a la vista.
+- **El banco viaja en su propio archivo** (`citas-*.js`, ~18 kB comprimido) que solo
+  se descarga al entrar al Método; no engorda el resto del sitio. En desarrollo,
+  `?dia=2026-11-03` muestra la frase de ese día.
+
+Para agregar frases: `scripts/citas/LEEME.md` tiene el proceso completo, con las
+herramientas de verificación.
 
 **Los servicios van en `src/data/servicios.ts`.** Son el mapa de lo que se sabe
 hacer (sacado de la lámina "¿Qué es el Método Fénix con IA?") y se muestran en la
@@ -227,6 +263,7 @@ y quien no las tenga cae en el respaldo sin que el sitio se descomponga.
     ├── components/
     │   ├── Atmosphere.tsx      ← grano, viñeta, halo y cortina de transición
     │   ├── Cursor.tsx          ← cursor personalizado
+    │   ├── CitaDelDia.tsx      ← la frase de hoy del Método (autor, foto, libro)
     │   ├── GraficoCaso.tsx     ← las láminas dibujadas de los casos (SVG)
     │   ├── Intro.tsx           ← telón de apertura, con el isotipo
     │   ├── Isotipo.tsx         ← el emblema de Phoenix, copiado de la identidad
