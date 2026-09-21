@@ -106,7 +106,7 @@ function pintar() {
       <p class="eyebrow">Agenda tu reunión</p>
       <h1 class="display h-md ag-title">Elige cuándo
 conversamos.</h1>
-      <p class="body ag-intro">30 minutos por videollamada. Los horarios están en hora de Chile y son los que tengo realmente libres.</p>
+      <p class="body ag-intro">Reunión 1:1 por videollamada. Los horarios están en hora de Chile y son los que tengo realmente libres.</p>
 
       <div class="ag-dias" role="tablist" aria-label="Días disponibles">
         ${estado.dias

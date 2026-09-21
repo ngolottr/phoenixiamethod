@@ -139,7 +139,7 @@ export const contact = {
     'No hace falta que sepas qué herramienta usar ni que tengas el proyecto definido. Con que sepas qué te está costando tiempo, alcanza para la primera conversación.',
   copyLabel: 'Copiar email',
   copiedLabel: 'Copiado',
-  formNote: 'Te llega un correo con el siguiente paso: agendar 30 minutos por videollamada.',
+  formNote: 'Te llega un correo con el siguiente paso: agendar una reunión 1:1 por videollamada.',
 }
 
 /** Opciones del desplegable de presupuesto. La primera es el marcador vacío. */

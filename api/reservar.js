@@ -53,7 +53,7 @@ async function avisar({ nombre, email, tema, cuando, enlaceReunion, revision }) 
     titulo: 'Reunión con Nicolás Golott — Phoenix IA Method',
     inicio: revision.inicio,
     fin: revision.termino,
-    detalle: `Reunión de ${DURACION_MIN} minutos.${enlaceReunion ? `\nEnlace: ${enlaceReunion}` : ''}`,
+    detalle: `Reunión 1:1 por videollamada.${enlaceReunion ? `\nEnlace: ${enlaceReunion}` : ''}`,
     lugar: enlaceReunion || 'Videollamada',
   })
 
@@ -61,7 +61,7 @@ async function avisar({ nombre, email, tema, cuando, enlaceReunion, revision }) 
 
 Tu reunión quedó agendada para el ${cuando} (hora de Chile).
 
-Son 30 minutos por videollamada.${enlaceReunion ? `\n\nEnlace: ${enlaceReunion}` : '\n\nTe hago llegar el enlace antes de la reunión.'}
+Es una reunión 1:1 por videollamada.${enlaceReunion ? `\n\nEnlace: ${enlaceReunion}` : '\n\nTe hago llegar el enlace antes de la reunión.'}
 
 Agrégala a tu calendario acá:
 ${agregar}
@@ -78,7 +78,7 @@ Phoenix IA Method`
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#071711;border:1px solid rgba(239,231,213,.14);">
   <tr><td style="padding:30px 32px 0;"><p style="margin:0;font:400 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.42em;color:#F26522;text-transform:uppercase;">Reunión confirmada</p></td></tr>
   <tr><td style="padding:20px 32px 0;"><p style="margin:0;font:400 26px/1.25 Georgia,serif;color:#F8F4F1;">Nos vemos el<br>${escapar(cuando)}.</p></td></tr>
-  <tr><td style="padding:18px 32px 0;"><p style="margin:0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#D8C7BC;">Son 30 minutos por videollamada, hora de Chile.</p></td></tr>
+  <tr><td style="padding:18px 32px 0;"><p style="margin:0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#D8C7BC;">Es una reunión 1:1 por videollamada, hora de Chile.</p></td></tr>
   ${
     enlaceReunion
       ? `<tr><td style="padding:22px 32px 0;"><a href="${escapar(enlaceReunion)}" style="display:inline-block;background:#F26522;color:#120B07;text-decoration:none;padding:16px 30px;font:400 12px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;">Entrar a la reunión</a></td></tr>`
@@ -189,7 +189,7 @@ export default async function handler(req, res) {
     const evento = await crearEvento({
       resumen: `Phoenix · ${nombre}`,
       descripcion: [
-        `Reunión de ${DURACION_MIN} minutos agendada desde phoenixiamethod.cl`,
+        `Reunión 1:1 agendada desde phoenixiamethod.cl`,
         '',
         `Contacto: ${email}`,
         tema ? `\nQué quiere resolver:\n${tema}` : '',

@@ -99,7 +99,7 @@ export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
         </p>
         <p className="body" style={{ marginTop: 14 }}>
           En un momento te llega un mensaje con el siguiente paso: responder con los horarios que te
-          acomoden para una reunión de 30 minutos. Si no lo ves, mira en spam.
+          acomoden para una reunión 1:1. Si no lo ves, mira en spam.
         </p>
         <p className="form-note" style={{ marginTop: 16 }}>
           Atiendo de lunes a viernes desde las 20:30, sábados desde las 16:00 y domingos todo el día

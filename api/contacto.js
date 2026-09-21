@@ -6,7 +6,7 @@
 
      1. Valida los datos (otra vez, porque nadie garantiza que vengan del form).
      2. Le manda a la persona un correo que retoma lo que escribió y le propone
-        agendar 30 minutos por Zoom, con el enlace de Cal.com.
+        agendar una reunión 1:1 por Zoom, con el enlace a la página de agendar.
      3. Te manda a ti una copia con los datos del contacto, para que quede
         registrado en tu Gmail sin necesidad de una planilla aparte.
 
@@ -97,7 +97,7 @@ Gracias por escribir. Leí tu solicitud y esto fue lo que me llegó:
 
 Para dimensionarlo bien necesito conversarlo contigo en vivo: por correo se pierde justo lo que importa, que es entender cómo funciona hoy tu operación antes de proponer nada.
 
-El siguiente paso es una reunión de 30 minutos por videollamada.
+El siguiente paso es una reunión 1:1 por videollamada.
 
 Elige tú mismo la hora que te acomode acá:
 
@@ -134,7 +134,7 @@ Phoenix IA Method`
   </td></tr>
   <tr><td style="padding:20px 32px 0;">
     <p style="margin:0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#D8C7BC;">Para dimensionarlo bien necesito conversarlo contigo en vivo: por correo se pierde justo lo que importa, que es entender cómo funciona hoy tu operación antes de proponer nada.</p>
-    <p style="margin:14px 0 0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#D8C7BC;">El siguiente paso es una reunión de <strong style="color:#F8F4F1;">30 minutos por videollamada</strong>.</p>
+    <p style="margin:14px 0 0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#D8C7BC;">El siguiente paso es una <strong style="color:#F8F4F1;">reunión 1:1 por videollamada</strong>.</p>
   </td></tr>
   <tr><td style="padding:24px 32px 0;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #F26522;">
@@ -395,7 +395,7 @@ export default async function handler(req, res) {
       apiKey,
       para: datos.email,
       nombrePara: datos.nombre,
-      asunto: `Agendemos 30 minutos, ${primerNombre(datos.nombre)}`,
+      asunto: `Agendemos una reunión, ${primerNombre(datos.nombre)}`,
       texto: cliente.texto,
       html: cliente.html,
       // El remitente es el subdominio de Brevo: si el visitante responde, la

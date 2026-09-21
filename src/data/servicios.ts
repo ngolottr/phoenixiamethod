@@ -62,7 +62,7 @@ export const servicios: Servicio[] = [
     titulo: 'Diagnóstico Fénix',
     bajada: 'Antes de construir nada: qué te está costando tiempo de verdad y qué conviene automatizar primero.',
     items: [
-      'Una reunión de una hora para entender el problema',
+      'Una reunión 1:1 para entender el problema',
       'Revisión de tu sitio, tus procesos y tus herramientas',
       'Informe escrito con el plan, en orden de impacto',
       'Qué se puede resolver gratis y qué justifica pagar',
