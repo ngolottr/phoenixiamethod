@@ -57,7 +57,7 @@ export const CAMBIO = { clp: 960, fecha: '19 de septiembre de 2026' }
  * llaves sin preguntárselo, y preguntar significa una llamada de más en cada
  * visita para responder algo que cambia una vez en la vida.
  */
-export const COBRO_EN_LINEA = false
+export const COBRO_EN_LINEA = true
 
 /**
  * Cómo se paga un paquete desde el sitio.
