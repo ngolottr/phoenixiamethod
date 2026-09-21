@@ -7,6 +7,15 @@ import type { IconoServicio } from '../data/servicios'
  * teñido de las fotos igual que el resto del sitio.
  */
 const TRAZOS: Record<IconoServicio, JSX.Element> = {
+  /* El diagnóstico: una lupa con un pulso adentro. Se mira el negocio y lo que
+     se busca son los signos vitales, no un defecto estético. */
+  lupa: (
+    <>
+      <circle cx="10.5" cy="10.5" r="6.8" />
+      <path d="M15.4 15.4L21 21" />
+      <path d="M7 10.8h1.7l1.2-2.6 1.6 4.4 1-1.8h1.4" />
+    </>
+  ),
   ia: (
     <>
       <rect x="5" y="5" width="14" height="14" rx="1.6" />
@@ -64,6 +73,16 @@ const TRAZOS: Record<IconoServicio, JSX.Element> = {
       <circle cx="12" cy="12" r="3" />
       <circle cx="12" cy="12" r="6.5" />
       <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" />
+    </>
+  ),
+  /* El CRM: la ficha de un cliente. No un embudo —un embudo dice "ventas" y
+     este servicio se trata de que cada persona tenga su historia guardada. */
+  fichero: (
+    <>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <circle cx="8.8" cy="10" r="2.3" />
+      <path d="M5.5 16.4c.6-1.8 1.8-2.8 3.3-2.8s2.7 1 3.3 2.8" />
+      <path d="M14.5 9h4M14.5 12.2h4M14.5 15.4h2.4" />
     </>
   ),
   asesor: (

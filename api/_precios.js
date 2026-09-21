@@ -26,11 +26,27 @@ export const PARTE_ANTICIPO = 0.3
  * identificador no aparece acá, la función lo rechaza.
  */
 export const PRECIOS = {
+  /* --- La puerta de entrada --- */
   diagnostico: { nombre: 'Diagnóstico Fénix', total: 90000, cobra: 'completo' },
+
+  /* --- Lo que se construye una vez: se cobra el 30 % y el resto se acuerda --- */
+  agentes: { nombre: 'Inteligencia artificial y agentes', total: 590000, cobra: 'anticipo' },
+  automatizacion: { nombre: 'Automatización e integraciones', total: 450000, cobra: 'anticipo' },
+  crm: { nombre: 'CRM y gestión de clientes', total: 790000, cobra: 'anticipo' },
   sitio: { nombre: 'Sitio que convierte', total: 690000, cobra: 'anticipo' },
   tienda: { nombre: 'Tienda online', total: 1190000, cobra: 'anticipo' },
-  automatizacion: { nombre: 'Automatización a medida', total: 450000, cobra: 'anticipo' },
-  acompanamiento: { nombre: 'Acompañamiento', total: 290000, cobra: 'completo' },
+  branding: { nombre: 'Branding y diseño', total: 390000, cobra: 'anticipo' },
+
+  /* --- Lo que se cobra mes a mes: precio cerrado, sin permanencia ---
+     Estos van sin "desde" a propósito. Un mensual con "desde" no se puede
+     cobrar con un clic: el que paga no sabría si lo que se le cobró es su plan
+     o el piso de una banda. Acá el plan base tiene un precio, y lo que se salga
+     del plan base se conversa antes. */
+  contenido: { nombre: 'Creación de contenido y video', total: 290000, cobra: 'completo' },
+  publicidad: { nombre: 'Publicidad digital', total: 250000, cobra: 'completo' },
+  marketing: { nombre: 'Marketing digital', total: 390000, cobra: 'completo' },
+  comunidad: { nombre: 'Redes sociales y comunidad', total: 290000, cobra: 'completo' },
+  acompanamiento: { nombre: 'Consultoría y acompañamiento', total: 290000, cobra: 'completo' },
 }
 
 /** Redondeado al mil: nadie cobra $207.000 y 30 centavos. */

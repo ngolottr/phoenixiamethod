@@ -43,7 +43,10 @@ const EVENTOS = new Set([
   // fabricar ingresos falsos en el panel con una línea de consola.
   'ver_precios', 'precio_conversar',
 ])
-const RE_PAQUETE = /^(comprar|hablar):[a-z]{4,20}$/
+/* Tres letras como mínimo porque hay paquetes con identificador corto —`crm`—
+   y el patrón anterior, de cuatro, los dejaba fuera sin que nada lo avisara:
+   el botón se pulsaba, el evento salía y el servidor lo descartaba en silencio. */
+const RE_PAQUETE = /^(comprar|hablar):[a-z]{3,20}$/
 const nombreValido = (tipo, n) =>
   tipo === 'vista'
     ? ESCENAS.has(n)

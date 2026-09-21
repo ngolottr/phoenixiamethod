@@ -6,10 +6,9 @@ import { Vortex } from '../components/Vortex'
 import { CasoPanel } from '../components/CasoPanel'
 import { PanelScroll } from '../components/PanelScroll'
 import { ServicioIcono } from '../components/ServicioIcono'
-import { Precios } from '../components/Precios'
+import { AvisoPrecios, PrecioServicio } from '../components/Precios'
 import { casos, type Caso } from '../data/proyectos'
 import { servicios, cierreMetodo } from '../data/servicios'
-import { paquetes } from '../data/precios'
 
 const TONES = ['emerald', 'midnight', 'brass'] as const
 
@@ -31,46 +30,39 @@ export function Work({
   const [active, setActive] = useState<string | null>(null)
   const [abierto, setAbierto] = useState<Caso | null>(null)
   const [entrando, setEntrando] = useState(false)
-  /* Parte en los servicios: quien llega primero necesita saber si su problema
-     cae dentro de lo que se hace; los casos son la prueba, un clic después, y
-     los precios el tercer paso —cuánto cuesta importa recién cuando ya sabes
-     que esto es para ti y que funciona. Ese es el orden de la conversación. */
-  const [vista, setVista] = useState<'servicios' | 'casos' | 'precios'>('servicios')
+  /* Dos vistas, no tres.
+     Los precios eran la tercera y no debían serlo: obligaban a mirar el
+     servicio en una pantalla, cambiar a otra y cruzar a mano cuál costaba
+     cuánto. Ahora cada servicio muestra su precio en la misma tarjeta, y lo
+     único que queda al lado son los casos: la prueba de que lo que se ofrece
+     ya funcionó. Qué hago y qué vale, primero; qué hice, después. */
+  const [vista, setVista] = useState<'soluciones' | 'casos'>('soluciones')
 
   /** El proyecto que se está señalando, para la vista previa de al lado. */
   const activo = casos.find((c) => c.index === active) ?? null
 
   return (
-    <section className="scene" aria-labelledby="work-title">
+    <section className="scene work-scene" aria-labelledby="work-title">
       <div className="gal-head rise" data-d="1">
         <div>
           <p className="eyebrow">
-            {vista === 'servicios'
-              ? 'Soluciones · Lo que hacemos'
-              : vista === 'casos'
-                ? 'Soluciones · Casos reales'
-                : 'Soluciones · Precios'}
+            {vista === 'soluciones' ? 'Soluciones · Con su precio' : 'Soluciones · Casos reales'}
           </p>
           <h2 id="work-title" className="display h-md" style={{ marginTop: 12 }}>
-            {vista === 'servicios' ? 'Todo lo que' : vista === 'casos' ? 'Lo que ya' : 'Cuánto cuesta,'}
+            {vista === 'soluciones' ? 'Todo lo que' : 'Lo que ya'}
             {'\n'}
-            <em>
-              {vista === 'servicios'
-                ? 'sabemos construir.'
-                : vista === 'casos'
-                  ? 'está funcionando.'
-                  : 'dicho de frente.'}
-            </em>
+            <em>{vista === 'soluciones' ? 'sabemos construir.' : 'está funcionando.'}</em>
           </h2>
         </div>
 
         <div className="filters" role="group" aria-label="Cambiar vista">
           <button
             className="filter"
-            aria-pressed={vista === 'servicios'}
-            onClick={() => setVista('servicios')}
+            aria-pressed={vista === 'soluciones'}
+            data-evento="ver_precios"
+            onClick={() => setVista('soluciones')}
           >
-            Servicios <span className="filter-n">{servicios.length}</span>
+            Servicios y precios <span className="filter-n">{servicios.length}</span>
           </button>
           <button
             className="filter"
@@ -80,29 +72,16 @@ export function Work({
           >
             Casos reales <span className="filter-n">{casos.length}</span>
           </button>
-          <button
-            className="filter"
-            aria-pressed={vista === 'precios'}
-            data-evento="ver_precios"
-            onClick={() => setVista('precios')}
-          >
-            Precios <span className="filter-n">{paquetes.length}</span>
-          </button>
         </div>
       </div>
 
-      {vista === 'precios' ? (
-        <div className="srv-cuerpo rise" data-d="2" key="precios">
-          <PanelScroll className="srv-panel">
-            <Precios onContacto={() => setEntrando(true)} />
-          </PanelScroll>
-        </div>
-      ) : vista === 'servicios' ? (
-        <div className="srv-cuerpo rise" data-d="2" key="servicios">
+      {vista === 'soluciones' ? (
+        <div className="srv-cuerpo rise" data-d="2" key="soluciones">
           <PanelScroll className="srv-panel">
             <ul className="srv-grilla">
               {servicios.map((s) => (
-                <li className="srv-card" key={s.titulo}>
+                <li className={`srv-card${s.destacado ? ' es-destacado' : ''}`} key={s.titulo}>
+                  {s.destacado && <span className="pr-sello">Empieza por acá</span>}
                   <div className="srv-cabeza">
                     <ServicioIcono nombre={s.icono} />
                     <div>
@@ -110,6 +89,7 @@ export function Work({
                       <p className="srv-bajada">{s.bajada}</p>
                     </div>
                   </div>
+                  <PrecioServicio servicio={s} onContacto={() => setEntrando(true)} />
                   <ul className="srv-items">
                     {s.items.map((it) => (
                       <li key={it}>{it}</li>
@@ -130,6 +110,7 @@ export function Work({
                 </button>
               </li>
             </ul>
+            <AvisoPrecios />
           </PanelScroll>
         </div>
       ) : (

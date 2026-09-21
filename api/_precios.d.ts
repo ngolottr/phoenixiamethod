@@ -5,7 +5,18 @@
 export declare const PARTE_ANTICIPO: number
 
 export declare const PRECIOS: Record<
-  'diagnostico' | 'sitio' | 'tienda' | 'automatizacion' | 'acompanamiento',
+  | 'diagnostico'
+  | 'agentes'
+  | 'automatizacion'
+  | 'crm'
+  | 'sitio'
+  | 'tienda'
+  | 'branding'
+  | 'contenido'
+  | 'publicidad'
+  | 'marketing'
+  | 'comunidad'
+  | 'acompanamiento',
   { nombre: string; total: number; cobra: 'completo' | 'anticipo' }
 >
 
