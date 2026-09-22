@@ -51,7 +51,7 @@ function enPalabras(inicio) {
 }
 
 /** Confirma al cliente y avisa a Nicolás. */
-async function avisar({ nombre, email, tema, cuando, enlaceReunion, revision }) {
+async function avisar({ nombre, email, tema, presupuesto, cuando, enlaceReunion, revision }) {
   const agregar = enlaceAgregarACalendario({
     titulo: 'Reunión con Nicolás Golott — Phoenix IA Method',
     inicio: revision.inicio,
@@ -65,7 +65,7 @@ async function avisar({ nombre, email, tema, cuando, enlaceReunion, revision }) 
 Tu reunión quedó agendada para el ${cuando} (hora de Chile).
 
 Es una reunión 1:1 por videollamada.${enlaceReunion ? `\n\nEnlace: ${enlaceReunion}` : '\n\nTe hago llegar el enlace antes de la reunión.'}
-
+${tema ? `\nEsto fue lo que me contaste:\n"${tema}"\n` : ''}
 Agrégala a tu calendario acá:
 ${agregar}
 
@@ -87,6 +87,17 @@ Phoenix IA Method`
       ? `<tr><td style="padding:22px 32px 0;"><a href="${escapar(enlaceReunion)}" style="display:inline-block;background:#F26522;color:#120B07;text-decoration:none;padding:16px 30px;font:400 12px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;">Entrar a la reunión</a></td></tr>`
       : `<tr><td style="padding:22px 32px 0;"><p style="margin:0;font:400 14px/1.6 Helvetica,Arial,sans-serif;color:#B39C90;">Te hago llegar el enlace de la videollamada antes de la reunión.</p></td></tr>`
   }
+  ${
+    tema
+      ? `<tr><td style="padding:22px 32px 0;">
+    <p style="margin:0 0 6px;font:400 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.2em;color:#B39C90;text-transform:uppercase;">Esto fue lo que me contaste</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td style="border-left:2px solid #F26522;padding:4px 0 4px 16px;">
+        <p style="margin:0;font:italic 400 15px/1.6 Georgia,serif;color:#F8F4F1;">${escapar(tema).replace(/\n/g, '<br>')}</p>
+      </td></tr></table>
+  </td></tr>`
+      : ''
+  }
   <tr><td style="padding:18px 32px 0;"><a href="${escapar(agregar)}" style="font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#F26522;">Agregar a mi calendario →</a></td></tr>
   <tr><td style="padding:26px 32px 32px;"><p style="margin:0;padding-top:20px;border-top:1px solid rgba(248,244,241,.12);font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#B39C90;">¿Necesitas moverla? Responde este correo.<br><br>Nicolás Golott<br><span style="color:#FFC46B;">Phoenix IA Method</span></p></td></tr>
 </table></td></tr></table></body></html>`
@@ -105,9 +116,10 @@ Phoenix IA Method`
 
   const aviso = `Nueva reunión agendada desde la web
 
-Cuándo:   ${cuando}
-Quién:    ${nombre}
-Correo:   ${email}
+Cuándo:       ${cuando}
+Quién:        ${nombre}
+Correo:       ${email}
+Presupuesto:  ${presupuesto || 'No indicado'}
 ${tema ? `\nQué quiere resolver:\n${tema}\n` : ''}
 Ya está en tu calendario de clientes.${enlaceReunion ? `\nEnlace: ${enlaceReunion}` : '\n\nOJO: el evento no tiene enlace de videollamada. Agrégalo antes de la reunión.'}`
 
@@ -147,6 +159,7 @@ export default async function handler(req, res) {
   const nombre = limpiarLinea(cuerpo.nombre, 80)
   const email = limpiarLinea(cuerpo.email, 160)
   const tema = limpiarTexto(cuerpo.tema, 1000)
+  const presupuesto = limpiarLinea(cuerpo.presupuesto, 80)
   const inicioISO = limpiarLinea(cuerpo.inicio, 40)
 
   if (nombre.length < 2) return res.status(400).json({ ok: false, error: 'Falta tu nombre.' })
@@ -195,6 +208,7 @@ export default async function handler(req, res) {
         `Reunión 1:1 agendada desde phoenixiamethod.cl`,
         '',
         `Contacto: ${email}`,
+        presupuesto ? `Presupuesto: ${presupuesto}` : '',
         tema ? `\nQué quiere resolver:\n${tema}` : '',
       ].join('\n'),
       inicioISO: new Date(revision.inicio).toISOString(),
@@ -209,7 +223,7 @@ export default async function handler(req, res) {
 
     // El evento ya está en la agenda. Los correos son deseables, pero si Brevo
     // falla la reserva sigue siendo válida: no se le dice que no a la persona.
-    await avisar({ nombre, email, tema, cuando, enlaceReunion, revision }).catch(() => {})
+    await avisar({ nombre, email, tema, presupuesto, cuando, enlaceReunion, revision }).catch(() => {})
     await contarDesdeServidor(req, 'reserva_hecha')
 
     const sesion = RE_SESION.test(String(cuerpo.sesion || '')) ? String(cuerpo.sesion) : ''
@@ -219,6 +233,7 @@ export default async function handler(req, res) {
       nombre,
       email,
       detalle: tema,
+      presupuesto,
       sesion,
       ...lugar(req),
       equipo: equipoDe(ua),

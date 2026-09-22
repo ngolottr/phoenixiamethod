@@ -1,14 +1,22 @@
 /* ============================================================================
-   SOLICITUDES DESDE LA WEB  →  CORREO AUTOMÁTICO
+   SOLICITUDES DESDE LA WEB  →  AVISO A NICOLÁS
    ----------------------------------------------------------------------------
-   Sin n8n y sin servidor propio. Esta función vive en Vercel y hace tres cosas
-   cuando alguien envía el formulario:
+   El formulario ya no manda un correo con un enlace para que la persona vuelva
+   más tarde a elegir su hora: el navegador la lleva derecho a /agendar.html en
+   cuanto envía el formulario (ver ContactForm.tsx), con su nombre, correo y
+   mensaje ya puestos ahí. Esta función corre en paralelo, sin que la persona
+   espere por ella, y hace dos cosas:
 
-     1. Valida los datos (otra vez, porque nadie garantiza que vengan del form).
-     2. Le manda a la persona un correo que retoma lo que escribió y le propone
-        agendar una reunión 1:1 por Zoom, con el enlace a la página de agendar.
-     3. Te manda a ti una copia con los datos del contacto, para que quede
+     1. Valida los datos (otra vez, porque nadie garantiza que vengan del form)
+        y te manda a ti una copia con los datos del contacto, para que quede
         registrado en tu Gmail sin necesidad de una planilla aparte.
+     2. Deja el registro en el panel de estadísticas (`registrarCliente`), con
+        lo que escribió y el recorrido que hizo por el sitio.
+
+   Si la persona no llega a reservar una hora, este es el único aviso que te
+   llega de que existió — por eso sigue corriendo aunque el navegador ya se
+   haya ido a otra página. El correo de la reunión (con el enlace y lo que
+   escribió acá) lo manda `api/reservar.js` cuando de verdad reserva.
 
    El correo sale por Brevo, que regala 300 envíos diarios. Se habla por HTTP,
    así que no hay ninguna librería instalada.
@@ -44,9 +52,10 @@ export const config = { maxDuration: 20 }
 
 const LIMITES = { nombre: 80, email: 160, mensaje: 2000, presupuesto: 80 }
 
-/* Cuánto se puede usar esta función. Cada solicitud gasta dos correos del cupo
-   diario de Brevo, que son 300: el tope global deja margen de sobra para las
-   personas reales y corta en seco a quien quiera vaciarlo. */
+/* Cuánto se puede usar esta función. Ya no gasta dos correos del cupo diario de
+   Brevo por solicitud, solo uno (el tuyo), así que el tope global deja mucho
+   más margen del que necesita una persona real y corta en seco a quien quiera
+   vaciarlo. */
 const CUPO_IP = [3, 15 * 60000] // 3 envíos cada cuarto de hora desde una IP
 const CUPO_CORREO = [2, 24 * 3600000] // 2 al día por dirección
 const CUPO_TOTAL = [40, 24 * 3600000] // 40 al día en toda la web
@@ -56,9 +65,9 @@ const SEGUNDOS_MINIMOS = 3
 
 /* Brevo dejó de reescribir el remitente cuando es una dirección gratuita: desde
    el 10/09 todo lo que sale con @gmail.com queda "Bloqueado" en su registro y no
-   llega a nadie —ni al visitante ni a Nicolás—, y la API igual responde que sí.
-   Por eso el remitente es ahora el subdominio que Brevo firma por su cuenta. Las
-   respuestas siguen llegando al Gmail de siempre: van por el replyTo. */
+   llega a nadie, y la API igual responde que sí. Por eso el remitente es ahora
+   el subdominio que Brevo firma por su cuenta. Las respuestas siguen llegando
+   al Gmail de siempre: van por el replyTo. */
 const CORREO_NICOLAS = process.env.CONTACTO_EMAIL || 'contacto.nicolaspk@gmail.com'
 const REMITENTE = {
   name: 'Nicolás Golott',
@@ -66,10 +75,9 @@ const REMITENTE = {
 }
 // trim: al cargar la variable desde una terminal se puede colar un salto de línea
 const SITIO = (process.env.SITIO_URL || 'https://phoenixiamethod.cl').trim().replace(/\/$/, '')
-const HORARIO =
-  'lunes a viernes desde las 20:30, sábados desde las 16:00 y domingos todo el día (hora de Chile)'
 
-/** Enlace a la página de reserva, con los datos ya rellenados. */
+/** Enlace a la página de reserva, con los datos ya rellenados — por si hay que
+ *  mandárselo a mano a alguien que no llegó a reservar. */
 function enlaceAgenda({ nombre, email }) {
   const q = new URLSearchParams({ nombre, email })
   return `${SITIO}/agendar.html?${q.toString()}`
@@ -84,85 +92,6 @@ function escapar(texto) {
     .replace(/"/g, '&quot;')
 }
 
-const primerNombre = (nombre) => nombre.split(/\s+/)[0]
-
-/* --- El correo que recibe la persona ------------------------------------- */
-
-function correoParaElCliente({ nombre, email, mensaje }) {
-  const nom = primerNombre(nombre)
-  const agenda = enlaceAgenda({ nombre, email })
-
-  const texto = `Hola, ${nom},
-
-Gracias por escribir. Leí tu solicitud y esto fue lo que me llegó:
-
-"${mensaje}"
-
-Para dimensionarlo bien necesito conversarlo contigo en vivo: por correo se pierde justo lo que importa, que es entender cómo funciona hoy tu operación antes de proponer nada.
-
-El siguiente paso es una reunión 1:1 por videollamada.
-
-Elige tú mismo la hora que te acomode acá:
-
-${agenda}
-
-Ahí ves solo los horarios que tengo realmente libres. Eliges uno, confirmas, y te llega la invitación al calendario con el enlace de la reunión.
-
-Atiendo ${HORARIO}.
-
-Nos vemos,
-
-Nicolás Golott
-Phoenix IA Method`
-
-  const html = `<!doctype html>
-<html lang="es"><body style="margin:0;padding:0;background:#120B07;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#120B07;padding:32px 16px;">
-<tr><td align="center">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#071711;border:1px solid rgba(239,231,213,.14);">
-  <tr><td style="padding:30px 32px 0;">
-    <p style="margin:0;font:400 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.42em;color:#F26522;text-transform:uppercase;">PHOENIX IA METHOD</p>
-  </td></tr>
-  <tr><td style="padding:22px 32px 0;">
-    <p style="margin:0;font:400 26px/1.2 Georgia,'Times New Roman',serif;color:#F8F4F1;">Hola, ${escapar(nom)}.</p>
-  </td></tr>
-  <tr><td style="padding:18px 32px 0;">
-    <p style="margin:0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#D8C7BC;">Gracias por escribir. Leí tu solicitud y esto fue lo que me llegó:</p>
-  </td></tr>
-  <tr><td style="padding:16px 32px 0;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
-      <td style="border-left:2px solid #F26522;padding:4px 0 4px 16px;">
-        <p style="margin:0;font:italic 400 15px/1.6 Georgia,serif;color:#F8F4F1;">${escapar(mensaje).replace(/\n/g, '<br>')}</p>
-      </td></tr></table>
-  </td></tr>
-  <tr><td style="padding:20px 32px 0;">
-    <p style="margin:0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#D8C7BC;">Para dimensionarlo bien necesito conversarlo contigo en vivo: por correo se pierde justo lo que importa, que es entender cómo funciona hoy tu operación antes de proponer nada.</p>
-    <p style="margin:14px 0 0;font:400 15px/1.7 Helvetica,Arial,sans-serif;color:#D8C7BC;">El siguiente paso es una <strong style="color:#F8F4F1;">reunión 1:1 por videollamada</strong>.</p>
-  </td></tr>
-  <tr><td style="padding:24px 32px 0;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #F26522;">
-      <tr><td style="padding:20px 22px;">
-        <p style="margin:0;font:400 11px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;color:#F26522;text-transform:uppercase;">Cómo seguimos</p>
-        <p style="margin:12px 0 0;font:400 16px/1.55 Helvetica,Arial,sans-serif;color:#F8F4F1;">Elige tú mismo la hora que te acomode. Verás solo los horarios que tengo <strong>realmente libres</strong>.</p>
-        <p style="margin:20px 0 6px;">
-          <a href="${escapar(agenda)}" style="display:inline-block;background:#F26522;color:#120B07;text-decoration:none;padding:16px 30px;font:400 12px/1 Helvetica,Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;">Elegir mi horario</a>
-        </p>
-        <p style="margin:14px 0 0;font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#B39C90;">Atiendo ${HORARIO}.</p>
-      </td></tr>
-    </table>
-  </td></tr>
-  <tr><td style="padding:26px 32px 32px;">
-    <p style="margin:0;padding-top:20px;border-top:1px solid rgba(248,244,241,.12);font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#B39C90;">
-      Nicolás Golott<br><span style="color:#FFC46B;">Phoenix IA Method</span>
-    </p>
-  </td></tr>
-</table>
-</td></tr></table>
-</body></html>`
-
-  return { texto, html }
-}
-
 /* --- La copia que te llega a ti ------------------------------------------ */
 
 function correoParaNicolas({ nombre, email, mensaje, presupuesto }, sospechas = []) {
@@ -170,14 +99,15 @@ function correoParaNicolas({ nombre, email, mensaje, presupuesto }, sospechas = 
   const encabezado = marcada
     ? `SOLICITUD FILTRADA COMO POSIBLE ROBOT
 Motivo: ${sospechas.join(' · ')}
-NO se le envió el correo automático. Si es una persona real, respóndele tú
-desde este mensaje.
+Si es una persona real, respóndele tú desde este mensaje.
 
 `
     : ''
   const siguiente = marcada
-    ? 'No se le envió el enlace para agendar.'
-    : `Ya se le envió el enlace para que elija su horario.
+    ? `Si de verdad quiere agendar, mándale este enlace:\n${enlaceAgenda({ nombre, email })}`
+    : `Ya está en camino a elegir su horario (la llevé directo ahí desde el formulario).
+Si no alcanza a reservar, mándale este enlace:
+${enlaceAgenda({ nombre, email })}
 Cuando reserve, el evento aparece solo en tu calendario de clientes.`
 
   const texto = `${encabezado}Nueva solicitud desde phoenixiamethod.cl
@@ -198,9 +128,7 @@ Responde directo a este mensaje para contestarle.`
 
   /* Maquetado de verdad, no un <pre> suelto. El 11/09 esta copia salió como un
      bloque monoespaciado sin estructura: Brevo la dio por entregada y Gmail la
-     aceptó y la descartó en silencio, sin dejarla ni en spam ni en la papelera.
-     El correo del visitante, con esta misma cuenta y el mismo remitente, llegó
-     sin problema. */
+     aceptó y la descartó en silencio, sin dejarla ni en spam ni en la papelera. */
   const fila = (etiqueta, valor) => `
     <tr>
       <td style="padding:2px 0;font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#6b6b66;width:120px;">${escapar(etiqueta)}</td>
@@ -220,7 +148,7 @@ Responde directo a este mensaje para contestarle.`
     marcada
       ? `<tr><td style="padding:16px 26px 0;">
     <p style="margin:0;padding:12px 14px;background:#fdf1e7;border-left:3px solid #b4531f;font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#5c3a22;">
-      Filtrada como posible robot (${escapar(sospechas.join(' · '))}). No se le envió el correo automático; si es una persona real, respóndele tú desde este mensaje.
+      Filtrada como posible robot (${escapar(sospechas.join(' · '))}). Si es una persona real, respóndele tú desde este mensaje.
     </p>
   </td></tr>`
       : ''
@@ -236,7 +164,7 @@ Responde directo a este mensaje para contestarle.`
     <p style="margin:8px 0 0;font:400 15px/1.65 Helvetica,Arial,sans-serif;color:#111;">${escapar(mensaje).replace(/\n/g, '<br>')}</p>
   </td></tr>
   <tr><td style="padding:20px 26px 26px;">
-    <p style="margin:0;padding-top:16px;border-top:1px solid #ececE8;font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#6b6b66;">${escapar(siguiente)}</p>
+    <p style="margin:0;padding-top:16px;border-top:1px solid #ececE8;font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#6b6b66;white-space:pre-line;">${escapar(siguiente)}</p>
   </td></tr>
 </table>
 </td></tr></table>
@@ -292,11 +220,6 @@ export default async function handler(req, res) {
     return fallo(res, 413, 'El mensaje es demasiado largo.')
   }
 
-  const apiKey = process.env.BREVO_API_KEY
-  if (!apiKey) {
-    return fallo(res, 500, 'El correo no está disponible ahora.', 'Falta BREVO_API_KEY')
-  }
-
   let cuerpo
   try {
     cuerpo = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
@@ -341,9 +264,9 @@ export default async function handler(req, res) {
 
   /* --- Filtros de abuso --------------------------------------------------- */
 
-  /* Este correo le repite al visitante lo que escribió. Sin este filtro, la web
-     sirve para mandarle a cualquiera un mensaje lleno de enlaces desde una
-     dirección con buena reputación: phishing con la cara de Nicolás. */
+  /* La copia interna repite lo que escribió el visitante. Sin este filtro, la
+     web sirve para mandarle a Nicolás un correo lleno de enlaces desde una
+     dirección con buena reputación. */
   if (cuentaEnlaces(datos.mensaje) > MAX_ENLACES) {
     return res
       .status(400)
@@ -363,14 +286,9 @@ export default async function handler(req, res) {
       .json({ ok: false, error: 'Ya recibí tu mensaje. Dame un rato antes de mandar otro.' })
   }
 
-  /* Señales de robot. Antes bastaba una para descartar la solicitud en
-     silencio, y el 11/09 eso se comió la de una persona real: el
-     autocompletado del teléfono llenó la trampa, el visitante vio "revisa tu
-     correo" y no salió ningún mensaje, ni para él ni para Nicolás.
-
-     Ahora una solicitud marcada no recibe el correo automático —no se le puede
-     mandar contenido a ciegas a una dirección que quizá no pidió nada— pero
-     llega igual a Nicolás con el motivo escrito, y queda en el registro de
+  /* Señales de robot. Ya no deciden si se manda o no un correo a la persona
+     (esta función no le manda ninguno), solo cómo se marca el aviso que te
+     llega a ti: igual llega, con el motivo escrito, y queda en el registro de
      Vercel. Los cupos ya se aplicaron más arriba, así que esta vía tampoco
      sirve para inundar la bandeja. */
   const abierto = Number(cuerpo.desde)
@@ -380,7 +298,16 @@ export default async function handler(req, res) {
     sospechas.push(`enviado en ${(abierto / 1000).toFixed(1)} s`)
   }
 
-  const cliente = correoParaElCliente(datos)
+  // Se registra siempre, pase lo que pase con el correo: es el dato duro del
+  // panel, y no depende de que Brevo esté disponible.
+  await guardarComoCliente(sospechas)
+
+  const apiKey = process.env.BREVO_API_KEY
+  if (!apiKey) {
+    console.error('[contacto] no pude avisar → falta BREVO_API_KEY')
+    return res.status(200).json({ ok: true })
+  }
+
   const aviso = correoParaNicolas(datos, sospechas)
   const miCorreo = CORREO_NICOLAS
 
@@ -392,64 +319,25 @@ export default async function handler(req, res) {
       ? undefined
       : { email: datos.email, name: datos.nombre }
 
-  if (sospechas.length) {
-    console.warn('[contacto] filtrada como robot:', sospechas.join(' · '), '→', datos.email)
-    try {
-      await enviar({
-        apiKey,
-        para: miCorreo,
-        nombrePara: 'Nicolás',
-        asunto: `Solicitud filtrada (posible robot) — ${datos.nombre}`,
-        texto: aviso.texto,
-        html: aviso.html,
-        responderA: responderAlVisitante,
-      })
-    } catch (e) {
-      console.error('[contacto] no pude avisar de la solicitud filtrada →', e.message)
-    }
-    await guardarComoCliente(sospechas)
-    return res.status(200).json({ ok: true })
-  }
-
-  try {
-    // Primero el de la persona: es el que no puede fallar.
-    await enviar({
-      apiKey,
-      para: datos.email,
-      nombrePara: datos.nombre,
-      asunto: `Agendemos una reunión, ${primerNombre(datos.nombre)}`,
-      texto: cliente.texto,
-      html: cliente.html,
-      // El remitente es el subdominio de Brevo: si el visitante responde, la
-      // respuesta tiene que caer en el Gmail de Nicolás, no en el vacío.
-      responderA: { email: CORREO_NICOLAS, name: 'Nicolás Golott' },
-    })
-  } catch (e) {
-    // El detalle va al registro de Vercel. Al visitante, nada: la respuesta de
-    // Brevo trae pistas del remitente, del plan y de la clave.
-    return fallo(res, 502, 'No pude enviar el correo. Intenta de nuevo en unos minutos.', e.message)
-  }
-
-  // La copia interna es deseable, pero si falla no arruina la solicitud.
+  // El único correo que manda esta función ahora es el tuyo. Si falla, no hay
+  // nadie más a quien avisarle — pero la solicitud ya quedó registrada arriba,
+  // así que no se pierde.
   try {
     await enviar({
       apiKey,
       para: miCorreo,
       nombrePara: 'Nicolás',
-      asunto: `Nueva solicitud — ${datos.nombre}`,
+      asunto: sospechas.length
+        ? `Solicitud filtrada (posible robot) — ${datos.nombre}`
+        : `Nueva solicitud — ${datos.nombre}`,
       texto: aviso.texto,
       html: aviso.html,
       responderA: responderAlVisitante,
     })
   } catch (e) {
-    /* El visitante ya recibió su correo, así que la solicitud no se cae por
-       esto. Pero sin dejar rastro no había cómo distinguir "la copia se
-       demoró" de "la copia nunca salió", que es justo lo que costó horas de
-       diagnóstico el 11/09. */
-    console.error('[contacto] no llegó la copia interna →', e.message)
+    console.error('[contacto] no pude avisar de la solicitud →', e.message)
   }
 
-  await contarDesdeServidor(req, 'contacto_enviado')
-  await guardarComoCliente([])
+  if (!sospechas.length) await contarDesdeServidor(req, 'contacto_enviado')
   return res.status(200).json({ ok: true })
 }

@@ -151,9 +151,10 @@ conversamos.</h1>
 
         <div class="field">
           <label for="ag-tema">Qué quieres resolver <span class="ag-opt">(opcional)</span></label>
-          <textarea id="ag-tema" name="tema" placeholder="Así llego con contexto a la reunión"></textarea>
+          <textarea id="ag-tema" name="tema" placeholder="Así llego con contexto a la reunión">${escapar(params.get('tema') || '')}</textarea>
         </div>
 
+        <input type="hidden" id="ag-presupuesto" value="${escapar(params.get('presupuesto') || '')}" />
         <input type="text" id="ag-web" class="sr-only" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
         <div class="form-foot">
@@ -202,6 +203,7 @@ async function confirmar(e: Event) {
   const nombre = (document.getElementById('ag-nombre') as HTMLInputElement).value.trim()
   const email = (document.getElementById('ag-email') as HTMLInputElement).value.trim()
   const tema = (document.getElementById('ag-tema') as HTMLTextAreaElement).value.trim()
+  const presupuesto = (document.getElementById('ag-presupuesto') as HTMLInputElement).value
   const web = (document.getElementById('ag-web') as HTMLInputElement).value
   const error = document.getElementById('ag-error') as HTMLParagraphElement
 
@@ -218,7 +220,15 @@ async function confirmar(e: Event) {
     const r = await fetch('/api/reservar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre, email, tema, web, inicio: estado.elegida.inicio, sesion: sesionActual() }),
+      body: JSON.stringify({
+        nombre,
+        email,
+        tema,
+        presupuesto,
+        web,
+        inicio: estado.elegida.inicio,
+        sesion: sesionActual(),
+      }),
     })
     const datos = await r.json()
 
