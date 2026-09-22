@@ -174,3 +174,43 @@ body { background: var(--brasa); min-height: 100%; }
 
 .pn-pie { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center; margin-top: 28px; font-size: 11px; color: var(--humo); }
 .pn-pie .pn-volver { margin: 0; }
+
+/* --- Tarjeta con dato duro detrás ------------------------------------------- */
+.pn-kpi.is-clic { cursor: pointer; text-align: left; width: 100%; transition: border-color .15s, background .15s; }
+.pn-kpi.is-clic:hover, .pn-kpi.is-clic:focus-visible { border-color: var(--fuego); background: var(--rescoldo); }
+.pn-kpi.is-clic .pn-kpi-l::after { content: '→'; margin-left: 6px; opacity: .6; }
+
+/* --- Panel de clientes (dato duro) ------------------------------------------ */
+.pn-velo {
+  position: fixed; inset: 0; z-index: 60; background: rgba(8, 5, 3, .72);
+  display: flex; justify-content: center; align-items: flex-start;
+  padding: clamp(12px, 4vh, 48px) 14px; overflow-y: auto;
+}
+.pn-clientes {
+  width: 100%; max-width: 880px; background: var(--brasa-2); border: 1px solid var(--linea-fuerte);
+  border-radius: 16px; padding: clamp(18px, 3vw, 28px);
+}
+.pn-clientes-cabeza { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
+.pn-clientes-cabeza p { margin: 4px 0 0; font-size: 13px; color: var(--humo); }
+.pn-cerrar {
+  border: 1px solid var(--linea); border-radius: 8px; padding: 7px 12px;
+  color: var(--arena); font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+  flex-shrink: 0;
+}
+.pn-cerrar:hover { border-color: var(--fuego); color: var(--fuego); }
+.pn-clientes-lista { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 10px; }
+.pn-cliente { border: 1px solid var(--linea); border-radius: 12px; padding: 14px 16px; }
+.pn-cliente-fila { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.pn-cliente-n { font-family: var(--serif); font-size: 18px; color: var(--arena); margin: 0; }
+.pn-cliente-t { font-size: 12px; color: var(--humo); white-space: nowrap; }
+.pn-cliente-c { margin: 4px 0 0; font-size: 13px; }
+.pn-cliente-c a { color: var(--fuego); text-decoration: none; }
+.pn-cliente-c a:hover { text-decoration: underline; }
+.pn-cliente-meta { margin: 6px 0 0; font-size: 12px; color: var(--humo); }
+.pn-cliente-msg { margin: 10px 0 0; padding: 10px 12px; border-left: 2px solid var(--fuego); font-size: 13px; line-height: 1.55; color: var(--arena); background: var(--rescoldo); border-radius: 0 8px 8px 0; white-space: pre-wrap; }
+.pn-cliente-sospecha { margin: 8px 0 0; font-size: 11px; color: #FF8A7A; }
+.pn-cliente-recorrido { margin: 10px 0 0; font-size: 12px; }
+.pn-cliente-recorrido summary { cursor: pointer; color: var(--humo); }
+.pn-cliente-recorrido ol { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 3px; }
+.pn-cliente-recorrido li { display: flex; justify-content: space-between; gap: 10px; color: var(--arena); }
+.pn-cliente-recorrido time { color: var(--humo); }

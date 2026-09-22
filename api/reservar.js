@@ -8,7 +8,7 @@
    ========================================================================== */
 
 import { tramosOcupados, crearEvento } from './_google.js'
-import { contarDesdeServidor } from './_estadisticas.js'
+import { contarDesdeServidor, equipoDe, lugar, navegadorDe, registrarCliente, sistemaDe } from './_estadisticas.js'
 import { esHuecoValido, DURACION_MIN, partesEnChile } from './_agenda.js'
 import { CORREO_NICOLAS, enviarCorreo, escapar, enlaceAgregarACalendario } from './_correo.js'
 import {
@@ -25,6 +25,9 @@ import {
   sinCache,
   vieneDeLaWeb,
 } from './_seguridad.js'
+
+/** Igual que en api/evento.js: el identificador de sesión que arma el navegador. */
+const RE_SESION = /^[A-Za-z0-9_-]{8,40}$/
 
 export const config = { maxDuration: 20 }
 
@@ -208,6 +211,20 @@ export default async function handler(req, res) {
     // falla la reserva sigue siendo válida: no se le dice que no a la persona.
     await avisar({ nombre, email, tema, cuando, enlaceReunion, revision }).catch(() => {})
     await contarDesdeServidor(req, 'reserva_hecha')
+
+    const sesion = RE_SESION.test(String(cuerpo.sesion || '')) ? String(cuerpo.sesion) : ''
+    const ua = String(req.headers['user-agent'] || '')
+    await registrarCliente({
+      tipo: 'reserva',
+      nombre,
+      email,
+      detalle: tema,
+      sesion,
+      ...lugar(req),
+      equipo: equipoDe(ua),
+      navegador: navegadorDe(ua),
+      sistema: sistemaDe(ua),
+    })
 
     return res.status(200).json({ ok: true, cuando, enlace: enlaceReunion })
   } catch (e) {

@@ -22,7 +22,7 @@
                        acepta el envío y después lo marca "Bloqueado".
    ========================================================================== */
 
-import { contarDesdeServidor } from './_estadisticas.js'
+import { contarDesdeServidor, equipoDe, lugar, navegadorDe, registrarCliente, sistemaDe } from './_estadisticas.js'
 import {
   MAX_ENLACES,
   RE_EMAIL,
@@ -36,6 +36,9 @@ import {
   sinCache,
   vieneDeLaWeb,
 } from './_seguridad.js'
+
+/** Igual que en api/evento.js: el identificador de sesión que arma el navegador. */
+const RE_SESION = /^[A-Za-z0-9_-]{8,40}$/
 
 export const config = { maxDuration: 20 }
 
@@ -318,6 +321,24 @@ export default async function handler(req, res) {
     return res.status(400).json({ ok: false, error: `Datos incompletos: ${errores.join(', ')}` })
   }
 
+  // Para adjuntar el recorrido que hizo por el sitio antes de escribir.
+  const sesion = RE_SESION.test(String(cuerpo.sesion || '')) ? String(cuerpo.sesion) : ''
+  const ua = String(req.headers['user-agent'] || '')
+  const guardarComoCliente = (sospechas) =>
+    registrarCliente({
+      tipo: 'contacto',
+      nombre: datos.nombre,
+      email: datos.email,
+      detalle: datos.mensaje,
+      presupuesto: datos.presupuesto,
+      sesion,
+      ...lugar(req),
+      equipo: equipoDe(ua),
+      navegador: navegadorDe(ua),
+      sistema: sistemaDe(ua),
+      sospechas,
+    })
+
   /* --- Filtros de abuso --------------------------------------------------- */
 
   /* Este correo le repite al visitante lo que escribió. Sin este filtro, la web
@@ -386,6 +407,7 @@ export default async function handler(req, res) {
     } catch (e) {
       console.error('[contacto] no pude avisar de la solicitud filtrada →', e.message)
     }
+    await guardarComoCliente(sospechas)
     return res.status(200).json({ ok: true })
   }
 
@@ -428,5 +450,6 @@ export default async function handler(req, res) {
   }
 
   await contarDesdeServidor(req, 'contacto_enviado')
+  await guardarComoCliente([])
   return res.status(200).json({ ok: true })
 }

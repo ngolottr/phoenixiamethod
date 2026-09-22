@@ -4,6 +4,7 @@
    POST { clave }            → { ok, pase }  (válido 30 días)
    GET  ?vista=periodo&dias=N → todo el periodo (1, 7, 30 o 90 días)
    GET  ?vista=vivo           → quién está ahora y lo último que pasó
+   GET  ?vista=clientes&tipo=T → quiénes dejaron nombre y correo (T: contacto | reserva | vacío = todos)
    Las lecturas piden la cabecera  Authorization: Bearer <pase>.
 
    La contraseña vive en la variable ESTADISTICAS_CLAVE de Vercel, nunca en el
@@ -17,6 +18,7 @@ import {
   emitirPase,
   enVercel,
   hayAlmacen,
+  leerClientes,
   leerEnVivo,
   leerPeriodo,
   paseValido,
@@ -85,6 +87,14 @@ export default async function handler(req, res) {
   const vista = String(req.query?.vista || 'periodo')
   try {
     if (vista === 'vivo') return res.status(200).json({ ok: true, ...(await leerEnVivo()) })
+    if (vista === 'clientes') {
+      const tipo = String(req.query?.tipo || '')
+      const clientes = await leerClientes({ limite: 300 })
+      return res.status(200).json({
+        ok: true,
+        clientes: tipo ? clientes.filter((c) => c.tipo === tipo) : clientes,
+      })
+    }
     const dias = Number(req.query?.dias)
     const n = RANGOS.includes(dias) ? dias : 7
     return res.status(200).json({ ok: true, ...(await leerPeriodo(n)) })

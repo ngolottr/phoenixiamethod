@@ -1,6 +1,7 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { MagneticButton } from './MagneticButton'
 import { contact, phoenix, presupuestos } from '../data/site'
+import { sesionActual } from '../lib/analitica'
 
 type Values = { name: string; email: string; budget: string; message: string }
 type Errors = Partial<Record<keyof Values, string>>
@@ -68,6 +69,7 @@ export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
           mensaje: values.message.trim(),
           web: trampa,
           desde: Date.now() - abierto.current,
+          sesion: sesionActual(),
         }),
       })
       setEstado(r.ok ? 'enviado' : 'error')

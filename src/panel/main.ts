@@ -1,9 +1,10 @@
 /* ============================================================================
    PANEL DE ESTADÍSTICAS — privado
    ----------------------------------------------------------------------------
-   Se entra desde el sitio: Ajustes → Estadísticas (o /panel.html). Pide la
-   contraseña, que vive en Vercel (ESTADISTICAS_CLAVE), y deja una sesión de 30
-   días en este dispositivo.
+   No hay ningún enlace visible en el sitio público: se entra escribiendo
+   /panel.html directo en la barra de direcciones. Pide la contraseña, que
+   vive en Vercel (ESTADISTICAS_CLAVE), y deja una sesión de 30 días en este
+   dispositivo.
 
    Qué se refresca y cada cuánto:
      - "En vivo" (quién está ahora, lo último que pasó): cada 20 segundos.
@@ -53,6 +54,22 @@ type Periodo = {
   eventos: Par[]
 }
 type Reciente = { t: number; tipo: 'vista' | 'evento'; n: string; p: string; c: string; e: string; f: string }
+type Cliente = {
+  t: number
+  tipo: 'contacto' | 'reserva'
+  nombre: string
+  email: string
+  detalle: string
+  presupuesto: string
+  pais: string
+  ciudad: string
+  equipo: string
+  navegador: string
+  sistema: string
+  fuente: string
+  recorrido: { t: number; n: string; f?: string }[]
+  sospechas?: string[]
+}
 type Vivo = {
   ahora: number
   hoy: { visitantes: number; vistas: number; sesiones: number }
@@ -72,6 +89,10 @@ const estado = {
   error: '',
   sinAlmacen: false,
   actualizado: 0,
+  clientesTipo: null as 'contacto' | 'reserva' | null,
+  clientes: null as Cliente[] | null,
+  clientesCargando: false,
+  clientesError: '',
 }
 
 function leerPase() {
@@ -243,12 +264,16 @@ function delta(actual: number, antes: number, alReves = false) {
   return `<span class="pn-delta ${bueno ? 'pn-sube' : 'pn-baja'}">${pct > 0 ? '▲' : '▼'} ${Math.abs(pct)} %</span>`
 }
 
-function tarjeta(etiqueta: string, valor: string, extra: string, destacada = false) {
-  return `<div class="pn-kpi${destacada ? ' is-destacada' : ''}">
+function tarjeta(etiqueta: string, valor: string, extra: string, destacada = false, tipoCliente?: 'contacto' | 'reserva') {
+  const tag = tipoCliente ? 'button' : 'div'
+  const atributos = tipoCliente
+    ? ` type="button" data-cliente-tipo="${tipoCliente}"`
+    : ''
+  return `<${tag} class="pn-kpi${destacada ? ' is-destacada' : ''}${tipoCliente ? ' is-clic' : ''}"${atributos}>
     <p class="pn-kpi-l">${esc(etiqueta)}</p>
     <p class="pn-kpi-v">${valor}</p>
     <p class="pn-kpi-x">${extra}</p>
-  </div>`
+  </${tag}>`
 }
 
 /**
@@ -397,7 +422,8 @@ function pintar() {
       <span>Sin cookies ni rastreadores externos. Los visitantes se cuentan con una huella anónima que cambia cada día.</span>
     </footer>
     <div class="pn-tip" id="pn-tip" hidden></div>
-  </div>`
+  </div>
+  ${estado.clientesTipo ? pantallaClientes() : ''}`
 
   raiz.querySelectorAll<HTMLButtonElement>('[data-dias]').forEach((b) =>
     b.addEventListener('click', () => {
@@ -415,8 +441,115 @@ function pintar() {
   raiz.querySelector<HTMLInputElement>('#pn-excluir')?.addEventListener('change', (e) =>
     excluirEsteDispositivo((e.target as HTMLInputElement).checked),
   )
+  raiz.querySelectorAll<HTMLButtonElement>('[data-cliente-tipo]').forEach((b) =>
+    b.addEventListener('click', () => abrirClientes(b.dataset.clienteTipo as 'contacto' | 'reserva')),
+  )
+  raiz.querySelector('#pn-clientes-cerrar')?.addEventListener('click', cerrarClientes)
+  raiz.querySelector('.pn-velo')?.addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) cerrarClientes()
+  })
   activarCarteles()
   pintarVivo()
+}
+
+/* --- Dato duro: quién dejó su nombre y correo -------------------------------- */
+
+function abrirClientes(tipo: 'contacto' | 'reserva') {
+  estado.clientesTipo = tipo
+  estado.clientes = null
+  estado.clientesError = ''
+  pintar()
+  cargarClientes(tipo)
+}
+
+function cerrarClientes() {
+  estado.clientesTipo = null
+  pintar()
+}
+
+async function cargarClientes(tipo: 'contacto' | 'reserva') {
+  estado.clientesCargando = true
+  pintar()
+  try {
+    const r = await fetch(`/api/estadisticas?vista=clientes&tipo=${tipo}`, {
+      headers: { Authorization: `Bearer ${estado.pase}` },
+      cache: 'no-store',
+    })
+    const j = await r.json().catch(() => ({ ok: false, error: 'Respuesta ilegible.' }))
+    if (!j.ok) throw new Error(j.error || 'No pude leer los datos.')
+    estado.clientes = j.clientes
+  } catch (e) {
+    estado.clientesError = (e as Error).message
+  }
+  estado.clientesCargando = false
+  pintar()
+}
+
+const horaCorta = (t: number) =>
+  new Date(t).toLocaleString('es-CL', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+
+function filaCliente(c: Cliente) {
+  const meta = [
+    c.ciudad ? c.ciudad.split(', ')[0] : c.pais ? pais(c.pais) : '',
+    c.equipo,
+    c.fuente ? `llegó desde ${c.fuente === 'directo' ? 'acceso directo' : c.fuente}` : '',
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
+  return `<li class="pn-cliente">
+    <div class="pn-cliente-fila">
+      <p class="pn-cliente-n">${esc(c.nombre || 'Sin nombre')}</p>
+      <span class="pn-cliente-t">${horaCorta(c.t)}</span>
+    </div>
+    <p class="pn-cliente-c">
+      <a href="mailto:${esc(c.email)}">${esc(c.email)}</a>
+      ${c.presupuesto ? ` · ${esc(c.presupuesto)}` : ''}
+    </p>
+    ${meta ? `<p class="pn-cliente-meta">${esc(meta)}</p>` : ''}
+    ${c.detalle ? `<p class="pn-cliente-msg">${esc(c.detalle)}</p>` : ''}
+    ${
+      c.sospechas?.length
+        ? `<p class="pn-cliente-sospecha">Filtrada como posible robot: ${esc(c.sospechas.join(' · '))}. No se le envió el correo automático.</p>`
+        : ''
+    }
+    ${
+      c.recorrido?.length
+        ? `<details class="pn-cliente-recorrido"><summary>Qué vio antes de escribir (${c.recorrido.length})</summary>
+      <ol>
+        ${c.recorrido
+          .map((r) => `<li><span>${esc(ESCENAS[r.n] || r.n)}</span><time>${horaCorta(r.t)}</time></li>`)
+          .join('')}
+      </ol>
+    </details>`
+        : ''
+    }
+  </li>`
+}
+
+function pantallaClientes() {
+  const titulo = estado.clientesTipo === 'reserva' ? 'Reuniones reservadas' : 'Formularios enviados'
+  const lista = estado.clientes || []
+  return `<div class="pn-velo" role="dialog" aria-modal="true" aria-label="${esc(titulo)}">
+    <div class="pn-clientes">
+      <div class="pn-clientes-cabeza">
+        <div>
+          <h2 class="pn-h" style="margin-bottom:2px">${esc(titulo)}</h2>
+          <p>Nombre, correo y hora de cada solicitud, con lo que vio antes de escribir.</p>
+        </div>
+        <button class="pn-cerrar" id="pn-clientes-cerrar" type="button">Cerrar ✕</button>
+      </div>
+      ${
+        estado.clientesCargando
+          ? '<div class="pn-cargando" aria-busy="true" style="margin-top:18px;height:160px"></div>'
+          : estado.clientesError
+            ? `<p class="pn-error" role="alert">${esc(estado.clientesError)}</p>`
+            : lista.length
+              ? `<ol class="pn-clientes-lista">${lista.map(filaCliente).join('')}</ol>`
+              : '<p class="pn-vacio" style="margin-top:18px">Todavía no hay ninguna en este rango.</p>'
+      }
+    </div>
+  </div>`
 }
 
 function cuerpo(p: Periodo) {
@@ -447,8 +580,8 @@ function cuerpo(p: Periodo) {
 
     <section class="pn-kpis pn-kpis-acciones" aria-label="Acciones que importan">
       ${tarjeta('Llamadas', num(t.acciones.llamadas), delta(t.acciones.llamadas, a.acciones.llamadas), true)}
-      ${tarjeta('Formularios enviados', num(t.acciones.contactos), delta(t.acciones.contactos, a.acciones.contactos), true)}
-      ${tarjeta('Reuniones reservadas', num(t.acciones.reservas), delta(t.acciones.reservas, a.acciones.reservas), true)}
+      ${tarjeta('Formularios enviados', num(t.acciones.contactos), delta(t.acciones.contactos, a.acciones.contactos), true, 'contacto')}
+      ${tarjeta('Reuniones reservadas', num(t.acciones.reservas), delta(t.acciones.reservas, a.acciones.reservas), true, 'reserva')}
       ${tarjeta('Abrieron la agenda', num(t.acciones.agenda), delta(t.acciones.agenda, a.acciones.agenda))}
       ${tarjeta('Conversión', `${tasa} %`, `${delta(conversiones, conversionesAntes)} <small>visitas que contactaron</small>`)}
     </section>
@@ -544,6 +677,10 @@ function activarCarteles() {
     })
   })
 }
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && estado.clientesTipo) cerrarClientes()
+})
 
 /* --- Arranque ---------------------------------------------------------------- */
 

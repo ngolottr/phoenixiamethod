@@ -80,6 +80,17 @@ function enviar(datos: Record<string, unknown>) {
   }).catch(() => {})
 }
 
+/**
+ * El identificador de esta sesión, para adjuntarlo al formulario de contacto o
+ * a la reserva: si la persona deja su nombre y correo, el servidor recupera con
+ * esto qué escenas vio antes de escribir. No depende de `activo()`: aunque las
+ * visitas no se estén contando (por ejemplo en local), igual sirve el id.
+ */
+export function sesionActual() {
+  asegurarSesion()
+  return sesion
+}
+
 /** Una escena (o página) vista. */
 export function contarVista(nombre: string) {
   asegurarSesion()

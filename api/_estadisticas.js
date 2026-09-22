@@ -229,7 +229,14 @@ export const K = {
   dim: (nombre, d) => `st:${nombre}:${d}`, // hash de una dimensión
   recientes: 'st:recientes',
   activos: 'st:activos',
+  jornada: (sesion) => `st:j:${sesion}`, // qué escenas vio esta sesión, para adjuntarlo si deja sus datos
+  clientes: 'st:clientes', // quiénes dejaron su nombre y correo (formulario o reserva). No expira.
 }
+
+/** Cuánto vive el recorrido de una sesión mientras nadie deja sus datos: unos días alcanzan. */
+const JORNADA_SEG = 3 * 86400
+/** Cuántos registros de clientes se guardan como máximo. No es un dato que convenga perder. */
+const MAX_CLIENTES = 2000
 
 export const DIMENSIONES = [
   'escena',
@@ -345,6 +352,18 @@ export async function registrar(datos, ahora = Date.now()) {
     hinc(kd, 'vistas')
     hinc(K.dim('escena', d), datos.nombre)
     tocar(K.dim('escena', d))
+    if (datos.sesion) {
+      // El recorrido de esta sesión, por si más tarde deja su nombre y correo:
+      // ahí se adjunta entero al registro del cliente. Mientras tanto es un
+      // borrador de corta vida, no un rastro que valga la pena guardar solo.
+      const entrada = JSON.stringify(
+        datos.nueva ? { t: ahora, n: datos.nombre, f: datos.fuente || '' } : { t: ahora, n: datos.nombre },
+      )
+      const kj = K.jornada(datos.sesion)
+      cmds.push(['LPUSH', kj, entrada])
+      cmds.push(['LTRIM', kj, 0, 29])
+      cmds.push(['EXPIRE', kj, JORNADA_SEG])
+    }
     if (datos.nueva) {
       if (datos.sesion) {
         cmds.push(['PFADD', K.sesiones(d), datos.sesion])
@@ -421,6 +440,81 @@ export async function contarDesdeServidor(req, nombre) {
   } catch (e) {
     console.error(`[estadisticas] no se pudo contar ${nombre} →`, e.message)
   }
+}
+
+/* --- Clientes -----------------------------------------------------------------
+   Cuando alguien deja su nombre y correo de verdad (formulario o reserva), se
+   guarda aparte de los contadores anónimos: acá SÍ hay dato duro, porque la
+   persona lo entregó por su cuenta. Se adjunta el recorrido que hizo por el
+   sitio antes de escribir, si la sesión todavía tenía su jornada guardada.
+   No expira: es el historial de solicitudes, no una métrica del día. */
+
+/**
+ * Guarda una solicitud identificada. `datos`:
+ *   tipo       'contacto' | 'reserva'
+ *   nombre, email, detalle (mensaje o tema), presupuesto
+ *   sesion     para recuperar qué vio antes de escribir (puede venir vacía)
+ *   pais, ciudad, equipo, navegador, sistema
+ *   sospechas  lista de motivos por los que se filtró como posible robot (o vacía)
+ * Nunca tumba al que llama: si falla, se pierde el registro pero no la
+ * respuesta a la persona.
+ */
+export async function registrarCliente(datos) {
+  try {
+    if (!hayAlmacen()) return
+    let recorrido = []
+    let fuente = ''
+    if (datos.sesion) {
+      const [lineas] = await redis([['LRANGE', K.jornada(datos.sesion), 0, -1]])
+      recorrido = (lineas || [])
+        .map((l) => {
+          try {
+            return JSON.parse(l)
+          } catch {
+            return null
+          }
+        })
+        .filter(Boolean)
+        .reverse() // LPUSH las deja del más nuevo al más viejo
+      fuente = recorrido.find((r) => r.f)?.f || ''
+    }
+    const registro = JSON.stringify({
+      t: Date.now(),
+      tipo: datos.tipo,
+      nombre: datos.nombre || '',
+      email: datos.email || '',
+      detalle: datos.detalle || '',
+      presupuesto: datos.presupuesto || '',
+      pais: datos.pais || '',
+      ciudad: datos.ciudad || '',
+      equipo: datos.equipo || '',
+      navegador: datos.navegador || '',
+      sistema: datos.sistema || '',
+      fuente,
+      recorrido,
+      sospechas: datos.sospechas && datos.sospechas.length ? datos.sospechas : undefined,
+    })
+    await redis([
+      ['LPUSH', K.clientes, registro],
+      ['LTRIM', K.clientes, 0, MAX_CLIENTES - 1],
+    ])
+  } catch (e) {
+    console.error('[estadisticas] no se pudo guardar el cliente →', e.message)
+  }
+}
+
+/** Los últimos registros de clientes, del más nuevo al más viejo. */
+export async function leerClientes({ limite = 300 } = {}) {
+  const [lineas] = await redis([['LRANGE', K.clientes, 0, Math.max(0, limite - 1)]])
+  return (lineas || [])
+    .map((l) => {
+      try {
+        return JSON.parse(l)
+      } catch {
+        return null
+      }
+    })
+    .filter(Boolean)
 }
 
 /* --- Leer -------------------------------------------------------------------- */

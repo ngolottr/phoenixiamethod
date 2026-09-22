@@ -10,7 +10,7 @@
 
 import '../styles/global.css'
 import './agendar.css'
-import { contarVista, iniciarAnalitica } from '../lib/analitica'
+import { contarVista, iniciarAnalitica, sesionActual } from '../lib/analitica'
 
 iniciarAnalitica()
 contarVista('agendar')
@@ -218,7 +218,7 @@ async function confirmar(e: Event) {
     const r = await fetch('/api/reservar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre, email, tema, web, inicio: estado.elegida.inicio }),
+      body: JSON.stringify({ nombre, email, tema, web, inicio: estado.elegida.inicio, sesion: sesionActual() }),
     })
     const datos = await r.json()
 
