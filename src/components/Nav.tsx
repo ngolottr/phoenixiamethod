@@ -1,5 +1,4 @@
 import { MagneticButton } from './MagneticButton'
-import { Ajustes } from './Ajustes'
 import { Isotipo } from './Isotipo'
 import { BLOQUES, SCENES, type SceneDef } from '../hooks/useSceneRouter'
 import { persona, phoenix } from '../data/site'
@@ -11,16 +10,6 @@ type Props = {
   onGo: (i: number) => void
   onPrev: () => void
   onNext: () => void
-  reduced: boolean
-  onToggleMotion: () => void
-  customCursor: boolean
-  onToggleCursor: () => void
-  drag: boolean
-  onToggleDrag: () => void
-  musica: boolean
-  onToggleMusica: () => void
-  sonido: boolean
-  onToggleSonido: () => void
   theme: Theme
   onToggleTheme: () => void
   /** el visor de galería está abierto: la navegación se retira */
@@ -33,16 +22,6 @@ export function Nav({
   onGo,
   onPrev,
   onNext,
-  reduced,
-  onToggleMotion,
-  customCursor,
-  onToggleCursor,
-  drag,
-  onToggleDrag,
-  musica,
-  onToggleMusica,
-  sonido,
-  onToggleSonido,
   theme,
   onToggleTheme,
   hidden = false,
@@ -120,21 +99,6 @@ export function Nav({
               Apariencia: modo {theme === 'dark' ? 'oscuro' : 'claro'}. Pulsa para cambiar.
             </span>
           </button>
-
-          <Ajustes
-            reduced={reduced}
-            onToggleMotion={onToggleMotion}
-            customCursor={customCursor}
-            onToggleCursor={onToggleCursor}
-            drag={drag}
-            onToggleDrag={onToggleDrag}
-            musica={musica}
-            onToggleMusica={onToggleMusica}
-            sonido={sonido}
-            onToggleSonido={onToggleSonido}
-            theme={theme}
-            onToggleTheme={onToggleTheme}
-          />
         </div>
       </header>
 

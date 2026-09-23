@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
-const MOTION_KEY = 'phoenix:motion'
-const CURSOR_KEY = 'phoenix:cursor'
-const DRAG_KEY = 'phoenix:drag'
 const THEME_KEY = 'phoenix:theme'
-const MUSICA_KEY = 'phoenix:musica'
-const SONIDO_KEY = 'phoenix:sonido'
 
 export type Theme = 'dark' | 'light'
 
@@ -48,40 +43,19 @@ function media(query: string): boolean {
 /**
  * Preferencias de experiencia.
  *
- * REGLA DE ARRANQUE: los efectos vienen APAGADOS. No todos los visitantes
- * tienen un equipo potente, y el sitio tiene que abrir rápido y verse bien
- * en cualquier máquina antes que lucirse. Cada efecto lo enciende el visitante
- * desde la barra superior, y su elección queda guardada para la próxima visita.
+ * El sitio corre siempre en su versión sobria y profesional: sin animaciones
+ * de entrada, sin arrastre, sin música ni sonidos de interfaz. Nada de eso es
+ * una opción del visitante. Lo único que queda encendido de forma permanente
+ * es el cursor propio (en escritorio, donde hay puntero fino) y las ondas al
+ * hacer clic: tampoco son una opción, son parte fija de la identidad.
  *
- * El tema sí respeta al sistema la primera vez: alguien que navega en claro a
- * pleno día no debería recibir una pantalla negra por defecto.
+ * El tema sí es una elección real —claro u oscuro— y respeta al sistema la
+ * primera vez: alguien que navega en claro a pleno día no debería recibir una
+ * pantalla negra por defecto.
  */
 export function usePreferences() {
-  // Movimiento: animaciones de entrada, cortinas, halos, grano.
-  const [reduced, setReduced] = useState<boolean>(() => {
-    const saved = readStored(MOTION_KEY)
-    if (saved === 'reduced') return true
-    if (saved === 'full') return false
-    return true
-  })
-
-  // Cursor propio (el punto y el anillo que persiguen al puntero).
-  const [customCursor, setCustomCursor] = useState<boolean>(() => {
-    return readStored(CURSOR_KEY) === 'on'
-  })
-
-  // Arrastre: la estela de ondas que deja el puntero al pulsar y arrastrar.
-  const [drag, setDrag] = useState<boolean>(() => {
-    return readStored(DRAG_KEY) === 'on'
-  })
-
-  // Música de fondo. Apagada de entrada por dos motivos que empujan igual: un
-  // sitio que suena solo es intrusivo, y los navegadores lo bloquean de todos
-  // modos hasta que hay un gesto del visitante.
-  const [musica, setMusica] = useState<boolean>(() => readStored(MUSICA_KEY) === 'on')
-
-  // Sonidos de interfaz: hoy, el portal del manifiesto.
-  const [sonido, setSonido] = useState<boolean>(() => readStored(SONIDO_KEY) === 'on')
+  const reduced = true
+  const customCursor = true
 
   const [theme, setTheme] = useState<Theme>(() => {
     const saved = readStored(THEME_KEY)
@@ -90,19 +64,9 @@ export function usePreferences() {
   })
 
   useEffect(() => {
-    document.documentElement.dataset.motion = reduced ? 'reduced' : 'full'
-    store(MOTION_KEY, reduced ? 'reduced' : 'full')
-  }, [reduced])
-
-  useEffect(() => {
-    document.documentElement.dataset.cursor = customCursor ? 'on' : 'off'
-    store(CURSOR_KEY, customCursor ? 'on' : 'off')
-  }, [customCursor])
-
-  useEffect(() => {
-    document.documentElement.dataset.drag = drag ? 'on' : 'off'
-    store(DRAG_KEY, drag ? 'on' : 'off')
-  }, [drag])
+    document.documentElement.dataset.motion = 'reduced'
+    document.documentElement.dataset.cursor = 'on'
+  }, [])
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -110,20 +74,6 @@ export function usePreferences() {
     pintarBarraDelNavegador()
   }, [theme])
 
-  useEffect(() => {
-    store(MUSICA_KEY, musica ? 'on' : 'off')
-  }, [musica])
-
-  useEffect(() => {
-    document.documentElement.dataset.sonido = sonido ? 'on' : 'off'
-    store(SONIDO_KEY, sonido ? 'on' : 'off')
-  }, [sonido])
-
-  const toggleMotion = useCallback(() => setReduced((v) => !v), [])
-  const toggleCursor = useCallback(() => setCustomCursor((v) => !v), [])
-  const toggleDrag = useCallback(() => setDrag((v) => !v), [])
-  const toggleMusica = useCallback(() => setMusica((v) => !v), [])
-  const toggleSonido = useCallback(() => setSonido((v) => !v), [])
   const toggleTheme = useCallback(
     () => setTheme((v) => (v === 'dark' ? 'light' : 'dark')),
     [],
@@ -132,15 +82,7 @@ export function usePreferences() {
   return {
     reduced,
     customCursor,
-    drag,
-    musica,
-    sonido,
     theme,
-    toggleMotion,
-    toggleCursor,
-    toggleDrag,
-    toggleMusica,
-    toggleSonido,
     toggleTheme,
   }
 }

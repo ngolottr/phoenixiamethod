@@ -2,7 +2,6 @@ import { useState, type ReactNode } from 'react'
 import { MagneticButton } from '../components/MagneticButton'
 import { Emblema } from '../components/Emblema'
 import { CitaDelDia, rotuloDeHoy, useFraseDelDia } from '../components/CitaDelDia'
-import { usePortal } from '../hooks/useAudio'
 import { manifesto } from '../data/site'
 
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI']
@@ -28,10 +27,9 @@ function render(line: string): ReactNode[] {
  * termina de leer un método —¿y esto quién más lo dice?—, y quien no llegue
  * hasta ahí igual la encuentra desde cualquier pantalla, en la cápsula de abajo.
  */
-export function Manifesto({ sonido }: { sonido: boolean }) {
+export function Manifesto() {
   const [i, setI] = useState(0)
   const versos = manifesto.verses
-  const portal = usePortal(sonido)
   const frase = useFraseDelDia()
 
   /* La sexta pantalla existe solo cuando el banco de frases ya cargó. Mientras
@@ -40,15 +38,10 @@ export function Manifesto({ sonido }: { sonido: boolean }) {
   const esCita = frase !== null && i === versos.length
   const verse = versos[i]
 
-  /* El portal se dispara acá dentro, en el mismo clic que cambia el verso, y no
-     desde un efecto: colgando del gesto del visitante ningún navegador lo
-     bloquea por política de reproducción automática. */
   const mover = (paso: number) => {
-    portal()
     setI((v) => (v + paso + total) % total)
   }
   const irALaFrase = () => {
-    portal()
     setI(versos.length)
   }
 

@@ -648,6 +648,18 @@ html[data-motion='reduced'] .pane-mas b { animation: none; }
   border-radius: 50%; font-size: 15px; letter-spacing: 0;
 }
 
+/* --- Flechas de la barra inferior, con fondo propio --------------------
+   El botón heredaba de .btn, que en reposo no pinta nada: solo el borde.
+   Flotando sobre una escena fija eso no se nota, pero desde que el teléfono
+   desplaza la escena entera (regla 7c más abajo), el texto de la tarjeta
+   pasa DETRÁS de la flecha y se lee cruzado con el aro. El vidrio esmerilado
+   que ya usan .util y .avanzar la vuelve opaca de verdad. */
+.botnav .btn.icon {
+  background: var(--velo);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
 /* ===========================================================================
    NAVEGACIÓN
    =========================================================================== */
@@ -742,8 +754,6 @@ html[data-motion='reduced'] .pane-mas b { animation: none; }
 /* El tema no es un efecto que se enciende: es una elección entre dos. */
 .util-tema { color: var(--arena); border-color: var(--linea-fuerte); }
 .util-tema:hover { color: var(--amb-accent); }
-.aj-boton[aria-expanded='true'] { color: var(--amb-accent); border-color: var(--amb-accent); }
-
 /* --- Llamar ahora ----------------------------------------------------------
    El único control de la barra que va lleno: es para una urgencia y tiene que
    encontrarse sin buscarlo. Un pulso lento lo señala sin volverlo alarma. */
@@ -771,107 +781,6 @@ html[data-motion='reduced'] .util-llamar::after { animation: none; opacity: 0; }
   fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round;
 }
 
-/* La puerta al panel de estadísticas, al pie de los ajustes */
-.aj-panel-privado {
-  display: flex; align-items: center; gap: 8px;
-  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--linea);
-  font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
-  color: var(--humo); text-decoration: none;
-}
-.aj-panel-privado em { font-style: normal; letter-spacing: .08em; text-transform: none; opacity: .7; }
-.aj-panel-privado:hover, .aj-panel-privado:focus-visible { color: var(--amb-accent); }
-
-/* --- El panel de ajustes ------------------------------------------------- */
-
-.ajustes { position: relative; }
-
-.aj-panel {
-  position: absolute; top: calc(100% + 10px); right: 0; z-index: 40;
-  /* Nunca más ancho que la pantalla menos los márgenes: en un teléfono de
-     320 px el panel se estrecha en vez de empujar la página de lado. */
-  width: min(300px, calc(100vw - 2 * var(--edge)));
-  display: flex; flex-direction: column; gap: 10px;
-  padding: 16px;
-  /* Con los interruptores de audio el panel creció, y en un teléfono apaisado
-     —375 px de alto— se salía por abajo sin forma de alcanzar el final. Se
-     desplaza dentro de sí mismo antes que desbordar la pantalla. */
-  max-height: calc(var(--vh) - 92px);
-  overflow-y: auto; overscroll-behavior: contain;
-  scrollbar-width: thin;
-  background: var(--velo-total);
-  border: 1px solid var(--linea-fuerte);
-  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, .6);
-  text-align: left;
-  animation: ajAbre .18s var(--ease);
-}
-@keyframes ajAbre { from { opacity: 0; transform: translateY(-6px); } }
-html[data-motion='reduced'] .aj-panel { animation: none; }
-
-.aj-titulo {
-  font-size: 8.5px; letter-spacing: .32em; text-transform: uppercase;
-  color: var(--humo);
-}
-.aj-titulo + * { margin-top: -2px; }
-
-/* Apariencia: dos opciones, una elegida. */
-.aj-tema { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.aj-tema-op {
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  min-height: 42px; padding: 0 10px;
-  font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
-  color: var(--humo);
-  border: 1px solid var(--linea);
-  transition: color .25s, border-color .25s, background .25s;
-}
-.aj-tema-op:hover { color: var(--arena); border-color: var(--linea-fuerte); }
-.aj-tema-op[aria-checked='true'] {
-  color: var(--amb-bg); background: var(--amb-accent); border-color: var(--amb-accent);
-}
-
-/* Efectos: una fila por efecto, con su interruptor. */
-.aj-efectos { display: flex; flex-direction: column; gap: 4px; }
-.aj-fila {
-  display: flex; align-items: center; gap: 12px;
-  width: 100%; min-height: 46px; padding: 8px 2px;
-  text-align: left;
-  border-bottom: 1px solid var(--linea);
-}
-.aj-efectos .aj-fila:last-child { border-bottom: 0; }
-.aj-fila-txt { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
-.aj-fila-n { font-size: 12px; letter-spacing: .04em; color: var(--arena); }
-.aj-fila-d { font-size: 10px; line-height: 1.35; color: var(--humo); }
-.aj-fila-e {
-  font-size: 8px; letter-spacing: .18em; color: var(--humo); width: 22px; text-align: right;
-}
-.aj-fila[aria-checked='true'] .aj-fila-e { color: var(--amb-accent); }
-
-/* El interruptor. Una transición de transform y color: nada que componer. */
-.aj-sw {
-  position: relative; flex: none;
-  width: 38px; height: 21px; border-radius: 999px;
-  border: 1px solid var(--linea-fuerte);
-  transition: background .25s var(--ease), border-color .25s var(--ease);
-}
-.aj-sw-bola {
-  position: absolute; left: 2px; top: 50%;
-  width: 15px; height: 15px; border-radius: 50%;
-  background: var(--humo);
-  transform: translateY(-50%);
-  transition: transform .25s var(--ease), background .25s var(--ease);
-}
-.aj-fila[aria-checked='true'] .aj-sw {
-  background: var(--amb-accent); border-color: var(--amb-accent);
-}
-.aj-fila[aria-checked='true'] .aj-sw-bola {
-  background: var(--amb-bg); transform: translateY(-50%) translateX(17px);
-}
-.aj-fila:hover .aj-fila-n { color: var(--amb-accent); }
-
-.aj-nota {
-  font-size: 9.5px; line-height: 1.5; color: var(--humo);
-  padding-top: 10px; border-top: 1px solid var(--linea);
-}
-
 /* Barra inferior: flechas + indicador de escena */
 .botnav {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 700;
@@ -897,6 +806,11 @@ html[data-motion='reduced'] .aj-panel { animation: none; }
   min-height: 54px; padding: 0 22px 0 26px;
   border: 1px solid var(--linea-fuerte); border-radius: 999px;
   background: var(--velo);
+  /* El fondo ya lleva algo de transparencia (--velo); sin desenfoque, con la
+     escena entera desplazándose detrás en el teléfono, se alcanza a leer el
+     texto de la tarjeta cruzado con "Contacto →". El desenfoque lo apaga. */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   color: var(--arena); text-align: left;
   transition: color .35s var(--ease), border-color .35s var(--ease),
               background .35s var(--ease), transform .25s var(--ease);
@@ -3130,9 +3044,8 @@ html[data-motion='reduced'] .intro { display: none; }
      se le metía debajo y perdía el final. Que corte antes y baje de línea. */
   .home-copy > .eyebrow { max-width: 64%; }
 
-  /* Los dos controles pasan a solo símbolo, con la zona táctil que pide un
-     dedo. El teléfono tiene exactamente las mismas opciones que el escritorio:
-     el panel de ajustes es el mismo. */
+  /* Los controles pasan a solo símbolo, con la zona táctil que pide un dedo.
+     El teléfono recibe exactamente la misma barra que el escritorio. */
   .util {
     padding: 0; font-size: 8px; letter-spacing: .16em;
     width: 40px; height: 40px; min-height: 40px; justify-content: center; gap: 0;
@@ -3141,7 +3054,6 @@ html[data-motion='reduced'] .intro { display: none; }
   .util-icon { font-size: 14px; }
   .utils { gap: 6px; }
   .wordmark { font-size: 10px; letter-spacing: .34em; }
-  .aj-panel { width: min(320px, calc(100vw - 2 * var(--edge))); padding: 15px; }
 
   /* Atmósfera más barata en el teléfono. El grano no se aprecia a este tamaño
      y cuesta un pintado de pantalla completa; la viñeta se cierra menos porque
@@ -3258,7 +3170,7 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
    líneas al crecer. */
 @media (max-width: 1024px) {
   .eyebrow, .util, .topnav-bloque, .topnav-bloque-n, .hint, .ticker-count,
-  .aj-t, .aj-fila-n, .aj-fila-i, .filter, .label, .soc-handle,
+  .filter, .label, .soc-handle,
   .about-stat .l, .proyector-n, .cc-e, .ch-d, .pm-n,
   .work-row .wi, .work-row .wm, .work-row .wd, .wd,
   .work-vista-pie,
@@ -3269,7 +3181,7 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
 
   /* Texto corrido chico: 12 px y espaciado normal, que es lo que se lee
      cómodo en un teléfono sostenido con una mano. */
-  .aj-fila-d, .cc-n, .form-note, .field-error, .gal-cap .t, .proyector-pie {
+  .cc-n, .form-note, .field-error, .gal-cap .t, .proyector-pie {
     font-size: 12px;
     letter-spacing: .01em;
     line-height: 1.55;
@@ -3318,7 +3230,7 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
    Con el dedo, un botón de 24 px se falla. En pantallas táctiles todo lo que
    se toca mide al menos 40. */
 @media (pointer: coarse) {
-  .util, .btn.icon, .filter, .aj-boton { min-height: 40px; min-width: 40px; }
+  .util, .btn.icon, .filter { min-height: 40px; min-width: 40px; }
   .btn { padding-block: 13px; }
 }
 
@@ -3372,6 +3284,24 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
      desplazarse dentro de su propia ventanita. */
   .work-scene .work-cuerpo { flex: none; min-height: 0; }
   .work-scene .work-list { flex: none; min-height: 0; overflow: visible; }
+}
+
+/* --- 7d. La marca, cuando hay algo debajo para cruzarse ------------------
+   Mismo problema que el de la flecha de la barra inferior (más arriba en
+   .botnav .btn.icon), pero en la de ARRIBA: el nombre "PHOENIX IA METHOD" es
+   texto suelto, sin fondo. Mientras flota sobre la ilustración del Inicio se
+   ve bien así, pero ahora que cualquier escena larga se desplaza entera por
+   debajo de la barra fija (regla 7), el texto de la tarjeta que va pasando
+   se lee cruzado con las letras de la marca. El margen negativo compensa el
+   relleno para que la caja no se mueva ni un píxel de donde estaba. */
+@media (max-width: 760px) {
+  .wordmark {
+    padding: 6px 10px; margin: -6px -10px;
+    border-radius: 999px;
+    background: var(--velo);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
 }
 
 /* --- 8. La barra de abajo crece en teléfonos ------------------------------

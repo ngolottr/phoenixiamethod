@@ -7,7 +7,6 @@ import { Intro } from './components/Intro'
 import { Nav } from './components/Nav'
 
 import { pintarBarraDelNavegador, usePreferences, useViewportHeight } from './hooks/usePreferences'
-import { useMusica } from './hooks/useAudio'
 import { INICIO_DE_BLOQUE, SCENES, useSceneRouter } from './hooks/useSceneRouter'
 import { AmbientContext, useAmbientProvider } from './hooks/useAmbient'
 import { contarVista, iniciarAnalitica } from './lib/analitica'
@@ -32,24 +31,8 @@ function typingInField() {
 export default function App() {
   useViewportHeight()
 
-  const {
-    reduced,
-    customCursor,
-    drag,
-    musica,
-    sonido,
-    theme,
-    toggleMotion,
-    toggleCursor,
-    toggleDrag,
-    toggleMusica,
-    toggleSonido,
-    toggleTheme,
-  } = usePreferences()
+  const { reduced, customCursor, theme, toggleTheme } = usePreferences()
 
-  // La cama lofi vive acá arriba: el recorrido cambia de escena y la música no
-  // se entera, que es justo lo que se quiere de una música de fondo.
-  useMusica(musica)
   const { index, scene, direction, wiping, go, goTo, next, prev, home } = useSceneRouter(reduced)
   const ambient = useAmbientProvider()
 
@@ -189,7 +172,7 @@ export default function App() {
           <Home
             onEnter={() => goTo(INICIO_DE_BLOQUE.negocio)}
             onContacto={() => goTo('contacto')}
-            arrastrable={drag}
+            arrastrable={false}
           />
         )
       case 'sobre-mi':
@@ -201,13 +184,13 @@ export default function App() {
       case 'trabajo':
         return <Work onLockNav={setNavLocked} onContacto={() => goTo('contacto')} />
       case 'manifiesto':
-        return <Manifesto sonido={sonido} />
+        return <Manifesto />
       case 'contacto':
         return <Contact />
       case 'redes':
         return <Social onHome={home} />
     }
-  }, [scene.id, goTo, home, drag, sonido])
+  }, [scene.id, goTo, home])
 
   return (
     <AmbientContext.Provider value={ambient}>
@@ -218,7 +201,7 @@ export default function App() {
       <Intro reduced={reduced} />
       <Atmosphere cursorActivo={customCursor} />
       <Cursor enabled={customCursor} />
-      <Ripples enabled={drag} />
+      <Ripples enabled />
       <Curtain active={wiping} direction={direction} />
 
       <Nav
@@ -227,16 +210,6 @@ export default function App() {
         onGo={go}
         onPrev={prev}
         onNext={next}
-        reduced={reduced}
-        onToggleMotion={toggleMotion}
-        customCursor={customCursor}
-        onToggleCursor={toggleCursor}
-        drag={drag}
-        onToggleDrag={toggleDrag}
-        musica={musica}
-        onToggleMusica={toggleMusica}
-        sonido={sonido}
-        onToggleSonido={toggleSonido}
         theme={theme}
         onToggleTheme={toggleTheme}
         hidden={navLocked}
