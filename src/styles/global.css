@@ -854,6 +854,16 @@ html[data-motion='reduced'] .util-llamar::after { animation: none; opacity: 0; }
 .ticker-marks span.on { width: 34px; background: var(--amb-accent); }
 .ticker-count { font-size: 10px; letter-spacing: .28em; color: var(--humo); }
 .ticker-count b { color: var(--arena); font-weight: 400; }
+/* Enlace a la política de privacidad: fijo en la barra de abajo, en todas las
+   escenas. Con la misma voz que el contador para que no compita con él, pero
+   con un área de toque decente y un subrayado al pasar. */
+.ticker { flex-wrap: wrap; row-gap: 4px; }
+.ticker-legal {
+  font-size: 10px; letter-spacing: .28em; text-transform: uppercase;
+  color: var(--humo); text-decoration: none;
+  padding-block: 6px; border-bottom: 1px solid transparent;
+}
+.ticker-legal:hover, .ticker-legal:focus-visible { color: var(--arena); border-bottom-color: currentColor; }
 
 .hint { font-size: 9px; letter-spacing: .22em; text-transform: uppercase; color: rgba(143,167,155,.6); }
 @media (max-width: 900px) { .hint { display: none; } }
@@ -3171,7 +3181,7 @@ img, svg, video, canvas { max-width: 100%; height: auto; }
    ninguna baja de 11, y el espaciado se achica para que no se partan en dos
    líneas al crecer. */
 @media (max-width: 1024px) {
-  .eyebrow, .util, .topnav-bloque, .topnav-bloque-n, .hint, .ticker-count,
+  .eyebrow, .util, .topnav-bloque, .topnav-bloque-n, .hint, .ticker-count, .ticker-legal,
   .filter, .label, .soc-handle,
   .about-stat .l, .proyector-n, .cc-e, .ch-d, .pm-n,
   .work-row .wi, .work-row .wm, .work-row .wd, .wd,

@@ -4,19 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#120B07" />
-    <meta name="description" content="Qué datos personales recoge phoenixiamethod.cl, para qué los usa, con quién los comparte y cómo pedir que se borren." />
+    <meta name="description" content="Qué datos personales trata Phoenix IA Method, para qué, con quién los comparte, cuánto tiempo los guarda y cómo ejercer tus derechos." />
     <link rel="canonical" href="https://phoenixiamethod.cl/privacidad" />
     <title>Política de privacidad — Phoenix IA Method</title>
     <!--
       Página estática, sin JavaScript: la política de seguridad del sitio no
-      deja correr scripts sueltos, y un texto legal no necesita ninguno.
-      Todo lo que dice acá tiene que calzar con lo que hace el código de api/.
-      Si una función empieza a guardar o compartir algo nuevo, se cambia esta
-      página en el mismo commit.
+      deja correr scripts sueltos, y un texto legal no necesita ninguno. El
+      formulario de derechos es un formulario clásico que va a
+      /api/privacidad (ver api/privacidad.js), que responde con una página.
+
+      Todo lo que dice acá tiene que calzar con lo que hace el código de api/ y
+      con el procedimiento interno de Neurona (02_Fenix_IA_Method → Servicios →
+      Privacidad_y_Datos.md). Si una función empieza a guardar o compartir algo
+      nuevo, o cambia cómo se atiende a los clientes, se cambia esta página en
+      el mismo commit y se anota en el historial del final.
     -->
     <style>
-      :root { --brasa:#120B07; --arena:#F8F4F1; --humo:#B39C90; --fuego:#F26522; --linea:rgba(248,244,241,.14); }
+      :root { --brasa:#120B07; --carbon:#1a110c; --arena:#F8F4F1; --humo:#B39C90; --fuego:#F26522; --linea:rgba(248,244,241,.14); }
       * { box-sizing:border-box; }
+      html { scroll-behavior:smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } }
       body { margin:0; background:var(--brasa); color:var(--arena);
              font-family:'Calibri','Segoe UI',system-ui,-apple-system,sans-serif;
              -webkit-font-smoothing:antialiased; line-height:1.7; }
@@ -25,18 +32,41 @@
       .marca a { color:inherit; text-decoration:none; }
       h1 { font-family:Georgia,'Times New Roman',serif; font-weight:400; font-size:clamp(30px,7vw,46px); line-height:1.1; margin:0 0 12px; }
       h1 em { font-style:italic; color:var(--fuego); }
-      .fecha { color:var(--humo); font-size:13px; margin:0 0 40px; }
+      .fecha { color:var(--humo); font-size:13px; margin:0 0 32px; }
       h2 { font-family:Georgia,'Times New Roman',serif; font-weight:400; font-size:22px; margin:44px 0 12px;
-           padding-top:24px; border-top:1px solid var(--linea); }
+           padding-top:24px; border-top:1px solid var(--linea); scroll-margin-top:16px; }
+      h3 { font-size:16px; font-weight:600; margin:24px 0 6px; color:var(--arena); }
       p, li { color:var(--humo); }
       strong { color:var(--arena); font-weight:600; }
-      ul { padding-left:20px; }
+      ul, ol { padding-left:20px; }
       li { margin:0 0 8px; }
       a { color:var(--fuego); }
+      :focus-visible { outline:2px solid var(--fuego); outline-offset:3px; border-radius:3px; }
       table { width:100%; border-collapse:collapse; font-size:14px; margin:8px 0 0; }
       th, td { text-align:left; vertical-align:top; padding:10px 8px; border-bottom:1px solid var(--linea); color:var(--humo); }
       th { color:var(--arena); font-weight:600; }
       .tabla { overflow-x:auto; }
+      .corto { background:var(--carbon); border:1px solid var(--linea); border-radius:8px; padding:18px 20px 8px; margin:0 0 28px; }
+      .corto p.t { margin:0 0 8px; font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:var(--fuego); }
+      .indice { columns:2 220px; column-gap:28px; padding-left:18px; margin:0; }
+      .indice li { margin:0 0 4px; break-inside:avoid; }
+      .indice a { color:var(--humo); text-decoration:none; border-bottom:1px solid var(--linea); }
+      .indice a:hover { color:var(--arena); border-bottom-color:currentColor; }
+      .aviso { border-left:3px solid var(--fuego); padding:2px 0 2px 16px; margin:16px 0; }
+      /* Formulario de derechos */
+      form { background:var(--carbon); border:1px solid var(--linea); border-radius:8px; padding:20px; margin:18px 0 8px; display:grid; gap:16px; }
+      label { display:block; font-size:13px; font-weight:600; color:var(--arena); margin:0 0 6px; }
+      .opcional { font-weight:400; color:var(--humo); }
+      input, select, textarea { width:100%; font:inherit; font-size:16px; color:var(--arena); background:var(--brasa);
+             border:1px solid rgba(248,244,241,.24); border-radius:6px; padding:11px 12px; min-height:46px; }
+      select { appearance:auto; }
+      textarea { min-height:110px; resize:vertical; }
+      .dos { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+      @media (max-width:560px) { .dos { grid-template-columns:1fr; } }
+      .trampa { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+      .enviar { justify-self:start; padding:14px 24px; border:0; font:600 12px/1 inherit; font-family:inherit; letter-spacing:.2em; text-transform:uppercase;
+                background:var(--fuego); color:var(--brasa); border-radius:4px; cursor:pointer; }
+      .nota { font-size:13px; margin:0; }
       .volver { display:inline-block; margin-top:48px; padding:13px 22px; text-decoration:none; font-size:11px;
                 letter-spacing:.2em; text-transform:uppercase; background:var(--fuego); color:var(--brasa);
                 border-radius:4px; font-weight:600; }
@@ -46,22 +76,47 @@
     <main>
       <p class="marca"><a href="/">Phoenix IA Method</a></p>
       <h1>Política de <em>privacidad</em></h1>
-      <p class="fecha">Última actualización: 23 de septiembre de 2026</p>
+      <p class="fecha">Versión 2 · Última actualización: 23 de septiembre de 2026</p>
 
+      <div class="corto">
+        <p class="t">En corto</p>
+        <ul>
+          <li>Solo pido los datos que necesito para responderte, reunirme contigo, cobrarte y hacer tu proyecto.</li>
+          <li><strong>No vendo ni cedo tus datos</strong>, y el sitio no usa cookies ni rastreadores de terceros.</li>
+          <li>Las reuniones <strong>se graban solo si me das permiso</strong> al empezar. La grabación queda en mi computador y se borra a más tardar a los 60 días.</li>
+          <li>Uso herramientas de inteligencia artificial para ordenar mis notas, pero <strong>ninguna toma decisiones sobre ti</strong>.</li>
+          <li>Puedes pedir ver, corregir o borrar tus datos cuando quieras, <a href="#ejercer">con el formulario de abajo</a>. Te respondo en 2 días hábiles.</li>
+        </ul>
+      </div>
+
+      <nav aria-label="Contenido de la política">
+        <ol class="indice">
+          <li><a href="#responsable">Quién es el responsable</a></li>
+          <li><a href="#datos">Qué datos y para qué</a></li>
+          <li><a href="#reuniones">Reuniones y grabaciones</a></li>
+          <li><a href="#ia">Inteligencia artificial</a></li>
+          <li><a href="#proyectos">Datos de tu negocio</a></li>
+          <li><a href="#fundamento">Por qué puedo usarlos</a></li>
+          <li><a href="#estadisticas">Estadísticas sin cookies</a></li>
+          <li><a href="#terceros">Con quién se comparten</a></li>
+          <li><a href="#plazos">Cuánto tiempo se guardan</a></li>
+          <li><a href="#seguridad">Cómo se protegen</a></li>
+          <li><a href="#derechos">Tus derechos</a></li>
+          <li><a href="#ejercer">Cómo ejercerlos</a></li>
+          <li><a href="#reclamos">Si no quedas conforme</a></li>
+          <li><a href="#cambios">Cambios a esta política</a></li>
+        </ol>
+      </nav>
+
+      <h2 id="responsable">Quién es el responsable</h2>
       <p>
-        Esta página explica, sin letra chica, qué datos personales recoge
-        <strong>phoenixiamethod.cl</strong>, para qué se usan, con quién se comparten y cómo puedes
-        pedir que se corrijan o se borren.
+        El responsable de tus datos es <strong>Nicolás Golott</strong>, persona natural que presta los servicios de
+        consultoría tecnológica de <strong>Phoenix IA Method</strong> desde Santiago de Chile. Para cualquier consulta sobre
+        tus datos escribe a <a href="mailto:contacto.nicolaspk@gmail.com">contacto.nicolaspk@gmail.com</a> o usa el
+        <a href="#ejercer">formulario de derechos</a>.
       </p>
 
-      <h2>Quién es el responsable</h2>
-      <p>
-        El responsable de los datos es <strong>Nicolás Golott</strong>, persona natural que presta los
-        servicios de Phoenix IA Method desde Santiago de Chile. Para cualquier consulta sobre tus datos
-        escribe a <a href="mailto:contacto.nicolaspk@gmail.com">contacto.nicolaspk@gmail.com</a>.
-      </p>
-
-      <h2>Qué datos se recogen y para qué</h2>
+      <h2 id="datos">Qué datos se recogen y para qué</h2>
       <div class="tabla">
         <table>
           <thead>
@@ -79,6 +134,16 @@
               <td>Crear la reunión en el calendario y enviarte la confirmación con el enlace.</td>
             </tr>
             <tr>
+              <td>La reunión</td>
+              <td>Lo que conversamos: cómo funciona tu negocio, el problema que quieres resolver, cifras que decidas compartir y, si lo autorizas, la grabación.</td>
+              <td>Entender tu caso y prepararte una propuesta. <a href="#reuniones">Detalle abajo</a>.</td>
+            </tr>
+            <tr>
+              <td>Si seguimos conversando</td>
+              <td>Tu ficha de cliente: datos de contacto, etapa de la conversación, notas de cada reunión, propuestas y acuerdos.</td>
+              <td>Hacer el seguimiento, acordarme de lo que hablamos y no preguntarte dos veces lo mismo.</td>
+            </tr>
+            <tr>
               <td>Pagar un servicio</td>
               <td>Nombre y correo. Los datos de tu tarjeta o cuenta los ingresas en Flow y <strong>nunca pasan por este sitio</strong>.</td>
               <td>Abrir la orden de pago y confirmarte la compra.</td>
@@ -89,9 +154,19 @@
               <td>Emitir la boleta de honorarios en el SII, como exige la ley tributaria.</td>
             </tr>
             <tr>
+              <td>Durante un proyecto</td>
+              <td>La información de tu negocio que se necesite para el trabajo. <a href="#proyectos">Detalle abajo</a>.</td>
+              <td>Hacer el trabajo que contrataste, y nada más.</td>
+            </tr>
+            <tr>
               <td>Navegar por el sitio</td>
               <td>Qué secciones se ven, de qué sitio llegas, país y ciudad aproximados, tipo de equipo y navegador.</td>
               <td>Estadísticas propias para saber qué funciona y qué no.</td>
+            </tr>
+            <tr>
+              <td>Una solicitud de privacidad</td>
+              <td>Nombre, correo, qué pides y el detalle que escribas.</td>
+              <td>Responderte y dejar constancia de que se atendió.</td>
             </tr>
           </tbody>
         </table>
@@ -101,60 +176,185 @@
         sitio viste antes de hacerlo, para llegar a la conversación con contexto.
       </p>
 
-      <h2>Estadísticas sin cookies ni rastreadores</h2>
+      <h2 id="reuniones">Reuniones y grabaciones</h2>
+      <ul>
+        <li>Las reuniones son por videollamada (Zoom o Google Meet). <strong>Antes de la reunión no te pido que llenes nada</strong>: todo se conversa en la reunión.</li>
+        <li>Al empezar te pregunto si puedo grabar. <strong>Puedes decir que no</strong> y la reunión sigue exactamente igual. Si dices que sí, también puedes pedir que corte la grabación en cualquier momento.</li>
+        <li>La grabación se guarda <strong>en mi computador</strong>, no en la nube de la plataforma, y se transcribe en ese mismo computador.</li>
+        <li>La uso solo para preparar tu propuesta y dejar en tu ficha lo que acordamos. <strong>Nunca se publica</strong> ni se usa en contenido de redes, casos de estudio o publicidad sin tu autorización por escrito.</li>
+        <li>La grabación se borra <strong>a más tardar 60 días después de la reunión</strong>. En tu ficha quedan solo el resumen y las notas del caso.</li>
+        <li>Puedes pedir una copia de la grabación o que se borre antes, con el <a href="#ejercer">formulario de derechos</a>.</li>
+      </ul>
+
+      <h2 id="ia">Inteligencia artificial</h2>
+      <p>
+        Phoenix IA Method trabaja con inteligencia artificial, y la usa también puertas adentro. Para ordenar la
+        transcripción de una reunión, llenar tu ficha y redactar tu propuesta me apoyo en <strong>Claude</strong>, el
+        asistente de Anthropic. Eso significa que el contenido de la reunión pasa por ese servicio para procesarse.
+      </p>
+      <ul>
+        <li><strong>Ninguna decisión sobre ti la toma una máquina.</strong> La propuesta, el precio y cualquier decisión las tomo yo.</li>
+        <li>No subo a esas herramientas contraseñas ni accesos a tus sistemas.</li>
+        <li>Si prefieres que tus datos no pasen por herramientas de IA, dímelo al empezar o por el <a href="#ejercer">formulario</a>, y trabajo tu caso a mano.</li>
+      </ul>
+
+      <h2 id="proyectos">Datos de tu negocio durante un proyecto</h2>
+      <p>
+        Cuando me contratas para automatizar o integrar algo, muchas veces tengo que trabajar con información de tu
+        negocio, y a veces con datos de tus propios clientes. En ese caso trabajo <strong>por cuenta tuya</strong>, y el
+        responsable de esos datos sigues siendo tú:
+      </p>
+      <ul>
+        <li>Accedo solo a lo que el trabajo necesita, y solo mientras dura el proyecto.</li>
+        <li>Es información confidencial: no la uso para otros clientes ni para nada distinto del proyecto.</li>
+        <li>Los accesos a tus sistemas me los compartes por un canal seguro, no por chat ni por correo abierto. Puedes revocarlos cuando quieras, y al terminar te pido que los cambies o los revoques.</li>
+        <li>Al cerrar el proyecto te devuelvo o borro las copias de tus datos que haya usado, salvo lo que la ley obligue a guardar.</li>
+      </ul>
+
+      <h2 id="fundamento">Por qué puedo usar tus datos</h2>
+      <ul>
+        <li><strong>Porque me das tu consentimiento:</strong> cuando llenas un formulario, agendas o aceptas que grabe la reunión. Puedes retirarlo cuando quieras.</li>
+        <li><strong>Porque es necesario para el servicio:</strong> preparar la propuesta, cobrar y hacer el proyecto que contrataste.</li>
+        <li><strong>Porque la ley lo exige:</strong> emitir y guardar la boleta de honorarios.</li>
+        <li><strong>Por un interés legítimo:</strong> proteger el sitio contra abusos y medir, sin identificarte, qué partes del sitio sirven.</li>
+      </ul>
+
+      <h2 id="estadisticas">Estadísticas sin cookies ni rastreadores</h2>
       <ul>
         <li>El sitio <strong>no usa cookies</strong>, ni Google Analytics, ni píxeles de redes sociales, ni ningún rastreador de terceros.</li>
         <li><strong>No se guarda tu dirección IP.</strong> Para contar visitantes distintos se usa un código que cambia todos los días y que no permite volver a tu IP ni seguirte de un día a otro.</li>
         <li>Tu navegador guarda localmente un par de preferencias (por ejemplo, el tema claro u oscuro) y si ya visitaste el sitio antes. Eso queda en tu equipo y lo puedes borrar cuando quieras.</li>
       </ul>
 
-      <h2>Con quién se comparten</h2>
-      <p>Tus datos <strong>no se venden ni se ceden</strong> a nadie. Solo los tratan, por cuenta de Phoenix IA Method, los servicios que hacen funcionar el sitio:</p>
+      <h2 id="terceros">Con quién se comparten</h2>
+      <p>Tus datos <strong>no se venden ni se ceden</strong> a nadie. Solo los tratan, por cuenta de Phoenix IA Method, los servicios que hacen funcionar el trabajo:</p>
       <ul>
-        <li><strong>Vercel</strong> — aloja el sitio y ejecuta sus funciones.</li>
-        <li><strong>Upstash</strong> — base de datos donde se guardan las estadísticas y los contactos.</li>
-        <li><strong>Brevo</strong> — envía los correos de aviso y de confirmación.</li>
-        <li><strong>Google Calendar y Google Meet</strong> — donde se crean las reuniones que agendas.</li>
-        <li><strong>Flow</strong> — la pasarela de pago chilena que procesa los pagos.</li>
+        <li><strong>Vercel</strong>: aloja el sitio y ejecuta sus funciones.</li>
+        <li><strong>Upstash</strong>: base de datos donde se guardan las estadísticas, los contactos y las solicitudes de privacidad.</li>
+        <li><strong>Brevo</strong>: envía los correos de aviso y de confirmación.</li>
+        <li><strong>Google</strong> (Calendar, Meet y Gmail): donde se crean las reuniones y donde llegan y se responden los correos.</li>
+        <li><strong>Zoom</strong>: la plataforma de videollamada, cuando la reunión es por ahí.</li>
+        <li><strong>Flow</strong>: la pasarela de pago chilena que procesa los pagos.</li>
+        <li><strong>Anthropic</strong> (Claude): el asistente de IA con que ordeno notas y preparo propuestas. Ahí también vive la aplicación privada donde llevo el seguimiento de clientes.</li>
+        <li><strong>Microsoft</strong> (OneDrive): donde se guardan mis notas de trabajo y las fichas de clientes.</li>
+        <li><strong>WhatsApp</strong> (Meta): solo si me escribes o te escribo por ahí.</li>
       </ul>
       <p>
-        Algunos de estos servicios guardan datos en servidores fuera de Chile. Cada uno tiene su propia
-        política de privacidad y sus propias medidas de seguridad.
+        Varios de estos servicios guardan datos en servidores fuera de Chile, principalmente en Estados Unidos y la
+        Unión Europea. Cada uno tiene su propia política de privacidad y sus propias medidas de seguridad. Si la ley me
+        obliga a entregar datos a una autoridad, por ejemplo al SII, solo entrego lo que se me pide.
       </p>
 
-      <h2>Cuánto tiempo se guardan</h2>
+      <h2 id="plazos">Cuánto tiempo se guardan</h2>
       <ul>
-        <li><strong>Contactos y reuniones:</strong> se conservan los últimos 2.000 registros; los más antiguos se borran solos. Puedes pedir que se borre el tuyo antes, cuando quieras.</li>
+        <li><strong>Grabaciones de reuniones:</strong> a más tardar 60 días después de la reunión.</li>
+        <li><strong>Contactos y reuniones agendadas en el sitio:</strong> se conservan los últimos 2.000 registros; los más antiguos se borran solos.</li>
+        <li><strong>Tu ficha de cliente</strong> (notas, propuestas, acuerdos): mientras sigamos en contacto, y hasta 2 años después del último. Después se borra.</li>
+        <li><strong>Datos de tu negocio durante un proyecto:</strong> mientras dura el proyecto; al cerrarlo se devuelven o se borran.</li>
         <li><strong>Datos para la boleta:</strong> un año en la base del sitio. La boleta emitida queda además en el SII por el plazo que exige la ley tributaria.</li>
+        <li><strong>Solicitudes de privacidad:</strong> 2 años, para poder demostrar que se atendieron.</li>
         <li><strong>Recorrido por el sitio sin dejar datos:</strong> tres días.</li>
         <li><strong>Estadísticas agregadas por día:</strong> unos trece meses.</li>
       </ul>
+      <p>Puedes pedir que se borre lo tuyo antes, salvo lo que la ley obligue a guardar.</p>
 
-      <h2>Cómo se protegen</h2>
+      <h2 id="seguridad">Cómo se protegen</h2>
       <ul>
-        <li>Todo el tráfico va cifrado (HTTPS obligatorio).</li>
+        <li>Todo el tráfico del sitio va cifrado (HTTPS obligatorio).</li>
         <li>Las claves de acceso a los servicios viven en variables de entorno del servidor, nunca en el código.</li>
         <li>El servidor revisa y limpia cada dato antes de guardarlo, y limita cuántas veces se puede usar cada formulario para frenar abusos.</li>
-        <li>Las estadísticas y los contactos solo los puede ver Nicolás, con contraseña.</li>
+        <li>Las estadísticas, los contactos, las fichas y las grabaciones solo los puede ver Nicolás, con sus propias cuentas y contraseñas.</li>
+        <li>Si alguna vez hubiera una filtración que te afecte, te aviso apenas lo sepa, con lo que pasó y lo que puedes hacer.</li>
       </ul>
 
-      <h2>Tus derechos</h2>
+      <h2 id="derechos">Tus derechos</h2>
       <p>
-        Conforme a la Ley N° 19.628 sobre protección de la vida privada y a la Ley N° 21.719, puedes pedir
-        en cualquier momento <strong>acceder</strong> a los datos que se tienen de ti, <strong>corregirlos</strong>,
-        <strong>borrarlos</strong>, <strong>oponerte</strong> a su uso o recibirlos en un formato que puedas llevarte.
-        Escribe a <a href="mailto:contacto.nicolaspk@gmail.com">contacto.nicolaspk@gmail.com</a> indicando el correo
-        con el que dejaste tus datos, y tendrás respuesta dentro de 15 días hábiles.
+        Conforme a la <strong>Ley N° 19.628</strong> sobre protección de la vida privada y, desde su entrada en vigencia el
+        1 de diciembre de 2026, a la <strong>Ley N° 21.719</strong>, puedes pedir en cualquier momento y sin costo:
       </p>
-      <p>
-        Los datos de la boleta no se pueden borrar del SII una vez emitida, porque la ley tributaria obliga a conservarla.
+      <ul>
+        <li><strong>Acceso:</strong> saber qué datos tengo de ti, de dónde salieron y para qué los uso.</li>
+        <li><strong>Rectificación:</strong> corregir lo que esté malo o desactualizado.</li>
+        <li><strong>Supresión:</strong> que se borren.</li>
+        <li><strong>Oposición:</strong> que dejen de usarse para algo en particular.</li>
+        <li><strong>Portabilidad:</strong> recibirlos en un archivo que puedas llevarte.</li>
+        <li><strong>Bloqueo:</strong> que se suspenda su uso mientras se revisa tu solicitud.</li>
+        <li><strong>Retirar tu consentimiento</strong>, por ejemplo el de grabar las reuniones.</li>
+      </ul>
+      <p>Tampoco te afecta ninguna decisión tomada solo por una máquina.</p>
+      <p class="aviso">
+        Los datos de una boleta ya emitida no se pueden borrar del SII, porque la ley tributaria obliga a conservarla.
       </p>
 
-      <h2>Cambios a esta política</h2>
+      <h2 id="ejercer">Cómo ejercer tus derechos</h2>
       <p>
-        Si el sitio empieza a recoger datos nuevos o a usar otro servicio, esta página se actualiza y cambia
-        la fecha de arriba.
+        Llena este formulario. Te llega al correo un acuse con un <strong>folio</strong>, y te respondo a más tardar en
+        <strong>2 días hábiles</strong>. Si reunir lo que pides toma más trabajo, en ese plazo te confirmo cómo va y te
+        entrego la respuesta completa dentro de 30 días. Para proteger tus datos, respondo solo al correo con que me
+        contactaste y, si hace falta, te pido confirmar que eres tú.
       </p>
+      <form method="post" action="/api/privacidad">
+        <div>
+          <label for="tipo">Qué quieres pedir</label>
+          <select id="tipo" name="tipo" required>
+            <option value="acceso">Saber qué datos tienen de mí (acceso)</option>
+            <option value="rectificacion">Corregir mis datos (rectificación)</option>
+            <option value="supresion">Borrar mis datos (supresión)</option>
+            <option value="oposicion">Que dejen de usar mis datos para algo (oposición)</option>
+            <option value="portabilidad">Recibir mis datos en un archivo (portabilidad)</option>
+            <option value="bloqueo">Suspender el uso de mis datos mientras se revisa (bloqueo)</option>
+            <option value="consentimiento">Retirar un permiso que di, por ejemplo el de grabar (consentimiento)</option>
+            <option value="otra">Otra consulta sobre mis datos</option>
+          </select>
+        </div>
+        <div class="dos">
+          <div>
+            <label for="nombre">Tu nombre</label>
+            <input id="nombre" name="nombre" type="text" autocomplete="name" required minlength="2" maxlength="80" />
+          </div>
+          <div>
+            <label for="email">Tu correo</label>
+            <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" />
+          </div>
+        </div>
+        <div>
+          <label for="detalle">Detalle <span class="opcional">(opcional)</span></label>
+          <textarea id="detalle" name="detalle" maxlength="1400" placeholder="Por ejemplo: el correo con que agendé, o qué dato quieres corregir."></textarea>
+        </div>
+        <div class="trampa" aria-hidden="true">
+          <label for="web">No llenar este campo</label>
+          <input id="web" name="web" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+        <button class="enviar" type="submit">Enviar solicitud</button>
+        <p class="nota">Los datos de este formulario se usan solo para atender tu solicitud y se guardan 2 años como constancia.</p>
+      </form>
+      <p class="nota">
+        ¿Prefieres el correo? Escribe a <a href="mailto:contacto.nicolaspk@gmail.com?subject=Solicitud%20de%20privacidad">contacto.nicolaspk@gmail.com</a>
+        con el asunto "Solicitud de privacidad".
+      </p>
+
+      <h2 id="reclamos">Si no quedas conforme</h2>
+      <p>
+        Si no te respondo en el plazo o no estás de acuerdo con la respuesta, puedes recurrir a los tribunales civiles
+        según el artículo 16 de la Ley N° 19.628. Cuando empiece a funcionar la Agencia de Protección de Datos Personales
+        creada por la Ley N° 21.719, también podrás reclamar ante ella.
+      </p>
+
+      <h2 id="menores">Menores de edad</h2>
+      <p>
+        Los servicios de Phoenix IA Method están pensados para personas adultas y negocios. No recojo a sabiendas datos
+        de menores de 18 años; si me entero de que llegó alguno, lo borro.
+      </p>
+
+      <h2 id="cambios">Cambios a esta política</h2>
+      <p>
+        Si empiezo a recoger datos nuevos, a usar otro servicio o a trabajar de otra forma con tus datos, esta página se
+        actualiza y cambia la fecha de arriba. Si el cambio te afecta y ya eres cliente, te aviso por correo.
+      </p>
+      <ul>
+        <li><strong>Versión 2 (23/09/2026):</strong> se agregan las reuniones y su grabación, el uso de inteligencia artificial, los datos de tu negocio durante un proyecto, los plazos de cada dato y el formulario de derechos con folio.</li>
+        <li><strong>Versión 1 (23/09/2026):</strong> primera publicación.</li>
+      </ul>
 
       <a class="volver" href="/">Volver al sitio</a>
     </main>

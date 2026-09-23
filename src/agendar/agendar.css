@@ -84,6 +84,11 @@ body { background: var(--brasa); min-height: 100%; }
 
 .ag-cta { margin-top: 26px; }
 .ag-link { color: var(--fuego); text-decoration: underline; text-underline-offset: 3px; }
+/* Pie con la política de privacidad: fijo en el HTML, fuera de lo que pinta el
+   script, así se ve aunque la agenda no cargue. */
+.ag-pie { text-align: center; padding: 8px 20px max(28px, env(safe-area-inset-bottom)); font-size: 12px; letter-spacing: .08em; color: rgba(179,156,144,.75); }
+.ag-pie a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.ag-pie a:hover, .ag-pie a:focus-visible { color: var(--fuego); }
 
 @media (max-width: 520px) {
   .ag-horas { grid-template-columns: repeat(3, 1fr); }

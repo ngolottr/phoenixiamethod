@@ -438,11 +438,28 @@ función siquiera arranque:
 
 ### Privacidad
 
-La política vive en `public/privacidad.html` (servida en `/privacidad`) y está
-enlazada desde el formulario de contacto, la agenda, la ventana de compra y el
-formulario de la boleta. Describe exactamente lo que hace `api/`: **si una
-función empieza a guardar o compartir un dato nuevo, o se suma un servicio, se
-actualiza esa página en el mismo commit.**
+La política vive en `public/privacidad.html` (servida en `/privacidad`). Está
+enlazada en **la barra de abajo de todas las escenas**, en el pie de la agenda,
+en el formulario de contacto, la agenda, la ventana de compra, el formulario de
+la boleta y los correos de confirmación. Describe exactamente lo que hace `api/`
+y cómo se atiende a los clientes: **si una función empieza a guardar o compartir
+un dato nuevo, se suma un servicio o cambia cómo se trabaja con los datos de los
+clientes, se actualiza esa página en el mismo commit** y se anota en su
+historial.
+
+Desde la versión 2 (23/09/2026) cubre también las reuniones grabadas, el uso de
+IA, los datos de los clientes durante un proyecto y los plazos de cada dato.
+
+**Formulario de derechos.** Al final de la política hay un formulario clásico
+(sin JavaScript) que va a `api/privacidad.js`. La función valida, aplica cupos
+(3 por hora por IP, 2 al día por correo, 20 al día en total) y campo trampa,
+asigna un folio `PRV-AAMMDD-XXXX`, guarda la solicitud en Redis por 2 años
+(`privacidad:sol:<folio>`), le avisa a Nicolás con el plazo en el asunto y le
+manda al titular un acuse con el folio. El plazo es de **2 días hábiles** (Ley
+19.628, art. 16); se cuentan saltando fines de semana, sin descontar feriados,
+así que nunca queda más largo que el legal. El acuse no repite nada de lo que
+escribió la persona, para que el formulario no sirva para mandar textos ajenos.
+Cómo se atiende cada solicitud: Neurona → `02_Fenix_IA_Method/Servicios/Privacidad_y_Datos.md`.
 
 **Por qué no hay "Row Level Security".** RLS es una función de Postgres
 (Supabase y similares) y este sitio no tiene base de ese tipo ni cuentas de

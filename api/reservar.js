@@ -83,7 +83,9 @@ Si necesitas moverla o no puedes llegar, responde este correo.
 Nos vemos,
 
 Nicolás Golott
-Phoenix IA Method`
+Phoenix IA Method
+
+Política de privacidad: https://phoenixiamethod.cl/privacidad`
 
   const html = `<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#120B07;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#120B07;padding:32px 16px;"><tr><td align="center">
@@ -108,7 +110,7 @@ Phoenix IA Method`
       : ''
   }
   <tr><td style="padding:18px 32px 0;"><a href="${escapar(agregar)}" style="font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#F26522;">Agregar a mi calendario →</a></td></tr>
-  <tr><td style="padding:26px 32px 32px;"><p style="margin:0;padding-top:20px;border-top:1px solid rgba(248,244,241,.12);font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#B39C90;">¿Necesitas moverla? Responde este correo.<br><br>Nicolás Golott<br><span style="color:#FFC46B;">Phoenix IA Method</span></p></td></tr>
+  <tr><td style="padding:26px 32px 32px;"><p style="margin:0;padding-top:20px;border-top:1px solid rgba(248,244,241,.12);font:400 13px/1.6 Helvetica,Arial,sans-serif;color:#B39C90;">¿Necesitas moverla? Responde este correo.<br><br>Nicolás Golott<br><span style="color:#FFC46B;">Phoenix IA Method</span><br><a href="https://phoenixiamethod.cl/privacidad" style="color:#F26522;">Política de privacidad</a></p></td></tr>
 </table></td></tr></table></body></html>`
 
   await enviarCorreo({

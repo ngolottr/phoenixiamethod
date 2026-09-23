@@ -160,6 +160,12 @@ export function Nav({
             <b>{scene.num}</b> / {SCENES.length.toString().padStart(2, '0')} — {scene.label}
             <span className="ticker-bloque"> · {BLOQUES[scene.bloque].titulo}</span>
           </span>
+          {/* Visible en todas las escenas, no solo junto a los formularios: quien
+              quiera saber qué se hace con sus datos no tiene por qué llegar
+              hasta el contacto para encontrarlo. */}
+          <a className="ticker-legal" href="/privacidad">
+            Privacidad
+          </a>
         </div>
       </div>
 
