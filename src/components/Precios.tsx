@@ -139,7 +139,8 @@ function Comprar({
         {/* Quien está a punto de pagar merece saber exactamente qué sigue. */}
         <p className="compra-nota">
           Te lleva a <strong>Flow</strong>, la pasarela chilena, para pagar con tarjeta o
-          transferencia. Los datos de tu tarjeta no pasan nunca por este sitio.
+          transferencia. Los datos de tu tarjeta no pasan nunca por este sitio.{' '}
+          <a href="/privacidad" target="_blank" rel="noopener">Política de privacidad</a>.
         </p>
       </div>
     </div>,

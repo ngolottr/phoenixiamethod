@@ -141,17 +141,17 @@ conversamos.</h1>
 
         <div class="field">
           <label for="ag-nombre">Tu nombre</label>
-          <input id="ag-nombre" name="nombre" required value="${escapar(params.get('nombre') || '')}" placeholder="Cómo te llamas" autocomplete="name" />
+          <input id="ag-nombre" name="nombre" required maxlength="80" value="${escapar(params.get('nombre') || '')}" placeholder="Cómo te llamas" autocomplete="name" />
         </div>
 
         <div class="field">
           <label for="ag-email">Tu correo</label>
-          <input id="ag-email" name="email" type="email" required value="${escapar(params.get('email') || '')}" placeholder="tu@correo.com" autocomplete="email" />
+          <input id="ag-email" name="email" type="email" required maxlength="254" value="${escapar(params.get('email') || '')}" placeholder="tu@correo.com" autocomplete="email" />
         </div>
 
         <div class="field">
           <label for="ag-tema">Qué quieres resolver <span class="ag-opt">(opcional)</span></label>
-          <textarea id="ag-tema" name="tema" placeholder="Así llego con contexto a la reunión">${escapar(params.get('tema') || '')}</textarea>
+          <textarea id="ag-tema" name="tema" maxlength="2000" placeholder="Así llego con contexto a la reunión">${escapar(params.get('tema') || '')}</textarea>
         </div>
 
         <input type="hidden" id="ag-presupuesto" value="${escapar(params.get('presupuesto') || '')}" />
@@ -162,6 +162,7 @@ conversamos.</h1>
             ${estado.enviando ? 'Confirmando…' : 'Confirmar reunión'} <span class="arrow">→</span>
           </button>
           <p class="field-error" id="ag-error" hidden></p>
+          <p class="form-note">Al confirmar aceptas la <a href="/privacidad" target="_blank" rel="noopener">política de privacidad</a>.</p>
         </div>
       </form>
     </main>`

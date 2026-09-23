@@ -33,15 +33,19 @@
 import { contarDesdeServidor, equipoDe, lugar, navegadorDe, registrarCliente, sistemaDe } from './_estadisticas.js'
 import {
   MAX_ENLACES,
+  PRESUPUESTOS,
   RE_EMAIL,
+  aplicarCors,
+  correoValido,
   cuentaEnlaces,
   cuerpoDemasiadoGrande,
   fallo,
   ipDe,
   limpiarLinea,
   limpiarTexto,
-  pasaLosCupos,
+  pasaLosCuposCompartidos,
   sinCache,
+  validarCampos,
   vieneDeLaWeb,
 } from './_seguridad.js'
 
@@ -50,7 +54,7 @@ const RE_SESION = /^[A-Za-z0-9_-]{8,40}$/
 
 export const config = { maxDuration: 20 }
 
-const LIMITES = { nombre: 80, email: 160, mensaje: 2000, presupuesto: 80 }
+const LIMITES = { nombre: 80, email: 254, mensaje: 2000, presupuesto: 80 }
 
 /* Cuánto se puede usar esta función. Ya no gasta dos correos del cupo diario de
    Brevo por solicitud, solo uno (el tuyo), así que el tope global deja mucho
@@ -204,6 +208,7 @@ async function enviar({ apiKey, para, nombrePara, asunto, texto, html, responder
 
 export default async function handler(req, res) {
   sinCache(res)
+  if (aplicarCors(req, res, 'POST')) return
 
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Método no permitido' })
@@ -228,11 +233,16 @@ export default async function handler(req, res) {
     return fallo(res, 400, 'No pude leer el formulario.')
   }
 
+  // Cada campo tiene que ser texto y caber en su largo. Lo que no, se rechaza
+  // entero en vez de recortarse: nadie lo manda llenando el formulario.
+  const malos = validarCampos(cuerpo, { ...LIMITES, web: 200, sesion: 40, desde: 20 })
+  if (malos.length) return fallo(res, 400, 'Revisa los datos del formulario.', `campos raros: ${malos}`)
+
   const datos = {
     // Nombre y presupuesto viajan al asunto y al remitente de respuesta: ahí un
     // salto de línea es una inyección de cabeceras, no un salto de línea.
     nombre: limpiarLinea(cuerpo.nombre, LIMITES.nombre),
-    email: limpiarLinea(cuerpo.email, LIMITES.email),
+    email: correoValido(cuerpo.email),
     presupuesto: limpiarLinea(cuerpo.presupuesto, LIMITES.presupuesto),
     mensaje: limpiarTexto(cuerpo.mensaje, LIMITES.mensaje),
   }
@@ -241,6 +251,7 @@ export default async function handler(req, res) {
   if (datos.nombre.length < 2) errores.push('nombre')
   if (!RE_EMAIL.test(datos.email)) errores.push('email')
   if (datos.mensaje.length < 12) errores.push('mensaje')
+  if (!PRESUPUESTOS.has(String(cuerpo.presupuesto ?? '').trim())) errores.push('presupuesto')
   if (errores.length) {
     return res.status(400).json({ ok: false, error: `Datos incompletos: ${errores.join(', ')}` })
   }
@@ -275,7 +286,7 @@ export default async function handler(req, res) {
   }
 
   const ip = ipDe(req)
-  const permitido = pasaLosCupos([
+  const permitido = await pasaLosCuposCompartidos([
     [`contacto:ip:${ip}`, ...CUPO_IP],
     [`contacto:mail:${datos.email.toLowerCase()}`, ...CUPO_CORREO],
     ['contacto:total', ...CUPO_TOTAL],

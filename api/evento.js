@@ -22,7 +22,7 @@ import {
   registrar,
   sistemaDe,
 } from './_estadisticas.js'
-import { cuerpoDemasiadoGrande, ipDe, pasaLosCupos, sinCache, vieneDeLaWeb } from './_seguridad.js'
+import { aplicarCors, cuerpoDemasiadoGrande, ipDe, pasaLosCupos, sinCache, vieneDeLaWeb } from './_seguridad.js'
 
 const RE_SESION = /^[A-Za-z0-9_-]{8,40}$/
 
@@ -69,6 +69,7 @@ const TECHO_DIARIO = 3000
 export default async function handler(req, res) {
   sinCache(res)
   const listo = () => res.status(204).end()
+  if (aplicarCors(req, res, 'POST')) return
 
   if (req.method !== 'POST') return res.status(405).end()
   if (!hayAlmacen()) return listo()

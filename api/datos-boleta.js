@@ -27,7 +27,15 @@ import { CORREO_NICOLAS, enviarCorreo, escapar } from './_correo.js'
 import { PRECIOS } from './_precios.js'
 import { formatearRut, rutValido } from './_rut.js'
 import { hayAlmacen, redis } from './_estadisticas.js'
-import { ipDe, limpiarLinea, pasaLosCupos, sinCache, vieneDeLaWeb } from './_seguridad.js'
+import {
+  cuerpoDemasiadoGrande,
+  ipDe,
+  limpiarLinea,
+  pasaLosCuposCompartidos,
+  sinCache,
+  validarCampos,
+  vieneDeLaWeb,
+} from './_seguridad.js'
 
 const RETENCION = 0.1525
 
@@ -86,6 +94,7 @@ function responder(res, estado, datos) {
 export default async function handler(req, res) {
   sinCache(res)
   if (req.method !== 'POST') return res.status(405).end()
+  if (cuerpoDemasiadoGrande(req)) return res.status(413).end()
 
   /* El formulario va sin JavaScript —la política de seguridad del sitio no
      permite scripts sueltos— así que llega como formulario clásico. */
@@ -101,7 +110,17 @@ export default async function handler(req, res) {
   }
 
   const ip = ipDe(req)
-  if (!pasaLosCupos([[`boleta:ip:${ip}`, 10, 30 * 60000], ['boleta:total', 60, 60 * 60000]])) {
+  // Cada campo tiene que ser texto y caber en su largo; si no, ni se mira.
+  if (validarCampos(b, { token: 120, rut: 20, nombre: 120, direccion: 160, comuna: 80, region: 80 }).length) {
+    return responder(res, 400, {
+      titulo: 'Esos datos',
+      enfasis: 'no me cuadran.',
+      cuerpo: 'Vuelve atrás y revísalos, o escríbeme y los tomo por correo. Tu pago está hecho igual.',
+      tono: 'alto',
+    })
+  }
+
+  if (!(await pasaLosCuposCompartidos([[`boleta:ip:${ip}`, 10, 30 * 60000], ['boleta:total', 60, 60 * 60000]]))) {
     return responder(res, 429, {
       titulo: 'Demasiados',
       enfasis: 'intentos.',

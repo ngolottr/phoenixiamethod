@@ -95,6 +95,7 @@ export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
         <input
           id={id('name')}
           name="name"
+          maxLength={80}
           value={values.name}
           onChange={set('name')}
           onBlur={blur('name')}
@@ -115,6 +116,7 @@ export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
         <input
           id={id('email')}
           name="email"
+          maxLength={254}
           type="email"
           value={values.email}
           onChange={set('email')}
@@ -147,6 +149,7 @@ export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
         <textarea
           id={id('msg')}
           name="message"
+          maxLength={2000}
           value={values.message}
           onChange={set('message')}
           onBlur={blur('message')}
@@ -182,7 +185,10 @@ export function ContactForm({ idPrefix = 'f' }: { idPrefix?: string }) {
         <MagneticButton type="submit" className="btn solid" disabled={yendo}>
           {yendo ? 'Un momento…' : 'Elegir mi horario'} <span className="arrow">→</span>
         </MagneticButton>
-        <p className="form-note">{contact.formNote}</p>
+        <p className="form-note">
+          {contact.formNote} Al enviar aceptas la{' '}
+          <a href="/privacidad" target="_blank" rel="noopener">política de privacidad</a>.
+        </p>
       </div>
     </form>
   )

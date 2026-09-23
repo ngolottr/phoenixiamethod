@@ -23,13 +23,14 @@ import {
   leerPeriodo,
   paseValido,
 } from './_estadisticas.js'
-import { cuerpoDemasiadoGrande, dentroDelCupo, fallo, ipDe, sinCache, vieneDeLaWeb } from './_seguridad.js'
+import { aplicarCors, cuerpoDemasiadoGrande, dentroDelCupo, fallo, ipDe, sinCache, vieneDeLaWeb } from './_seguridad.js'
 
 const RANGOS = [1, 7, 30, 90]
 
 export default async function handler(req, res) {
   sinCache(res)
   res.setHeader('X-Robots-Tag', 'noindex')
+  if (aplicarCors(req, res)) return
 
   if (req.method === 'POST') {
     if (!vieneDeLaWeb(req) || cuerpoDemasiadoGrande(req)) return fallo(res, 403, 'No permitido.')

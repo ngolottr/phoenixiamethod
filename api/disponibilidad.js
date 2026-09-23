@@ -6,7 +6,7 @@
 
 import { tramosOcupados } from './_google.js'
 import { calcularHuecos, DIAS_A_MOSTRAR, DURACION_MIN, ZONA } from './_agenda.js'
-import { fallo, ipDe, pasaLosCupos } from './_seguridad.js'
+import { aplicarCors, fallo, ipDe, pasaLosCuposCompartidos } from './_seguridad.js'
 
 export const config = { maxDuration: 15 }
 
@@ -15,11 +15,12 @@ export const config = { maxDuration: 15 }
 const CUPO_IP = [40, 5 * 60000]
 
 export default async function handler(req, res) {
+  if (aplicarCors(req, res, 'GET')) return
   if (req.method !== 'GET') {
     return res.status(405).json({ ok: false, error: 'Método no permitido' })
   }
 
-  if (!pasaLosCupos([[`disponibilidad:ip:${ipDe(req)}`, ...CUPO_IP]])) {
+  if (!(await pasaLosCuposCompartidos([[`disponibilidad:ip:${ipDe(req)}`, ...CUPO_IP]]))) {
     res.setHeader('Retry-After', '60')
     return res.status(429).json({ ok: false, error: 'Demasiadas consultas. Recarga en un minuto.' })
   }

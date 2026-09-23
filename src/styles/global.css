@@ -2338,6 +2338,8 @@ html[data-motion='reduced'] .cita-texto { animation: none; }
 
 .form-foot { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 4px; }
 .form-note { font-size: 10px; line-height: 1.7; color: rgba(143,167,155,.75); max-width: 34ch; }
+/* El enlace a la política de privacidad: sin subrayado se pierde en el texto chico. */
+.form-note a, .compra-nota a { text-decoration: underline; text-underline-offset: 2px; }
 .form-ok {
   font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: var(--amb-accent);
   animation: rise .6s var(--ease) backwards;

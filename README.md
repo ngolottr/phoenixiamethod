@@ -405,6 +405,10 @@ Google Calendar. Todo lo que hay en `api/_seguridad.js` existe por eso.
 | XSS en la página de reserva | Escapado en todo lo que entra por `innerHTML` + `Content-Security-Policy` |
 | Que la web sea incrustada en otro sitio para engañar a alguien | `frame-ancestors 'none'` y `X-Frame-Options: DENY` |
 | Que la llave de publicación quede escrita en registros e historial | `api/publicar.js` solo acepta la cabecera `Authorization`, y compara en tiempo constante |
+| Que otra web llame a las funciones desde el navegador de un visitante | `aplicarCors()`: solo los dominios de `anfitrionesPermitidos()` reciben `Access-Control-Allow-Origin` (nunca `*`); la consulta previa de cualquier otro origen recibe 403 |
+| Datos con forma trucha (objetos, listas, textos gigantes, presupuestos inventados) | `validarCampos()` rechaza en vez de recortar; `correoValido()` valida el correo tal como llegó; `PRESUPUESTOS` es lista cerrada |
+| Guardar HTML o caracteres invisibles que engañen en el panel o en un correo | `limpiarTexto()` normaliza Unicode y saca control, invisibles (bidi, ancho cero) y etiquetas antes de guardar |
+| Que un script en el HTML (inyectado o de un tercero) se ejecute | CSP `script-src 'self'` + `script-src-attr 'none'`: nada inline, ni `onclick=` |
 
 **Los cupos, en números**
 
@@ -412,11 +416,16 @@ Google Calendar. Todo lo que hay en `api/_seguridad.js` existe por eso.
 - Reserva: 4 por IP cada hora, 2 al día por dirección, 25 al día en total.
 - Disponibilidad: 40 por IP cada 5 minutos.
 
-**Lo que estos cupos NO son.** Viven en la memoria de la función. Una función sin
-servidor puede arrancar en varias máquinas a la vez y reiniciarse cuando quiera,
-así que frenan el abuso corriente —un bot repitiendo el formulario— pero no a
-alguien decidido repartiendo la carga entre muchas IP. Para eso está el firewall
-de Vercel, que es una casilla en el panel:
+- Pago: 8 por IP cada 30 min, 8 por correo cada hora, 60 por hora en total.
+- Datos para la boleta: 10 por IP cada 30 min, 60 por hora en total.
+
+**Tres pisos.** Desde el 23/09/2026 los cupos de contacto, reserva, pago, boleta
+y disponibilidad se cuentan dos veces: en la memoria de la función (gratis, pero
+cada máquina lleva su propia cuenta) y en Redis con `pasaLosCuposCompartidos()`,
+que vale para todas las máquinas a la vez. En Redis las claves van con hash: no
+queda escrita ninguna IP ni ningún correo. Si Redis se cae, queda el piso en
+memoria. El tercer piso es el firewall de Vercel, que frena antes de que la
+función siquiera arranque:
 
 - [x] **Hecho el 2026-09-07.** Vercel → proyecto `phoenixiamethod` (entonces `elgolott`) → **Firewall** →
       **Reglas** → regla `Límite de la API`: si la ruta empieza con `/api`,
@@ -426,6 +435,24 @@ de Vercel, que es una casilla en el panel:
       sola** regla de límite de velocidad, así que esa es la que hay.
 - [ ] Vercel → **Firewall** → activar **Attack Challenge Mode** si alguna vez ves
       tráfico raro en los registros. Es un interruptor, no hay que configurarlo.
+
+### Privacidad
+
+La política vive en `public/privacidad.html` (servida en `/privacidad`) y está
+enlazada desde el formulario de contacto, la agenda, la ventana de compra y el
+formulario de la boleta. Describe exactamente lo que hace `api/`: **si una
+función empieza a guardar o compartir un dato nuevo, o se suma un servicio, se
+actualiza esa página en el mismo commit.**
+
+**Por qué no hay "Row Level Security".** RLS es una función de Postgres
+(Supabase y similares) y este sitio no tiene base de ese tipo ni cuentas de
+usuario: guarda en Redis, que solo tocan las funciones del servidor con un token
+que vive en variables de entorno. El equivalente acá es que cada dato tiene una
+sola puerta: las estadísticas y los contactos solo con el pase firmado del
+panel; los datos de la boleta solo con un token de Flow cuyo pago Flow confirma;
+la pantalla de pago listo solo muestra el pago del token que la abrió. Si algún
+día el sitio tiene cuentas de clientes con Supabase, **RLS se activa en cada
+tabla desde el primer día**, con políticas `auth.uid() = user_id`.
 
 ### Auditoría del 17/09/2026 (dominio .cl y estadísticas)
 

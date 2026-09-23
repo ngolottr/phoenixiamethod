@@ -13,7 +13,10 @@ import { esHuecoValido, DURACION_MIN, partesEnChile } from './_agenda.js'
 import { CORREO_NICOLAS, enviarCorreo, escapar, enlaceAgregarACalendario } from './_correo.js'
 import {
   MAX_ENLACES,
+  PRESUPUESTOS,
   RE_EMAIL,
+  aplicarCors,
+  correoValido,
   cuentaEnlaces,
   cuerpoDemasiadoGrande,
   esEnlaceSeguro,
@@ -21,8 +24,9 @@ import {
   ipDe,
   limpiarLinea,
   limpiarTexto,
-  pasaLosCupos,
+  pasaLosCuposCompartidos,
   sinCache,
+  validarCampos,
   vieneDeLaWeb,
 } from './_seguridad.js'
 
@@ -140,6 +144,7 @@ Ya está en tu calendario de clientes.${enlaceReunion ? `\nEnlace: ${enlaceReuni
 
 export default async function handler(req, res) {
   sinCache(res)
+  if (aplicarCors(req, res, 'POST')) return
 
   if (req.method !== 'POST') {
     return res.status(405).json({ ok: false, error: 'Método no permitido' })
@@ -161,14 +166,18 @@ export default async function handler(req, res) {
     return fallo(res, 400, 'No pude leer la reserva.')
   }
 
+  const malos = validarCampos(cuerpo, { nombre: 80, email: 254, tema: 2000, presupuesto: 80, inicio: 40, web: 200, sesion: 40 })
+  if (malos.length) return fallo(res, 400, 'Revisa los datos de la reserva.', `campos raros: ${malos}`)
+
   const nombre = limpiarLinea(cuerpo.nombre, 80)
-  const email = limpiarLinea(cuerpo.email, 160)
+  const email = correoValido(cuerpo.email)
   const tema = limpiarTexto(cuerpo.tema, 1000)
   const presupuesto = limpiarLinea(cuerpo.presupuesto, 80)
   const inicioISO = limpiarLinea(cuerpo.inicio, 40)
 
   if (nombre.length < 2) return res.status(400).json({ ok: false, error: 'Falta tu nombre.' })
   if (!RE_EMAIL.test(email)) return res.status(400).json({ ok: false, error: 'Ese correo no es válido.' })
+  if (!PRESUPUESTOS.has(String(cuerpo.presupuesto ?? '').trim())) return res.status(400).json({ ok: false, error: 'Elige un presupuesto de la lista.' })
 
   // Antes se le pasaba a Google cualquier cosa que llegara: una fecha ilegible
   // reventaba la función y devolvía el error interno como respuesta.
@@ -185,7 +194,7 @@ export default async function handler(req, res) {
   }
 
   const ip = ipDe(req)
-  const permitido = pasaLosCupos([
+  const permitido = await pasaLosCuposCompartidos([
     [`reservar:ip:${ip}`, ...CUPO_IP],
     [`reservar:mail:${email.toLowerCase()}`, ...CUPO_CORREO],
     ['reservar:total', ...CUPO_TOTAL],

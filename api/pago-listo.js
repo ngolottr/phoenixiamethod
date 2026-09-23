@@ -89,6 +89,7 @@ function formularioBoleta(token) {
           <label>Región<input name="region" maxlength="80" autocomplete="address-level1" /></label>
         </div>
         <button type="submit">Enviar mis datos</button>
+        <p class="bo-d">Solo los uso para emitir tu boleta. <a href="/privacidad" target="_blank" rel="noopener">Política de privacidad</a>.</p>
       </form>`
 }
 
@@ -154,6 +155,7 @@ function pagina(clave, orden, token = '') {
       .bo { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--linea); }
       .bo-t { font-family: Georgia, serif; font-size: 20px; color: var(--arena); margin: 0 0 8px; }
       .bo-d { font-size: 13px; margin-bottom: 20px; }
+      .bo-d a { color: var(--acento); }
       .bo label { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;
                   font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--humo); }
       .bo input { width: 100%; padding: 11px 13px; border-radius: 3px;

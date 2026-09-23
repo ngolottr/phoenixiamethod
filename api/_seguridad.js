@@ -15,12 +15,15 @@
      4. Errores mudos: el detalle queda en el registro del servidor, nunca en la
         respuesta, para no ir contando por dentro cómo está armado esto.
 
-   Sobre el punto 1: esto vive en memoria, y una función sin servidor puede
-   arrancar en varias máquinas a la vez o reiniciarse. O sea que frena de golpe
-   el abuso normal — un bot repitiendo el mismo formulario — pero no es una
-   muralla. La muralla de verdad se activa en el panel de Vercel (Firewall →
-   Rate Limiting), y está anotada en el README.
+   Sobre el punto 1: hay dos pisos. El primero vive en memoria y es gratis,
+   pero una función sin servidor puede arrancar en varias máquinas a la vez o
+   reiniciarse, así que solo frena el abuso torpe. El segundo vive en la base
+   (Redis) y vale para todas las máquinas a la vez: ese es el que no se esquiva
+   repartiendo las peticiones. Ver `pasaLosCuposCompartidos`.
    ========================================================================== */
+
+import crypto from 'node:crypto'
+import { hayAlmacen, redis } from './_estadisticas.js'
 
 /* --- Límite de frecuencia -------------------------------------------------- */
 
@@ -68,6 +71,76 @@ export function pasaLosCupos(reglas) {
     if (!dentroDelCupo(clave, maximo, ventana)) return false
   }
   return true
+}
+
+/**
+ * Los mismos cupos, pero contados en la base: valen para todas las copias de
+ * la función a la vez. Ventana fija (se reinicia al terminar cada ventana),
+ * que cuesta dos comandos por regla y alcanza de sobra para esto.
+ *
+ * Las claves van pasadas por un hash: en la base no queda escrita ninguna IP
+ * ni ningún correo, solo un resumen que no se puede revertir.
+ *
+ * Si la base no responde, deja pasar: el piso en memoria ya se aplicó, y un
+ * formulario caído por culpa de Redis es peor que un cupo menos estricto.
+ */
+export async function pasaLosCuposCompartidos(reglas, ahora = Date.now()) {
+  if (!pasaLosCupos(reglas)) return false
+  if (!hayAlmacen() || !reglas.length) return true
+  const comandos = []
+  for (const [clave, , ventana] of reglas) {
+    const tramo = Math.floor(ahora / ventana)
+    const k = `rl:${crypto.createHash('sha256').update(clave).digest('hex').slice(0, 24)}:${tramo}`
+    comandos.push(['INCR', k], ['EXPIRE', k, Math.ceil(ventana / 1000)])
+  }
+  try {
+    const salida = await redis(comandos)
+    return reglas.every(([, maximo], i) => Number(salida[i * 2]) <= maximo)
+  } catch (e) {
+    console.error('[seguridad] cupo compartido sin base →', e.message)
+    return true
+  }
+}
+
+/* --- CORS ------------------------------------------------------------------ */
+
+/**
+ * Quién puede llamar a estas funciones desde JavaScript en un navegador: solo
+ * esta web. El formulario y el sitio viven en el mismo dominio que las
+ * funciones, así que para ellos CORS ni siquiera entra en juego; lo que hace
+ * esto es cerrarle la puerta explícitamente a cualquier otra página.
+ *
+ *   - Nunca se contesta `Access-Control-Allow-Origin: *`.
+ *   - Si el origen está en la lista, se le devuelve ese mismo origen.
+ *   - Si no está, no se pone ninguna cabecera: el navegador bloquea la
+ *     respuesta y la otra página no puede leer nada.
+ *   - La consulta previa (OPTIONS) de un origen ajeno recibe 403.
+ *
+ * Devuelve true si ya contestó (fue una consulta previa) y el handler debe
+ * terminar ahí.
+ */
+export function aplicarCors(req, res, metodos = 'GET, POST') {
+  res.setHeader('Vary', 'Origin')
+  const origen = String(req.headers.origin || '')
+  let permitido = false
+  if (origen) {
+    try {
+      permitido = anfitrionesPermitidos().includes(new URL(origen).host)
+    } catch {
+      permitido = false
+    }
+  }
+  if (permitido) {
+    res.setHeader('Access-Control-Allow-Origin', origen)
+    res.setHeader('Access-Control-Allow-Methods', metodos)
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    res.setHeader('Access-Control-Max-Age', '600')
+  }
+  if (req.method === 'OPTIONS') {
+    res.status(permitido ? 204 : 403).end()
+    return true
+  }
+  return false
 }
 
 /* --- Origen ---------------------------------------------------------------- */
@@ -164,14 +237,29 @@ export function cuerpoDemasiadoGrande(req) {
 const CONTROL = new RegExp('[\u0000-\u0009\u000B-\u001F\u007F]', 'g')
 const RENGLON = new RegExp('[\u000A\u000D\u0085\u2028\u2029]', 'g')
 
+/* Caracteres invisibles: los de ancho cero y los que invierten el sentido de
+   la escritura. Con ellos un nombre o un enlace se ve distinto de lo que es
+   —la vieja treta de "factura[U+202E]fdp.exe"— y en un correo o en el panel
+   eso es un engaño servido. Nadie los escribe a propósito en un formulario. */
+const INVISIBLES = new RegExp('[\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]', 'g')
+/* Etiquetas de HTML. Todo lo que se muestra se escapa igual al pintarlo (en el
+   panel, en los correos), así que esto es un segundo cinturón: lo que entra a
+   la base ya viene sin etiquetas, por si algún día otro programa lo lee sin
+   escapar. Solo caza etiquetas de verdad: "<3" o "x < 5" quedan intactos. */
+const ETIQUETA = /<\/?[a-z!][^<>]*>/gi
+
 /**
- * Limpia un texto libre: recorta, saca los caracteres de control y deja los
- * saltos de línea, que en un mensaje sí tienen sentido.
+ * Limpia un texto libre antes de guardarlo o reenviarlo: normaliza el Unicode,
+ * saca caracteres de control, invisibles y etiquetas de HTML, recorta y deja
+ * los saltos de línea, que en un mensaje sí tienen sentido.
  */
 export function limpiarTexto(valor, max) {
   return String(valor ?? '')
+    .normalize('NFC')
     .replace(/\r/g, '')
     .replace(CONTROL, '')
+    .replace(INVISIBLES, '')
+    .replace(ETIQUETA, '')
     .trim()
     .slice(0, max)
 }
@@ -201,8 +289,56 @@ export function cuentaEnlaces(texto) {
  */
 export const MAX_ENLACES = 2
 
-/** Un correo válido, sin adornos. */
-export const RE_EMAIL = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i
+/**
+ * Un correo válido, sin adornos: solo los caracteres que la norma permite
+ * antes de la arroba, y un dominio hecho de etiquetas normales. Deja fuera
+ * comillas, espacios, <, >, paréntesis y cualquier cosa que sirva para romper
+ * un encabezado o un enlace. El largo se controla aparte (`validarCampos`).
+ */
+export const RE_EMAIL =
+  /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]{1,64}@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\.[a-z]{2,24}$/i
+
+/* --- Validación en el servidor --------------------------------------------- */
+
+/**
+ * El navegador valida para ayudar a la persona; el servidor valida porque a él
+ * le puede llegar cualquier cosa, escrita a mano con una línea de comandos.
+ *
+ * `esquema` es { campo: largoMáximo }. Cada campo que venga tiene que ser
+ * texto (o número) y no pasarse del largo. Un objeto, una lista o un texto
+ * gigante no se recortan en silencio: se rechazan, porque nadie los manda
+ * llenando el formulario. Devuelve la lista de campos que no pasaron.
+ */
+export function validarCampos(cuerpo, esquema) {
+  if (!cuerpo || typeof cuerpo !== 'object' || Array.isArray(cuerpo)) return ['cuerpo']
+  const malos = []
+  for (const [campo, max] of Object.entries(esquema)) {
+    const v = cuerpo[campo]
+    if (v === undefined || v === null || v === '') continue
+    if (typeof v === 'number' && Number.isFinite(v)) continue
+    if (typeof v !== 'string' || v.length > max) malos.push(campo)
+  }
+  return malos
+}
+
+/**
+ * Un correo se valida tal como llegó, no después de limpiarlo: limpiar primero
+ * convertiría "a<b>@x.cl" en "a@x.cl" y lo daría por bueno. Devuelve el correo
+ * si pasa, o '' si no.
+ */
+export function correoValido(valor) {
+  const crudo = typeof valor === 'string' ? valor.trim() : ''
+  return crudo.length <= 254 && RE_EMAIL.test(crudo) ? crudo : ''
+}
+
+/** Las opciones del desplegable de presupuesto. Cualquier otra cosa se rechaza. */
+export const PRESUPUESTOS = new Set([
+  '',
+  'Prefiero conversarlo',
+  'Menos de $300.000',
+  'Entre $300.000 y $1.000.000',
+  'Más de $1.000.000',
+])
 
 /** Que una dirección quepa en un enlace de correo sin sorpresas. */
 export function esEnlaceSeguro(url) {

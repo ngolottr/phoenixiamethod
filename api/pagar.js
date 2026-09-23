@@ -18,12 +18,15 @@ import { cobroDe } from './_precios.js'
 import { crearOrden, hayLlaves, enProduccion } from './_flow.js'
 import {
   RE_EMAIL,
+  aplicarCors,
+  correoValido,
   cuerpoDemasiadoGrande,
   fallo,
   ipDe,
   limpiarLinea,
-  pasaLosCupos,
+  pasaLosCuposCompartidos,
   sinCache,
+  validarCampos,
   vieneDeLaWeb,
 } from './_seguridad.js'
 
@@ -48,6 +51,7 @@ function numeroDeOrden(id) {
 
 export default async function handler(req, res) {
   sinCache(res)
+  if (aplicarCors(req, res, 'POST')) return
 
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Método no permitido' })
   if (!vieneDeLaWeb(req)) return fallo(res, 403, 'No se pudo iniciar el pago.', 'origen no permitido')
@@ -69,20 +73,23 @@ export default async function handler(req, res) {
     return fallo(res, 400, 'No se pudo leer la solicitud.', 'cuerpo ilegible')
   }
 
+  const malos = validarCampos(b, { paquete: 40, email: 254, nombre: 80 })
+  if (malos.length) return fallo(res, 400, 'Revisa tus datos.', `campos raros: ${malos}`)
+
   /* El monto sale de acá dentro, del identificador y de nada más. Si el
      paquete no está en la lista, no está a la venta: los que van a
      conversación no tienen precio que cobrar. */
   const cobro = cobroDe(String(b.paquete || '').slice(0, 40))
   if (!cobro) return fallo(res, 400, 'Ese paquete no se puede pagar en línea.', `paquete raro: ${b.paquete}`)
 
-  const email = limpiarLinea(b.email, 120).toLowerCase()
+  const email = correoValido(b.email).toLowerCase()
   if (!RE_EMAIL.test(email)) return res.status(400).json({ ok: false, error: 'Revisa tu correo.' })
   const nombre = limpiarLinea(b.nombre, 80)
 
   /* Cada intento de pago abre una orden en Flow. Sin tope, un bucle deja el
      panel del comercio lleno de basura y hace ruido en la conciliación. */
   const ip = ipDe(req)
-  if (!pasaLosCupos([[`pagar:ip:${ip}`, 8, 30 * 60000], [`pagar:mail:${email}`, 8, 60 * 60000], ['pagar:total', 60, 60 * 60000]])) {
+  if (!(await pasaLosCuposCompartidos([[`pagar:ip:${ip}`, 8, 30 * 60000], [`pagar:mail:${email}`, 8, 60 * 60000], ['pagar:total', 60, 60 * 60000]]))) {
     return fallo(res, 429, 'Demasiados intentos. Prueba en un rato.', `cupo agotado para ${ip}`)
   }
 
