@@ -533,8 +533,9 @@ curl -X POST -H "Authorization: Bearer TU_CRON_SECRET" https://phoenixiamethod.c
 `api/contacto.js` y `api/reservar.js` cuentan por su cuenta el formulario
 enviado y la reunión reservada, porque son ellas las que saben que de verdad pasó.
 
-**Entrar al panel:** en el sitio, Ajustes (⚙) → *Estadísticas · acceso privado*,
-o directo en `/panel.html`. La contraseña es la variable `ESTADISTICAS_CLAVE` de
+**Entrar al panel:** escribiendo `phoenixiamethod.cl/panel.html` directo en la
+barra de direcciones. No hay ningún enlace visible en el sitio público (el que
+estaba en Ajustes ya no existe). La contraseña es la variable `ESTADISTICAS_CLAVE` de
 Vercel (una copia está en `CLAVE-ESTADISTICAS.txt`, que no se sube a git). Al
 entrar se puede marcar "no contar mis visitas" para ese dispositivo.
 
