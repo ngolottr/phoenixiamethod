@@ -17,10 +17,10 @@
    consultar, que es cuando sí conviene que Flow insista.
    ========================================================================== */
 
-import { PAGADA, estadoDelPago, hayLlaves } from './_flow.js'
+import { PAGADA, estadoDelPago, hayLlaves, tokenValido } from './_flow.js'
 import { CORREO_NICOLAS, enviarCorreo, escapar } from './_correo.js'
 import { PRECIOS } from './_precios.js'
-import { sinCache } from './_seguridad.js'
+import { dentroDelCupo, sinCache } from './_seguridad.js'
 
 /** Lo que Flow guardó cuando se creó la orden. Puede no venir. */
 function extras(datos) {
@@ -118,8 +118,8 @@ export default async function handler(req, res) {
   if (typeof b === 'string') token = new URLSearchParams(b).get('token') || ''
   else token = String(b?.token || '')
 
-  if (!token) {
-    console.error('[pago-confirmado] aviso sin token')
+  if (!tokenValido(token)) {
+    console.error('[pago-confirmado] aviso sin token válido')
     return res.status(400).end()
   }
 
@@ -136,6 +136,12 @@ export default async function handler(req, res) {
     console.log(`[pago-confirmado] orden ${pago.commerceOrder} quedó en estado ${pago.status}, no se avisa`)
     return res.status(200).end()
   }
+
+  /* Un token pagado es válido para siempre: quien lo tenga podría reenviar el
+     aviso en bucle y llenarte la bandeja de "Venta" repetidas. Se corta recién
+     acá, con el pago ya confirmado, para no tragarse el reintento legítimo de
+     Flow cuando la consulta de arriba falló. */
+  if (!dentroDelCupo(`pago-confirmado:${token}`, 1, 24 * 3600000)) return res.status(200).end()
 
   try {
     await avisar(pago, extras(pago))

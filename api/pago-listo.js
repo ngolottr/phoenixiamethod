@@ -19,9 +19,9 @@
    siendo válido. Acá no se avisa a nadie ni se registra ninguna venta.
    ========================================================================== */
 
-import { PAGADA, estadoDelPago, hayLlaves } from './_flow.js'
+import { PAGADA, estadoDelPago, hayLlaves, tokenValido } from './_flow.js'
 import { escapar } from './_correo.js'
-import { sinCache } from './_seguridad.js'
+import { ipDe, pasaLosCupos, sinCache } from './_seguridad.js'
 
 function sitio() {
   return (process.env.SITIO_URL || 'https://phoenixiamethod.cl').trim().replace(/\/$/, '')
@@ -204,7 +204,10 @@ export default async function handler(req, res) {
   else if (b && typeof b === 'object') token = String(b.token || '')
   if (!token && req.query) token = String(req.query.token || '')
 
-  if (!token || !hayLlaves()) return responder(res, 'desconocido')
+  if (!tokenValido(token) || !hayLlaves()) return responder(res, 'desconocido')
+  // Cada visita consulta a Flow con la clave del comercio: sin tope, esta
+  // página sirve para gastar la cuota de la API a punta de recargas.
+  if (!pasaLosCupos([[`pago-listo:ip:${ipDe(req)}`, 20, 10 * 60000]])) return responder(res, 'desconocido')
 
   try {
     const pago = await estadoDelPago(token)

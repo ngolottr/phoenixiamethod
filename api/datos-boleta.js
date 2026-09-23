@@ -22,7 +22,7 @@
    acepta es información sobre una venta que Flow confirma que ocurrió.
    ========================================================================== */
 
-import { PAGADA, estadoDelPago, hayLlaves } from './_flow.js'
+import { PAGADA, estadoDelPago, hayLlaves, tokenValido } from './_flow.js'
 import { CORREO_NICOLAS, enviarCorreo, escapar } from './_correo.js'
 import { PRECIOS } from './_precios.js'
 import { formatearRut, rutValido } from './_rut.js'
@@ -113,7 +113,7 @@ export default async function handler(req, res) {
   /* El pago tiene que ser real. Sin esta vuelta a Flow, cualquiera podría
      llenar la casilla de Nicolás con ventas que nunca ocurrieron. */
   const token = String(b.token || '')
-  if (!token || !hayLlaves()) {
+  if (!tokenValido(token) || !hayLlaves()) {
     return responder(res, 400, {
       titulo: 'No pude',
       enfasis: 'verificar tu pago.',
@@ -229,7 +229,8 @@ export default async function handler(req, res) {
     console.error('[datos-boleta] el correo falló →', e.message)
   }
 
-  console.log(`[datos-boleta] ✅ ${orden} — ${datos.rut}`)
+  // Sin el RUT: el registro de Vercel no es lugar para un dato de identidad.
+  console.log(`[datos-boleta] ✅ ${orden}`)
 
   return responder(res, 200, {
     titulo: 'Gracias.',

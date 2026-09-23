@@ -51,7 +51,12 @@ function enPalabras(inicio) {
 }
 
 /** Confirma al cliente y avisa a Nicolás. */
-async function avisar({ nombre, email, tema, presupuesto, cuando, enlaceReunion, revision }) {
+async function avisar({ nombre, email, tema: temaCompleto, presupuesto, cuando, enlaceReunion, revision }) {
+  /* El correo de confirmación va al correo que escribió el visitante, que puede
+     ser el de cualquiera. Si repitiera un texto con enlaces, esta web serviría
+     para mandarle phishing a un tercero desde tu remitente. Tu copia interna
+     sí lo lleva completo. */
+  const tema = cuentaEnlaces(temaCompleto) ? '' : temaCompleto
   const agregar = enlaceAgregarACalendario({
     titulo: 'Reunión con Nicolás Golott — Phoenix IA Method',
     inicio: revision.inicio,
@@ -120,7 +125,7 @@ Cuándo:       ${cuando}
 Quién:        ${nombre}
 Correo:       ${email}
 Presupuesto:  ${presupuesto || 'No indicado'}
-${tema ? `\nQué quiere resolver:\n${tema}\n` : ''}
+${temaCompleto ? `\nQué quiere resolver:\n${temaCompleto}\n` : ''}
 Ya está en tu calendario de clientes.${enlaceReunion ? `\nEnlace: ${enlaceReunion}` : '\n\nOJO: el evento no tiene enlace de videollamada. Agrégalo antes de la reunión.'}`
 
   await enviarCorreo({

@@ -677,6 +677,10 @@ export function emitirPase(dias = 30) {
 }
 
 export function paseValido(pase) {
+  /* Sin contraseña configurada, la firma usaría el texto de respaldo, que está
+     publicado en GitHub: cualquiera podría fabricarse un pase. Pasa en los
+     despliegues de prueba de Vercel, que comparten la base con producción. */
+  if (enVercel() && !String(process.env.ESTADISTICAS_CLAVE || '').trim()) return false
   const [vence, firma] = String(pase || '').split('.')
   if (!vence || !firma || !/^\d+$/.test(vence)) return false
   if (Number(vence) < Date.now()) return false

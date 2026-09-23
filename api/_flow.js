@@ -119,3 +119,6 @@ export async function estadoDelPago(token) {
 }
 
 export const PAGADA = 2
+
+/** Un token de Flow tiene forma fija. Lo demás no se le reenvía a Flow. */
+export const tokenValido = (t) => /^[A-Za-z0-9]{20,64}$/.test(String(t || ''))

@@ -90,6 +90,7 @@ function escapar(texto) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 }
 
 /* --- La copia que te llega a ti ------------------------------------------ */

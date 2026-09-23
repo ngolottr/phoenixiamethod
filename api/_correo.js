@@ -19,6 +19,7 @@ export function escapar(texto) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 }
 
 export async function enviarCorreo({ para, nombrePara, asunto, texto, html, responderA }) {
