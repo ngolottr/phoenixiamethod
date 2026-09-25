@@ -10,5 +10,6 @@ Disallow: /panel.html
 Disallow: /agendar
 Disallow: /agendar.html
 Disallow: /api/
+Disallow: /muestras/
 
 Sitemap: https://phoenixiamethod.cl/sitemap.xml

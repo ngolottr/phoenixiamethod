@@ -38,6 +38,10 @@
       ]
     },
     {
+      "source": "/muestras/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
       "source": "/(panel|agendar)(.html)?",
       "headers": [
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
