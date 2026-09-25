@@ -69,7 +69,7 @@ export const servicios: Servicio[] = [
       'Si después contratas, se descuenta del proyecto',
     ],
     pago: pago('diagnostico', {
-      letraChica: 'Se paga entero. Si el informe no te sirve, se devuelve.',
+      letraChica: 'Se paga entero. Si después de revisarlo juntos el informe no te sirve, avísame dentro de 7 días y se devuelve completo.',
     }),
     destacado: true,
   },
