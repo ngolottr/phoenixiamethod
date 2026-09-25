@@ -117,3 +117,4 @@ body.diapo.d1 .demo>div:first-child{display:none}
 body.diapo.d1 h1{font-size:64px}
 body.diapo.d1 .tel{width:360px;height:700px;border-radius:56px;padding:13px}
 body.diapo #cierre .cierre{padding:40px 24px}body.diapo #cierre h2{font-size:48px}
+body.diapo #modulos h2{font-size:52px}body.diapo #modulos .lead{font-size:24px}body.diapo #modulos .grid{gap:12px;margin-top:20px}body.diapo #modulos .mod{padding:16px 18px}body.diapo #modulos .mod p{font-size:15px}body.diapo #modulos .mod h4{margin-top:10px;font-size:18px}body.diapo #modulos .mini{min-height:0}body.diapo #modulos{margin-top:-60px}

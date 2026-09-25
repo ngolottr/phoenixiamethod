@@ -26,6 +26,10 @@
       '<div class="fila"><span>' + esc(D.palabras.producto) + '</span><span class="mb" style="margin:0">Pedir</span></div><div class="fila"><span>Estado del pedido</span><span>En camino</span></div>'],
     asistente: ['Asistente que responde al tiro', 'Contesta las preguntas de siempre (horarios, cobertura, cómo reservar) a cualquier hora, y lo difícil se lo pasa a ustedes.',
       '<div class="burb yo">¿Atienden el sábado?</div><div class="burb">¡Sí! El sábado hay horas en la mañana. ¿Te reservo una?</div>'],
+    leads: ['Contactos calificados', 'Cada contacto llega ordenado: qué necesita, para cuándo y si está en su zona. Así atienden primero a los que están listos.',
+      '<div class="fila"><span>' + esc(D.palabras.ejemplo1) + ' · esta semana</span><b style="color:#1e9e5a">A · listo</b></div><div class="fila"><span>Consulta de precios</span><b style="color:#f5a623">B · tibio</b></div><div class="fila"><span>Fuera de zona</span><b style="color:var(--sub)">C</b></div>'],
+    medicion: ['Resultados medibles', 'Un tablero simple con lo que importa: cuántas reservas llegan, de dónde vienen, cuántas se confirman y cuántas horas se recuperan. Se revisa juntos cada mes.',
+      '<b>Este mes</b><div class="fila"><span>Reservas en línea</span><b>—</b></div><div class="fila"><span>Confirmadas por recordatorio</span><b>—</b></div><div class="fila"><span>Llegaron por Google</span><b>—</b></div><div style="font-size:11px;color:var(--sub);margin-top:6px">Se llena con sus datos reales desde el primer día</div>'],
     resenas: ['Más reseñas, sin pedirlas a mano', 'Después de cada atención, un mensaje amable pide la reseña en Google.',
       '<div class="burb">¡Gracias por venir! ¿Nos dejarías tu opinión? Nos ayuda mucho 🙏</div><div class="est">★★★★★</div>']
   };
@@ -104,7 +108,7 @@
 
   // 4 · Todo lo que podemos implementar
   var c4 = el('div');
-  c4.innerHTML = '<div class="k">Todo lo que podemos implementar</div><h2>No es solo una página</h2><p class="lead">Se parte por lo que más les sirve y se suma lo demás cuando haga falta.</p>';
+  c4.innerHTML = '<div class="k">Todo lo que podemos implementar</div><h2>No es solo una página</h2><p class="lead">Todo se mide. Se parte por lo que más les sirve y se suma lo demás cuando los números lo justifiquen.</p>';
   var g = el('div', 'grid');
   D.modulos.forEach(function (k) { var m = MOD[k]; if (!m) return; var d = el('div', 'mod', '<div class="mini">' + m[2] + '</div><h4>' + m[0] + '</h4><p>' + m[1] + '</p>'); g.appendChild(d); });
   c4.appendChild(g);
@@ -116,7 +120,7 @@
     '<div class="flujo"><div><b>1</b><h4>Diagnóstico</h4><p>Entendemos cómo trabajan hoy y qué les cuesta.</p></div>' +
     '<div><b>2</b><h4>Lo dejamos andando</h4><p>Con su información, sus horarios y sus servicios.</p></div>' +
     '<div><b>3</b><h4>Les enseño a usarlo</h4><p>Una sesión práctica y una guía simple con capturas.</p></div>' +
-    '<div><b>4</b><h4>Lo revisamos juntos</h4><p>Acompañamiento el primer mes para ajustar lo que haga falta.</p></div></div>';
+    '<div><b>4</b><h4>Lo medimos juntos</h4><p>Con su tablero de resultados: se revisa cada mes y se ajusta lo que haga falta.</p></div></div>';
   f.appendChild(seccion('como', c5));
 
   // 6 · Cierre
