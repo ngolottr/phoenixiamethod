@@ -1,0 +1,51 @@
+/* Plan de implementación para un cliente (se apoya en muestra.css). */
+.citas{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:32px}
+.cita{background:#fff;border-radius:24px;padding:24px;box-shadow:0 12px 40px rgba(0,0,0,.05)}
+.cita b{display:block;font-size:34px;letter-spacing:-.02em;color:var(--a)}
+.cita span{display:block;font-size:16px;color:var(--sub);margin-top:8px;line-height:1.35}
+.nota{font-size:18px;color:var(--sub);margin-top:22px}
+.nota b{color:var(--txt)}
+.calc{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;margin-top:32px}
+.ctrl,.res{background:#fff;border-radius:28px;padding:28px;box-shadow:0 12px 40px rgba(0,0,0,.05)}
+.ctrl label{display:flex;justify-content:space-between;font-size:16px;font-weight:600;margin-top:18px}
+.ctrl label:first-child{margin-top:0}
+.ctrl output{color:var(--a)}
+.ctrl input{width:100%;margin-top:10px;accent-color:var(--a)}
+.res{background:#1d1d1f;color:#fff;display:flex;flex-direction:column;justify-content:center}
+.res span{font-size:16px;opacity:.8}
+.res b{font-size:56px;letter-spacing:-.03em;margin:8px 0}
+.res small{font-size:13px;opacity:.6;margin-top:18px;line-height:1.4}
+.frentes{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:32px}
+.fr{background:#fff;border-radius:28px;padding:26px;box-shadow:0 12px 40px rgba(0,0,0,.05)}
+.fr .n{width:40px;height:40px;border-radius:50%;background:var(--a);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.fr h3{font-size:21px;margin-top:14px}
+.fr ul{list-style:none;margin-top:10px}
+.fr li{font-size:15px;color:var(--sub);margin-top:10px;padding-left:18px;position:relative;line-height:1.4}
+.fr li:before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:var(--a)}
+.fr li b{color:var(--txt)}
+.fr .ok{font-size:14px;margin-top:14px;color:#1e9e5a;font-weight:600}
+.linea{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:32px}
+.linea div{background:#fff;border-radius:24px;padding:22px;box-shadow:0 12px 40px rgba(0,0,0,.05);border-top:4px solid var(--a)}
+.linea b{font-size:14px;color:var(--a);text-transform:uppercase;letter-spacing:.06em}
+.linea h4{font-size:19px;margin-top:8px}
+.linea p{font-size:15px;color:var(--sub);margin-top:6px;line-height:1.4}
+.opciones{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:32px}
+.op2{background:#fff;border-radius:28px;padding:30px;box-shadow:0 12px 40px rgba(0,0,0,.05)}
+.op2.dest{background:#1d1d1f;color:#fff}
+.op2 .et{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.7}
+.op2 b{display:block;font-size:44px;letter-spacing:-.02em;margin-top:8px}
+.op2 p{font-size:16px;margin-top:10px;line-height:1.45;opacity:.85}
+@media (max-width:860px){.citas{grid-template-columns:1fr 1fr}.calc,.frentes,.opciones{grid-template-columns:1fr}.linea{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.linea{grid-template-columns:1fr}.res b{font-size:46px}}
+/* diapositivas */
+body.diapo .citas{grid-template-columns:1fr 1fr}
+body.diapo .cita b{font-size:44px}body.diapo .cita span{font-size:20px}
+body.diapo .nota{font-size:24px}
+body.diapo .frentes{grid-template-columns:1fr;gap:12px}
+body.diapo .fr{padding:20px 26px}
+body.diapo .fr ul{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+body.diapo .fr li{font-size:17px}
+body.diapo .linea{grid-template-columns:1fr 1fr}
+body.diapo .linea p{font-size:18px}
+body.diapo .op2 p{font-size:19px}
+body.diapo #plan h2{font-size:50px}
