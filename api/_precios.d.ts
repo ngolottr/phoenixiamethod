@@ -6,7 +6,7 @@ export declare const PARTE_ANTICIPO: number
 
 export declare const PRECIOS: Record<
   | 'diagnostico'
-  | 'startup'
+  | 'reborn'
   | 'agentes'
   | 'automatizacion'
   | 'crm'

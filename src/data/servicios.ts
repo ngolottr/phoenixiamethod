@@ -74,13 +74,13 @@ export const servicios: Servicio[] = [
     destacado: true,
   },
 
-  /* El paquete cerrado para pymes (M8). Va justo después del diagnóstico: es
+  /* El paquete cerrado para pymes (M8), Reborn Phoenix. Va justo después del diagnóstico: es
      lo que la mayoría de los negocios chicos necesita, dicho sin tecnicismos y
      con un solo precio. El asistente con IA que conversa queda como el paso
      siguiente (Inteligencia artificial y agentes). */
   {
     icono: 'cohete',
-    titulo: 'Startup para Pymes',
+    titulo: 'Reborn Phoenix · plan para pymes',
     bajada: 'Tu negocio recibe reservas o pedidos solo, desde el celular de tus clientes. Un precio cerrado, sin sorpresas.',
     items: [
       'Tus clientes reservan o piden solos, a cualquier hora',
@@ -90,9 +90,9 @@ export const servicios: Servicio[] = [
       'WhatsApp que responde fuera de horario con tu link',
       'Cartel con QR, te enseño a usarlo y un tablero con tus números',
     ],
-    pago: pago('startup', {
+    pago: pago('reborn', {
       prefijo: undefined,
-      letraChica: 'Partes con $135.000. Los $315.000 restantes, al terminar el primer mes, cuando ya lo viste funcionando. Después, $45.000 al mes, sin permanencia.',
+      letraChica: 'Partes con $135.000. Los $315.000 restantes, al terminar el primer mes, cuando ya lo viste funcionando. Después, $45.000 al mes, sin permanencia. La agenda (AgendaPro, desde $15.900 al mes) la pagas directo a AgendaPro.',
     }),
   },
 

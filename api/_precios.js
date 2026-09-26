@@ -32,9 +32,10 @@ export const PRECIOS = {
   /* --- El paquete cerrado para pymes (M8, 26-09-2026) ---
      Precio fijo, sin "desde": una pyme que recién conoce estas herramientas
      necesita ver un número. Es "Tu agenda en orden" de Carlos convertido en
-     producto. Se cobra el 30 % para partir; el resto, al terminar el primer
-     mes; y la mensualidad de $45.000 se acuerda aparte, sin permanencia. */
-  startup: { nombre: 'Startup para Pymes', total: 450000, cobra: 'anticipo' },
+     producto; su nombre es Reborn Phoenix. Se cobra el 30 % para partir; el resto, al terminar el primer
+     mes; y la mensualidad de $45.000 se acuerda aparte, sin permanencia. La
+     agenda (AgendaPro) la paga el cliente directo: no sale de este precio. */
+  reborn: { nombre: 'Reborn Phoenix · plan para pymes', total: 450000, cobra: 'anticipo' },
 
   /* --- Lo que se construye una vez: se cobra el 30 % y el resto se acuerda --- */
   agentes: { nombre: 'Inteligencia artificial y agentes', total: 590000, cobra: 'anticipo' },
