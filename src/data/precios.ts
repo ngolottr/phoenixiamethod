@@ -102,7 +102,7 @@ export type Pago = {
  */
 export function pago(
   id: IdPaquete,
-  extra: { sufijo?: string; letraChica?: string } = {},
+  extra: { sufijo?: string; letraChica?: string; prefijo?: string } = {},
 ): Pago {
   const p = PRECIOS[id]
   const esAnticipo = p.cobra === 'anticipo'

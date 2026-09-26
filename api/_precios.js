@@ -29,6 +29,13 @@ export const PRECIOS = {
   /* --- La puerta de entrada --- */
   diagnostico: { nombre: 'Diagnóstico Fénix', total: 90000, cobra: 'completo' },
 
+  /* --- El paquete cerrado para pymes (M8, 26-09-2026) ---
+     Precio fijo, sin "desde": una pyme que recién conoce estas herramientas
+     necesita ver un número. Es "Tu agenda en orden" de Carlos convertido en
+     producto. Se cobra el 30 % para partir; el resto, al terminar el primer
+     mes; y la mensualidad de $45.000 se acuerda aparte, sin permanencia. */
+  startup: { nombre: 'Startup para Pymes', total: 450000, cobra: 'anticipo' },
+
   /* --- Lo que se construye una vez: se cobra el 30 % y el resto se acuerda --- */
   agentes: { nombre: 'Inteligencia artificial y agentes', total: 590000, cobra: 'anticipo' },
   automatizacion: { nombre: 'Automatización e integraciones', total: 450000, cobra: 'anticipo' },

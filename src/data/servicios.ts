@@ -74,6 +74,28 @@ export const servicios: Servicio[] = [
     destacado: true,
   },
 
+  /* El paquete cerrado para pymes (M8). Va justo después del diagnóstico: es
+     lo que la mayoría de los negocios chicos necesita, dicho sin tecnicismos y
+     con un solo precio. El asistente con IA que conversa queda como el paso
+     siguiente (Inteligencia artificial y agentes). */
+  {
+    icono: 'cohete',
+    titulo: 'Startup para Pymes',
+    bajada: 'Tu negocio recibe reservas o pedidos solo, desde el celular de tus clientes. Un precio cerrado, sin sorpresas.',
+    items: [
+      'Tus clientes reservan o piden solos, a cualquier hora',
+      'Tu negocio en Google Maps con botón para reservar',
+      'Un aviso en tu celular por cada reserva o pedido',
+      'Recordatorio al cliente para que no se te caigan horas',
+      'WhatsApp que responde fuera de horario con tu link',
+      'Cartel con QR, te enseño a usarlo y un tablero con tus números',
+    ],
+    pago: pago('startup', {
+      prefijo: undefined,
+      letraChica: 'Partes con $135.000. Los $315.000 restantes, al terminar el primer mes, cuando ya lo viste funcionando. Después, $45.000 al mes, sin permanencia.',
+    }),
+  },
+
   /* --- Lo que se construye una vez ---------------------------------------- */
   {
     icono: 'ia',
