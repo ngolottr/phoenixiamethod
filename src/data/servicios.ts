@@ -92,7 +92,7 @@ export const servicios: Servicio[] = [
     ],
     pago: pago('reborn', {
       prefijo: undefined,
-      letraChica: 'Partes con $135.000. Los $315.000 restantes, al terminar el primer mes, cuando ya lo viste funcionando. Después, $45.000 al mes, sin permanencia. La agenda (AgendaPro, desde $15.900 al mes) la pagas directo a AgendaPro.',
+      letraChica: 'Partes con $135.000. Los $315.000 restantes, al terminar el primer mes, cuando ya lo viste funcionando. Después, $45.000 al mes, con un contrato mínimo de 12 meses que te explico antes de firmar. La agenda (AgendaPro, desde $15.900 al mes) la pagas directo a AgendaPro.',
     }),
   },
 
@@ -242,11 +242,11 @@ export const servicios: Servicio[] = [
       'Monitoreo de que los flujos sigan corriendo',
       'Capacitación a tu equipo en IA y herramientas',
       'Reporte mensual de qué pasó y qué conviene cambiar',
-      'Prioridad cuando algo se cae. Sin permanencia',
+      'Prioridad cuando algo se cae',
     ],
     pago: pago('acompanamiento', {
       sufijo: 'al mes',
-      letraChica: 'Se cobra mes a mes. Sin permanencia ni cláusula de salida.',
+      letraChica: 'Se cobra mes a mes, con un contrato mínimo de 12 meses que te explico antes de firmar.',
     }),
   },
 

@@ -241,7 +241,7 @@ export function AvisoPrecios() {
       Precios en pesos chilenos y sin IVA: los servicios se documentan con boleta
       de honorarios. Lo que se construye una vez se publica con «desde», porque
       el alcance mueve el precio, y se reserva con un 30 %; lo mensual es precio
-      cerrado y sin permanencia. El valor en dólares es solo referencia,
+      cerrado, con contrato mínimo de 12 meses. El valor en dólares es solo referencia,
       calculado a ${CAMBIO.clp} por dólar ({CAMBIO.fecha}); el cobro se hace
       siempre en pesos. Si estás fuera de Chile, escríbeme y lo coordinamos.
     </p>

@@ -33,7 +33,7 @@ export const PRECIOS = {
      Precio fijo, sin "desde": una pyme que recién conoce estas herramientas
      necesita ver un número. Es "Tu agenda en orden" de Carlos convertido en
      producto; su nombre es Reborn Phoenix. Se cobra el 30 % para partir; el resto, al terminar el primer
-     mes; y la mensualidad de $45.000 se acuerda aparte, sin permanencia. La
+     mes; y la mensualidad de $45.000 se acuerda aparte, con contrato mínimo de 12 meses (M3 v1.1). La
      agenda (AgendaPro) la paga el cliente directo: no sale de este precio. */
   reborn: { nombre: 'Reborn Phoenix · plan para pymes', total: 450000, cobra: 'anticipo' },
 
@@ -45,7 +45,7 @@ export const PRECIOS = {
   tienda: { nombre: 'Tienda online', total: 1190000, cobra: 'anticipo' },
   branding: { nombre: 'Branding y diseño', total: 390000, cobra: 'anticipo' },
 
-  /* --- Lo que se cobra mes a mes: precio cerrado, sin permanencia ---
+  /* --- Lo que se cobra mes a mes: precio cerrado, contrato mínimo de 12 meses ---
      Estos van sin "desde" a propósito. Un mensual con "desde" no se puede
      cobrar con un clic: el que paga no sabría si lo que se le cobró es su plan
      o el piso de una banda. Acá el plan base tiene un precio, y lo que se salga
