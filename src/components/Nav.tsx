@@ -163,6 +163,11 @@ export function Nav({
           {/* Visible en todas las escenas, no solo junto a los formularios: quien
               quiera saber qué se hace con sus datos no tiene por qué llegar
               hasta el contacto para encontrarlo. */}
+          {/* Las páginas de servicios son estáticas (una por búsqueda en Google);
+              este enlace las conecta con el inicio para que Google las encuentre. */}
+          <a className="ticker-legal" href="/servicios">
+            Servicios
+          </a>
           <a className="ticker-legal" href="/privacidad">
             Privacidad
           </a>
