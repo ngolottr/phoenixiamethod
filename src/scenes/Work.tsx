@@ -187,7 +187,7 @@ export function Work({
         <div className="cta-copy">
           <p className="cta-kicker">¿Hay algo que te esté costando tiempo?</p>
           <p className="cta-line">
-            Cuéntame el problema —no la herramienta— y te digo en un correo si puedo ayudarte.
+            Cuéntame el problema —no la herramienta— y lo vemos juntos en una videollamada uno a uno.
           </p>
         </div>
 
