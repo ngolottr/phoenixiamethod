@@ -55,6 +55,9 @@ const nombreValido = (tipo, n) =>
     : EVENTOS.has(n) ||
       /^abrir_caso:\d{2}$/.test(n) ||
       RE_PAQUETE.test(n) ||
+      // Un prospecto abrió la propuesta que se le mandó por correo
+      // (public/muestras/propuesta-<negocio>-<azar>/).
+      /^propuesta:[a-z0-9-]{3,40}$/.test(n) ||
       (/^enlace:[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(n) && n.length <= 70)
 
 /* --- Techo diario ------------------------------------------------------------
